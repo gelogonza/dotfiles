@@ -131,7 +131,8 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | Key | Action |
 |---|---|
 | `SUPER + R` / `SUPER + D` | command palette |
-| `SUPER + L` | lock |
+| `SUPER + L` | lock (hyprlock) |
+| `SUPER + SHIFT + L` | lock (Quickshell, shader — **untested**, see docs/lock-screen.md) |
 | `SUPER + Q` / `SUPER + Return` | terminal |
 | `SUPER + C` | close window |
 | `SUPER + 1..0` | switch workspace |
@@ -228,11 +229,12 @@ Compositor: `hyprctl configerrors`, `hyprctl layers`.
 
 ## Known gaps
 
-- **hyprlock is unverified.** The config is written and bound to `SUPER+L`, but
-  hyprlock has no dry-run mode and a failed lock can leave a session locked, so
-  it has not been tested end to end. Test it deliberately with
-  `hyprlock --grace 30` — any keypress dismisses it without a password — and
-  keep a TTY available.
+- **Neither lock has been through a real lock/unlock cycle.** hyprlock is bound
+  to `SUPER+L`; the Quickshell lock (with the shader) is on `SUPER+SHIFT+L`.
+  The latter's PAM path is verified to prompt and to reject a wrong password,
+  but only your real password can prove it unlocks. Read
+  **[docs/lock-screen.md](docs/lock-screen.md)** and test with a TTY open before
+  relying on either.
 - **The wallpaper shader does not stop when occluded.** wlr-layer-shell exposes
   no occlusion signal, so it keeps rendering behind maximised windows. If
   battery or thermals matter, replace the `Wallpaper{}` block in `shell.qml`

@@ -8,6 +8,7 @@
 import Quickshell
 import "root:/Bar"
 import "root:/Launcher"
+import "root:/Lock"
 import "root:/Notifications"
 import "root:/PowerMenu"
 import "root:/Wallpaper"
@@ -36,4 +37,7 @@ ShellRoot {
     NotificationLayer {}
 
     PowerMenu {}
+
+    // ext-session-lock client. See docs/lock-screen.md before relying on it.
+    Lock {}
 }
