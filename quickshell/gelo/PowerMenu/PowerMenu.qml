@@ -10,6 +10,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
 import Quickshell.Wayland
 import "root:/Theme"
 import "root:/Components"
@@ -45,12 +46,34 @@ PanelWindow {
     WlrLayershell.keyboardFocus: Ui.powerMenuOpen ? WlrKeyboardFocus.OnDemand
                                                   : WlrKeyboardFocus.None
 
+    // Ordered least to most destructive, so the two that end the session sit
+    // furthest from the pointer's entry point.
+    //
+    // Sleep locks on the way down: hypridle's before_sleep_cmd fires
+    // loginctl lock-session, so the machine never resumes to an open desktop.
     readonly property var entries: [
-        { label: "Lock",     icon: "lock", cmd: "hyprlock" },
-        { label: "Log out",  icon: "logout",     cmd: "hyprctl dispatch exit" },
-        { label: "Reboot",   icon: "reboot",      cmd: "systemctl reboot" },
-        { label: "Shut down", icon: "power",   cmd: "systemctl poweroff" }
+        { label: "Lock",      icon: "lock",   cmd: "hyprlock" },
+        { label: "Sleep",     icon: "sleep",  cmd: "systemctl suspend" },
+        { label: "Log out",   icon: "logout", cmd: "hyprctl dispatch exit" },
+        { label: "Reboot",    icon: "reboot", cmd: "systemctl reboot" },
+        { label: "Shut down", icon: "power",  cmd: "systemctl poweroff" }
     ]
+
+    // Scriptable, and the same handle the bar's power button uses:
+    //     qs -c gelo ipc call power toggle
+    IpcHandler {
+        target: "power"
+
+        function toggle(): void {
+            Ui.powerMenuOpen = !Ui.powerMenuOpen;
+        }
+        function open(): void {
+            Ui.powerMenuOpen = true;
+        }
+        function close(): void {
+            Ui.powerMenuOpen = false;
+        }
+    }
 
     // Click-away.
     MouseArea {

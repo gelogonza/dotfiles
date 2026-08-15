@@ -43,7 +43,7 @@ Item {
     readonly property var ownIcons: [
         "volume-high", "volume-medium", "volume-low", "volume-muted",
         "bluetooth-on", "bluetooth-off",
-        "power", "lock", "logout", "reboot",
+        "power", "lock", "sleep", "logout", "reboot",
         "clipboard", "image",
         "weather-clear", "weather-clouds", "weather-overcast",
         "weather-showers", "weather-snow", "weather-storm", "weather-fog"
