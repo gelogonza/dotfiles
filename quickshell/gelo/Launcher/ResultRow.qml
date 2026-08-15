@@ -1,5 +1,4 @@
 import Quickshell
-import Quickshell.Widgets
 import QtQuick
 import "root:/Theme"
 import "root:/Components"
@@ -7,7 +6,14 @@ import "root:/Components"
 Item {
     id: root
 
-    property var app: null
+    // Generic across providers: the launcher feeds apps or clipboard entries
+    // through the same row rather than shipping two nearly identical delegates.
+    property string title: ""
+    property string subtitle: ""
+    property string iconName: ""
+    // Our own glyphs are tinted; application logos are not.
+    property bool iconTinted: false
+
     property int rowIndex: 0
     property bool selected: false
     property bool staggered: false
@@ -80,15 +86,15 @@ Item {
         amount: root.selected ? 1 : 0
     }
 
-    IconImage {
+    Icon {
         id: icon
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: Tokens.space.lg
-        implicitSize: 20
-        source: root.app && root.app.icon
-            ? Quickshell.iconPath(root.app.icon, true)
-            : ""
+        size: 20
+        tinted: root.iconTinted
+        source: root.iconName.length > 0 ? root.iconName : ""
+        color: Tokens.color.text2
         opacity: root.selected ? 1.0 : 0.8
     }
 
@@ -99,7 +105,7 @@ Item {
         anchors.leftMargin: Tokens.space.md
         width: Math.max(0, comment.x - x - Tokens.space.md)
 
-        text: root.app ? root.app.name : ""
+        text: root.title
         elide: Text.ElideRight
         font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.body
@@ -115,7 +121,7 @@ Item {
         anchors.rightMargin: Tokens.space.lg
         width: Math.min(implicitWidth, root.width * 0.4)
 
-        text: root.app && root.app.comment ? root.app.comment : ""
+        text: root.subtitle
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignRight
         font.family: Tokens.typography.display

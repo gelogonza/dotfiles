@@ -46,6 +46,7 @@ Item {
         "volume-high", "volume-medium", "volume-low", "volume-muted",
         "bluetooth-on", "bluetooth-off",
         "power", "lock", "logout", "reboot",
+        "clipboard", "image",
         "weather-clear", "weather-clouds", "weather-overcast",
         "weather-showers", "weather-snow", "weather-storm", "weather-fog"
     ]
@@ -60,8 +61,18 @@ Item {
         source: {
             if (root.source.length === 0)
                 return "";
-            // Already a path or URL — SystemTray items arrive like this.
-            if (root.source.indexOf("/") >= 0 || root.source.indexOf(":") >= 0)
+            // Already a URL — SystemTray items arrive like this.
+            if (root.source.indexOf(":") >= 0)
+                return root.source;
+
+            // An absolute path needs the file: scheme. Without it IconImage
+            // resolves it against qrc: and silently renders nothing — which is
+            // how desktop entries that use a full icon path (gpsd, some
+            // bundled apps) came out blank.
+            if (root.source.startsWith("/"))
+                return "file://" + root.source;
+
+            if (root.source.indexOf("/") >= 0)
                 return root.source;
             // Our own set takes precedence over the icon theme.
             if (root.ownIcons.indexOf(root.source) >= 0)

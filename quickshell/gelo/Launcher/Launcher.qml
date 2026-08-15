@@ -35,6 +35,11 @@ PanelWindow {
 
     property bool open: false
 
+    // "apps" or "clipboard". The launcher is one UI over two providers rather
+    // than two near-identical pickers; both expose query/results/activate.
+    property string mode: "apps"
+    readonly property var provider: mode === "clipboard" ? Clipboard : Apps
+
     // Stagger is an entrance flourish, not a per-keystroke effect. It plays when
     // the palette opens; while typing, rows swap in immediately.
     property bool staggering: false
@@ -54,10 +59,14 @@ PanelWindow {
     WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive
                                       : WlrKeyboardFocus.None
 
-    function show() {
-        // Clear the field, not Apps.query directly: the field is the source of
-        // truth and its onTextChanged is what pushes the query down. Resetting
-        // the query alone leaves stale text visible above unfiltered results.
+    function show(newMode) {
+        mode = newMode || "apps";
+        if (mode === "clipboard")
+            Clipboard.reload();          // history changes constantly
+
+        // Clear the field, not the provider's query directly: the field is the
+        // source of truth and its onTextChanged is what pushes the query down.
+        // Resetting the query alone leaves stale text above unfiltered results.
         field.text = "";
         list.currentIndex = 0;
         open = true;
@@ -73,6 +82,19 @@ PanelWindow {
     function hide() {
         open = false;
         field.text = "";
+    }
+
+    // Dispatches to whichever provider is active.
+    function activateCurrent(index) {
+        const i = index === undefined ? list.currentIndex : index;
+        const item = provider.results[i];
+        if (!item)
+            return;
+
+        if (mode === "clipboard")
+            Clipboard.activate(item);
+        else
+            Apps.launch(item);
     }
 
     function toggle() {
@@ -95,7 +117,11 @@ PanelWindow {
             launcher.toggle();
         }
         function open(): void {
-            launcher.show();
+            launcher.show("apps");
+        }
+
+        function clipboard(): void {
+            launcher.show("clipboard");
         }
         function close(): void {
             launcher.hide();
@@ -103,7 +129,7 @@ PanelWindow {
 
         // Open pre-filled, e.g. `qs -c gelo ipc call launcher search fire`.
         function search(query: string): void {
-            launcher.show();
+            launcher.show("apps");
             field.text = query;
         }
     }
@@ -206,7 +232,7 @@ PanelWindow {
                 selectedTextColor: Tokens.color.text1
 
                 onTextChanged: {
-                    Apps.query = text;
+                    launcher.provider.query = text;
                     list.currentIndex = 0;
                 }
 
@@ -214,7 +240,8 @@ PanelWindow {
                     anchors.fill: parent
                     verticalAlignment: Text.AlignVCenter
                     visible: field.text.length === 0
-                    text: "Search applications"
+                    text: launcher.mode === "clipboard" ? "Search clipboard history"
+                                                        : "Search applications"
                     font: field.font
                     color: Tokens.color.text2
                 }
@@ -236,7 +263,7 @@ PanelWindow {
                     case Qt.Key_Return:
                     case Qt.Key_Enter:
                         if (list.currentItem) {
-                            Apps.launch(Apps.results[list.currentIndex]);
+                            launcher.activateCurrent();
                             launcher.hide();
                         }
                         event.accepted = true;
@@ -266,7 +293,7 @@ PanelWindow {
             width: parent.width
             height: Math.min(contentHeight, 8 * 40)
 
-            model: Apps.results
+            model: launcher.provider.results
             currentIndex: 0
             clip: true
             interactive: contentHeight > height
@@ -275,14 +302,22 @@ PanelWindow {
                 required property var modelData
                 required property int index
 
-                app: modelData
+                // Apps supply name/comment/icon; clipboard entries supply a
+                // preview and no icon. The row only knows title/subtitle/icon.
+                title: launcher.mode === "clipboard" ? modelData.preview : modelData.name
+                subtitle: launcher.mode === "clipboard" ? "" : (modelData.comment || "")
+                iconName: launcher.mode === "clipboard"
+                    ? (modelData.kind === "image" ? "image" : "clipboard")
+                    : (modelData.icon || "")
+                iconTinted: launcher.mode === "clipboard"
+
                 rowIndex: index
                 width: list.width
                 selected: index === list.currentIndex
                 staggered: launcher.staggering
 
                 onActivated: {
-                    Apps.launch(app);
+                    launcher.activateCurrent(index);
                     launcher.hide();
                 }
                 onHovered: list.currentIndex = index
