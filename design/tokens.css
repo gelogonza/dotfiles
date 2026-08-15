@@ -58,11 +58,10 @@
   --chrome-shadowRadius: 32px;
   --chrome-shadowOpacity: 0.5;
   --chrome-shadowOffsetY: 6px;
-  --glow-radius: 20px;
-  --glow-spread: 1.7;
+  --glow-extent: 14;
   --glow-restOpacity: 0.0;
-  --glow-hoverOpacity: 0.3;
-  --glow-activeOpacity: 1.0;
+  --glow-hoverOpacity: 0.28;
+  --glow-activeOpacity: 0.75;
   --reflection-opacity: 0.16;
   --reflection-heightRatio: 0.55;
   --reflection-gap: 1;

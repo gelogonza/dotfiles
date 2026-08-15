@@ -46,13 +46,8 @@ Item {
                              : hovered ? Tokens.material.glow.hoverOpacity
                                        : Tokens.material.glow.restOpacity
 
-    Behavior on glowOpacity {
-        NumberAnimation {
-            duration: Tokens.motion.duration.base
-            easing.type: Easing.Bezier
-            easing.bezierCurve: Tokens.motion.easeBezier
-        }
-    }
+    // No Behavior here: Glow animates `amount` internally, and easing the same
+    // transition twice makes focus feel laggy.
 
     default property alias content: contentItem.data
 
@@ -80,27 +75,18 @@ Item {
     }
 
     // --- glow -------------------------------------------------------------
-    // A blurred, tinted, scaled copy of the surface sitting behind it.
+    // Delegated to Glow rather than reimplemented. Same directory, so no import
+    // is needed, and it means a focused Chrome surface and a selected launcher
+    // row bloom identically.
     //
-    // Deliberately not a coloured drop shadow: that needs `brightness: -1` to
-    // suppress the copy's own colour, and MultiEffect still paints that
-    // blackened copy over the halo — invisible on a dark surface, a hard black
-    // box on a light one.
-    MultiEffect {
-        source: surface
-        anchors.fill: surface
-        visible: root.glowEnabled && root.glowOpacity > 0
-        opacity: root.glowOpacity
-        autoPaddingEnabled: true
-
-        scale: Tokens.material.glow.spread
-
-        blurEnabled: true
-        blur: 1.0
-        blurMax: Tokens.material.glow.radius
-
-        colorization: 1.0
-        colorizationColor: Tokens.material.glow.tint
+    // This used to be a colourised MultiEffect blur, which samples the
+    // transparent-black surround and fringed the halo grey on a light
+    // background — the same failure documented in Glow.qml.
+    Glow {
+        anchors.fill: parent
+        visible: root.glowEnabled
+        amount: root.glowEnabled ? root.glowOpacity : 0
+        cornerRadius: root.cornerRadius
     }
 
     // --- surface + depth shadow -------------------------------------------

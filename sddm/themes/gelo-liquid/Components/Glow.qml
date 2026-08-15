@@ -36,7 +36,11 @@ Item {
     property real amount: 0
 
     property color tint: Tokens.material.glow.tint
-    property real spread: Tokens.material.glow.spread
+
+    // How far the halo reaches, in pixels. Deliberately absolute: as a ratio
+    // the bloom grew with the element and a wide control ended up wearing a fog
+    // rather than a glow.
+    property real extent: Tokens.material.glow.extent
 
     // Corner radius of the halo rings. Defaults to a pill/disc.
     property real cornerRadius: Math.min(width, height) / 2
@@ -63,9 +67,9 @@ Item {
             readonly property real k: (5 - index) / 5
 
             anchors.centerIn: parent
-            width: root.width * (1 + (root.spread - 1) * k)
-            height: root.height * (1 + (root.spread - 1) * k)
-            radius: root.cornerRadius * (1 + (root.spread - 1) * k)
+            width: root.width + 2 * root.extent * k
+            height: root.height + 2 * root.extent * k
+            radius: root.cornerRadius + root.extent * k
 
             color: root.tint
             // Quadratic falloff approximates a gaussian closely enough at this

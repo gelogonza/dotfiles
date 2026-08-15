@@ -116,11 +116,10 @@ QtObject {
         }
 
         readonly property QtObject glow: QtObject {
-            readonly property int radius: 20
-            readonly property real spread: 1.7
+            readonly property int extent: 14
             readonly property real restOpacity: 0.0
-            readonly property real hoverOpacity: 0.3
-            readonly property real activeOpacity: 1.0
+            readonly property real hoverOpacity: 0.28
+            readonly property real activeOpacity: 0.75
             readonly property color tint: root.color.accent
         }
 
