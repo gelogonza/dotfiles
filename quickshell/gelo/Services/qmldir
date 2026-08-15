@@ -2,3 +2,7 @@
 singleton Git 1.0 Git.qml
 singleton Apps 1.0 Apps.qml
 singleton Ripples 1.0 Ripples.qml
+singleton SysStats 1.0 SysStats.qml
+singleton Audio 1.0 Audio.qml
+singleton Ui 1.0 Ui.qml
+singleton Weather 1.0 Weather.qml
