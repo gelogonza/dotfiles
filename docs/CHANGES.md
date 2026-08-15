@@ -1406,3 +1406,45 @@ Also confirmed end to end: file written non-empty, `wl-paste --list-types`
 reports `image/png` with valid PNG magic, and `notify-send` releases when the
 card's expire timer closes the notification — so a screenshot does not leave a
 blocked process behind.
+
+
+---
+
+# Colour picker (roadmap 2.2)
+
+`SUPER+SHIFT+C` → `hypr/scripts/pick-colour.py`. Hex to the clipboard, and the
+answer to the question that actually comes up when you maintain a palette:
+**is that one of mine, and if not, how far off is it?**
+
+The notification shows a swatch of the picked colour, the hex, the verdict, and
+buttons for copying the hex, the `rgb()` form, or the token name.
+
+## Why CIEDE2000 and not RGB distance
+
+This palette is almost entirely saturated blue, which is the worst case for
+naive colour distance. Two blues far apart numerically can be
+indistinguishable, while a small numeric step across a hue boundary is obvious.
+CIE76 has the same weakness in the blue region — it is the well-known reason
+CIEDE2000 was specified at all. Matching in RGB would have produced confident,
+wrong answers precisely where this palette lives.
+
+Thresholds come from the same literature rather than taste:
+
+| ΔE | verdict |
+|---|---|
+| < 1.0 | below the discrimination threshold — "is" |
+| < 2.3 | the just-noticeable difference — "matches" |
+| ≥ 2.3 | "nearest", with the distance and the runner-up |
+
+Measured against known values: exact tokens come back at ΔE 0.00, `#3579c5`
+(one step off the accent) at 0.38 so it reads as *is* the accent, `#4f7fc0` at
+2.13 so it reads as *matches* `text-2`, and pure red lands 24.56 from the
+nearest ANSI red — far, and correctly reported as far.
+
+## Generic over the token source
+
+The matcher walks `design/tokens.json` collecting every hex-looking value with
+a dotted path, rather than naming the groups it knows about. 37 colours today;
+a colour added to the token source is matchable without touching the script.
+That also means it reports `terminal.ansi[9]`-style names, which are the names
+you would actually go and edit.

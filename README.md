@@ -43,7 +43,9 @@ sudo pacman -S --needed \
 
 Optional: `sddm` (login screen), `nvidia-utils` (the GPU stat hides itself
 without it), `bluez bluez-utils` (the Bluetooth control hides itself without a
-radio).
+radio), `hyprpicker` (`SUPER+SHIFT+C` colour picker), `imagemagick` (colour
+swatch and screenshot dimensions in notifications), `swappy` (adds an Annotate
+button to the screenshot notification).
 
 ---
 
@@ -178,6 +180,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + S` / `Print` | screenshot a region |
 | `SUPER + SHIFT + S` | screenshot everything |
 | `SUPER + ALT + S` | screenshot a window (snaps to window edges) |
+| `SUPER + SHIFT + C` | pick a colour — hex to clipboard, names the nearest token |
 | `SUPER + 1..0` | switch workspace |
 | `SUPER + SHIFT + 1..0` | move window to workspace |
 
