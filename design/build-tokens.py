@@ -139,7 +139,19 @@ def render_qml(t: dict) -> str:
     L += ["        }", "", "        readonly property QtObject weight: QtObject {"]
     for k, v in typo["weight"].items():
         L.append(f"            readonly property int {k}: {v}")
-    L += ["        }", "    }", "", "    readonly property QtObject motion: QtObject {"]
+    L += ["        }", "    }", ""]
+
+    w = t["weather"]
+    L += [
+        "    // See design/tokens.json — this is off by default because turning it",
+        "    // on means talking to a third-party server about where you are.",
+        "    readonly property QtObject weather: QtObject {",
+        f'        readonly property bool enabled: {"true" if w["enabled"] else "false"}',
+        f'        readonly property string location: "{w["location"]}"',
+        "    }",
+        "",
+        "    readonly property QtObject motion: QtObject {",
+    ]
 
     e = motion["ease"]
     L += [
@@ -349,6 +361,10 @@ SHARED_COMPONENTS = {
         ROOT / "quickshell/gelo/Components/Glow.qml": 'root:/Theme',
         ROOT / "sddm/themes/gelo-liquid/Components/Glow.qml": '../Theme',
     },
+    "Icon.qml": {
+        ROOT / "quickshell/gelo/Components/Icon.qml": 'root:/Theme',
+        ROOT / "sddm/themes/gelo-liquid/Components/Icon.qml": '../Theme',
+    },
     "Reflection.qml": {
         ROOT / "quickshell/gelo/Components/Reflection.qml": 'root:/Theme',
         ROOT / "sddm/themes/gelo-liquid/Components/Reflection.qml": '../Theme',
@@ -365,6 +381,20 @@ SHARED_SHADERS = {
         ROOT / "quickshell/gelo/Shaders/xmb.frag",
     ],
 }
+
+
+# Our own icon set. Qt's icon-theme lookup resolves application icons fine but
+# returns nothing for Adwaita's symbolic names — its index.theme only indexes
+# 16x16/scalable/symbolic and Qt finds none of the status glyphs. Owning ~17
+# small SVGs removes that dependency entirely and lets the icons match the
+# geometric type rather than GNOME's house style.
+def render_icons() -> dict:
+    out = {}
+    for src in sorted((ROOT / "design/icons").glob("*.svg")):
+        body = src.read_text()
+        out[ROOT / "quickshell/gelo/icons" / src.name] = body
+        out[ROOT / "sddm/themes/gelo-liquid/icons" / src.name] = body
+    return out
 
 
 def render_shaders() -> dict:
@@ -388,6 +418,8 @@ def render_components() -> dict:
 
         for path, theme_import in targets.items():
             body = source.replace("@THEME@", theme_import)
+            icon_root = "root:/icons/" if "quickshell" in str(path) else "../icons/"
+            body = body.replace("@ICONROOT@", icon_root)
             out[path] = f"// {BANNER.replace('design/tokens.json', 'design/qml/' + name)}\n{body}"
     return out
 
@@ -411,6 +443,7 @@ def main() -> int:
     }
     outputs.update(render_components())
     outputs.update(render_shaders())
+    outputs.update(render_icons())
 
     stale = []
     for path, content in outputs.items():
