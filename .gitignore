@@ -28,3 +28,8 @@ queue.sqlite3
 *~
 *.swp
 .DS_Store
+
+# Upstream 43PR/dotfiles clone, kept locally for reference. It carries its own
+# .git, so committing it would create a nested repo. The parts actually used are
+# extracted into reference/.
+dotfiles/

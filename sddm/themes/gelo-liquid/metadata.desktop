@@ -1,0 +1,11 @@
+[SddmGreeterTheme]
+Name=gelo-liquid
+Description=Liquid-glass login with an animated fluid shader background
+Author=gelo
+Type=sddm-theme
+Version=1.0
+Website=https://github.com/gelogonza/dotfiles
+License=MIT
+QtVersion=qt6
+MainScript=Main.qml
+ConfigFile=theme.conf

@@ -1,0 +1,57 @@
+/* GENERATED FILE — DO NOT EDIT. Source: design/tokens.json (run design/build-tokens.py) */
+
+:root {
+  /* colour */
+  --bg-0: #0d0e12;
+  --bg-1: #16181d;
+  --bg-2: #1f222a;
+  --border: #2a2d36;
+  --text-1: #e8e6e0;
+  --text-2: #8f8d87;
+  --accent: #d97757;
+  --accent-dim: #a85f45;
+
+  /* spacing — 4px grid */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+
+  /* radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+
+  /* type */
+  --font-mono: "JetBrainsMono Nerd Font", monospace;
+  --font-sans: "Inter", sans-serif;
+  --text-caption: 11px;
+  --text-body: 13px;
+  --text-title: 15px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+
+  /* motion */
+  --ease: cubic-bezier(0.16, 1.0, 0.3, 1.0);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 400ms;
+  --stagger: 24ms;
+
+  /* liquid-glass material */
+  --glass-blurRadius: 24px;
+  --glass-backgroundOpacity: 0.68;
+  --glass-borderOpacity: 0.55;
+  --glass-specularOpacity: 0.09;
+  --glass-specularHeight: 1px;
+  --glass-shadowRadius: 32px;
+  --glass-shadowOpacity: 0.45;
+  --glass-shadowOffsetY: 8px;
+  --glass-radiusRest: 12;
+  --glass-radiusHover: 16;
+  --glass-radiusPress: 24;
+}
