@@ -15,9 +15,15 @@ GTK — then you open VS Code and stare at an unrelated palette for eight hours.
 
 | | Target | Approach | Status |
 |---|---|---|---|
-| 1.1 | VS Code | generated theme extension in `vscode/gelo-xmb/` | ◐ generated, not yet installed or verified |
+| 1.1 | VS Code | generated theme extension in `vscode/gelo-xmb/` | ☑ installed and verified |
 | 1.2 | Obsidian | CSS snippet into `Gelo's Vault/.obsidian/snippets/` | ☐ |
-| 1.3 | Spotify | spicetify `color.ini` (spicetify 2.44 already installed) | ☐ |
+| 1.3 | Spotify | spicetify `color.ini` (spicetify 2.44 already installed) | ☑ applied and verified |
+
+⚠️ **Setting `workbench.colorTheme` alone does nothing on this machine.**
+Something in this session reports high contrast to Electron, so VS Code obeys
+`workbench.preferredHighContrastColorTheme` and ignores the normal setting. A
+theme installed the obvious way appears to be a no-op. Both keys must be set.
+See `docs/CHANGES.md`.
 
 **Key decision — the editor is dark, and that is deliberate.** The desktop
 chrome is light; the terminal already is not. The editor theme is derived from
@@ -29,11 +35,13 @@ literally the same greens and reds.
 Rule of thumb this establishes: **surfaces you work *in* are dark; chrome you
 work *with* is light.**
 
-Spicetify carries the only real risk here — it patches the Spotify install
-rather than layering a config, so it needs `spicetify restore` documented before
-it is applied.
+Spicetify carried the only real risk here — it patches the Spotify install
+rather than layering a config. `docs/spotify.md` was written before it was
+applied and covers restore, the backup-invalidation trap, and recovery.
 
-Both currently run **Halcyon**, which is what these replace.
+Obsidian currently runs **Halcyon**, which is what 1.2 replaces. VS Code did
+too, until 1.1 landed; Spotify was on StarryNight/**orange**, which 1.3
+replaced — the one place in the system that was still running a warm hue.
 
 ## 2. Design-engineer workflow tools ☐
 

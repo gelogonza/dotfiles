@@ -15,8 +15,8 @@ It doubles as a portfolio piece, so *why* a thing looks the way it does matters
 as much as that it works.
 
 One file, `design/tokens.json`, generates everything: the shell, the login
-theme, the terminal, GTK apps, the compositor colours, the cursor. Nine
-generated outputs across five target formats.
+theme, the terminal, GTK apps, the editor, Spotify, the compositor colours, the
+cursor. Across six target formats.
 
 Reference is the **PS3 XMB**: cold silver-blue, one glowing accent, chrome
 surfaces, geometric type, and motion that lives in a wave field *behind* the
@@ -103,6 +103,14 @@ Other landmines, all of which have already cost time:
   `build-tokens.py` first; do not "optimise" that away.
 - **libadwaita ignores custom themes** — it reads named colours from
   `gtk-4.0/gtk.css` only.
+- **VS Code ignores `workbench.colorTheme` on this machine.** Something reports
+  high contrast to Electron, so it obeys
+  `workbench.preferredHighContrastColorTheme` instead. Setting a theme the
+  obvious way is a silent no-op. Set both keys.
+- **VS Code silently drops unrecognised colour keys.** A mistyped key is not an
+  error, it is one surface stuck on stock grey. Grep the shipped bundle
+  (`/usr/share/code/resources/app/out/vs/workbench/workbench.desktop.main.js`,
+  plus `resources/app/extensions/*/package.json` for `gitDecoration.*`).
 
 ---
 
@@ -113,14 +121,23 @@ CPU/MEM/GPU, git, tray, volume/bluetooth/power), command palette with app and
 clipboard modes, notifications, wallpaper shader with a ripple bus, cursor
 theme, terminal, GTK theming, idle daemon, polkit agent, power menu with sleep.
 
-**Uncommitted, deliberately:**
+**Uncommitted:**
 
-- `vscode/` and the VS Code renderer in `design/build-tokens.py` — the theme
-  generates and parses (70 colours, 13 scopes) but has **never been installed or
-  looked at**. That is the immediate next task (roadmap 1.1).
-- **9 deleted `obs-studio/` files.** These are *not* ours — the directory was
-  emptied by something outside this work. Do not commit the deletions without
-  asking; `git restore obs-studio/` undoes them.
+- `vscode/` and the VS Code renderer in `design/build-tokens.py` — now
+  **installed and verified** (roadmap 1.1). 277 colours, 21 scopes, every key
+  validated against VS Code's registry, every text pair measured at AA or
+  better. `~/.vscode/extensions/gelo-xmb` is a symlink into the repo.
+- `spicetify/` and `docs/spotify.md` — **applied and verified** (roadmap 1.3).
+  Three layers: `color.ini` is the theme, `user.css` adds chrome/glow,
+  `theme.js` runs the XMB shader behind the app and ripples it on the beat.
+  The last two are **optional** — on breakage delete `theme.js` first, then
+  `user.css`, re-applying after each. Live tuning: profile menu → XMB field,
+  or Ctrl+Alt+X (not Ctrl+Shift+X, which is Spotify's Connect panel).
+  Spotify was on StarryNight/orange, the last warm hue in the system.
+  `~/.config/spicetify/Themes/gelo-xmb` is a symlink into the repo.
+  ⚠️ **Read `docs/spotify.md` before running any spicetify command** —
+  `spicetify backup` on an already-patched install destroys your way back to
+  stock Spotify.
 
 **Untested and it matters:**
 

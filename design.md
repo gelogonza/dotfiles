@@ -14,7 +14,7 @@ the bug.
 ## 1. The pipeline
 
 `design/tokens.json` is the single source of truth.
-`design/build-tokens.py` fans it out to **seven** targets in four languages:
+`design/build-tokens.py` fans it out to **nine** targets in seven languages:
 
 | Generated | Consumer | Language |
 |---|---|---|
@@ -24,6 +24,8 @@ the bug.
 | `hypr/tokens.conf` | `hyprland.conf`, `hyprlock.conf` | hyprlang |
 | `ghostty/gelo-theme` | terminal | ghostty config |
 | `gtk-{3,4}.0/gtk.css` | GTK3 / libadwaita apps | CSS |
+| `vscode/gelo-xmb/` | VS Code | theme extension (JSON) |
+| `spicetify/gelo-xmb/` | Spotify | spicetify ini + CSS + JS/GLSL |
 | `*/Components/*.qml`, `*/Shaders/*.frag`, `*/icons/*.svg` | both QML roots | copied |
 
 ```bash
@@ -388,6 +390,127 @@ the theme, since that is the base whose colours the CSS overrides.
 
 ---
 
+## 8c. The editor
+
+`vscode/gelo-xmb/` is generated the same way everything else is. It is the one
+surface that derives from the **`terminal` token block** rather than the UI
+palette, so an editor split and a terminal split are the same colour and a diff
+in either is the same green and red.
+
+**It never touches `color.*`.** Where an editor needs an accent — cursor, focus
+ring, active tab, badge, primary button — it uses ANSI bright blue, which is
+already in the terminal palette. Reaching for `color.accent` would put the
+desktop accent in a fourth place (§3) and measures worse anyway: white on
+`accent` is 4.54:1, editor-background ink on bright blue is 8.13:1.
+
+ANSI bright-black is the terminal's dim slot and measures 2.69:1 here — fine for
+a shell prompt, far too quiet for comments. The theme derives three measured
+steps off it toward the foreground (`dim` / `muted` / `hint`, 3.99–4.93:1), so
+hierarchy comes from opacity rather than from a new hue.
+
+Two mechanical traps, both silent:
+
+- **`workbench.colorTheme` does nothing on this machine.** Electron reports high
+  contrast, so VS Code uses `workbench.preferredHighContrastColorTheme`. Set
+  both.
+- **Unrecognised colour keys are ignored, not rejected.** A typo leaves that one
+  surface on stock vs-dark grey. Validate key names against the shipped bundle.
+
+## 8d. Spotify
+
+`spicetify/gelo-xmb/color.ini`, terminal-derived for the same reason the editor
+is, with ANSI bright blue where an accent is needed. One subtext step rather
+than the editor's three: Spotify's lightest surface (the card) sets the worst
+case at 4.83:1, and one value that clears it clears everywhere.
+
+17 of 19 keys are live in Spotify 1.2.95. A few surfaces stay stock — notably a
+~58px `#c0d62f` ring on the account avatar, the last warm chrome in the system.
+**Leave them.**
+
+`user.css` beside it carries the material language — Chrome on the player bar,
+Glow on the transport, rows and cards. It is **strictly optional**: delete it
+and re-apply and the `color.ini` alone is still a complete theme. Three rules
+keep it that way:
+
+1. **Colour comes from `var(--spice-*)`, never a literal**, so it inherits the
+   palette and a token change needs no edit there.
+2. **Visual properties only** — background, box-shadow, border, filter. Nothing
+   that participates in layout, so a selector that stops matching costs an
+   effect, not a broken window.
+3. **Selectors are `data-testid` or Spotify's own semantic classes**
+   (`.x-progressBar-fillColor`). Never a hashed styled-components class.
+
+Two things rule 3 cost us, both correct trades:
+
+- **Reflection has no home here.** The player bar leaves the cover art ~16px of
+  clearance, so a `-webkit-box-reflect` mirror is clipped to nothing, and making
+  room means touching layout. It is a bloom behind the art instead.
+- **The play button stays white.** It is an Encore control with
+  `colorSet="invertedLight"`, and spicetify's `replace_colors` already rewires
+  that set to our palette — it was following `text` all along. The painted
+  circle is a hashed class, so neither `background-color: !important` nor
+  overriding Encore's colour-set variables reaches it. It is lit rather than
+  repainted, which is closer to the reference anyway: the reference glows
+  things, it does not tint them.
+
+General rule that fell out of this: **for any Encore control, set the colour
+set, do not fight the paint.**
+
+`theme.js` adds the third layer: the **actual wallpaper shader**, behind
+Spotify, rippling on the beat. Animating Spotify's own widgets would contradict
+§7 — motion belongs in the field behind the interface, not in it. The generator
+retargets `design/shaders/xmb.frag` to WebGL2 by rewriting its header only, so
+there is one authored copy of the wave field and the web version cannot drift.
+Unlike the wallpaper it stops when hidden, because a web page gets
+`visibilitychange` and a layer surface does not.
+
+The field sits under text, which the wallpaper never does. That is capped by a
+scrim plus a brighter secondary ink scoped to the main view — the same move
+`hint` makes for inputs in §8c. **If you scale `time` for this shader, divide
+`rippleSpeed` by the same factor**, or wavefronts propagate that many times too
+slowly and read as broken.
+
+Beats drive the **band drift**, not ripple wavefronts. A ring expanding across
+the field reads as something drawn over it rather than as the field moving, and
+the reference's motion is in the ribbons. The wallpaper keeps its ripples
+because an *interaction* has a point of origin and music does not — same shader,
+two couplings.
+
+It ships a live control panel (profile menu → XMB field, or Ctrl+Alt+X) for
+colour source, tint strength, field brightness and saturation, main-view scrim,
+UI opacity, right-panel opacity, reactivity, drift rate and turntable spin. **This is not a second source of
+truth.** It invents no colours, its defaults are the
+generated values, Reset returns to them, and it can copy the current settings to
+the clipboard — because the point is to find a number on the live thing and then
+put it in `tokens.json`.
+
+Colour is chosen by **source** — `tokens.json` (default), a custom hex, or the
+album art — with **tint strength** for how far and **cool lock** for how cool.
+The choice drives the chrome as well as the field: surfaces, buttons, selection
+and the waveform accent all follow it, and **Surface style** picks between
+tinting the chrome and dropping it to neutral black. Because accents ride the
+same luminance-preserving `tint()`, an album-coloured button keeps the contrast
+a token-coloured one was measured at.
+**Album tint is opt-in and hue-locked.** The field can take its colour from the
+cover art (default 0), with **cool lock** compressing any hue toward the
+palette's 207.5° so a red album reads as warmer without becoming warm. The rule
+is a default, not a cage.
+
+**Recolouring never changes luminance.** Hue and saturation move, then the
+lightness is solved back to the original WCAG relative luminance. Holding HSL
+*lightness* instead is not sufficient — it lets luminance swing 1.70× across the
+hue circle, which would quietly undo the contrast work above. This is what makes
+album tint safe by construction rather than by luck.
+
+**Translucency is a decision to show whatever is underneath.** Making the main
+view translucent exposed Spotify's album-art tint and turned the panel warm red
+under a maroon cover — 24% warm pixels, through the one rule §3 does not bend.
+Anything made translucent has to be re-checked against the palette, because
+layers that were covered are now part of the design.
+
+Read `docs/spotify.md` before running any spicetify command. `spicetify backup`
+on an already-patched install destroys your way back to stock.
+
 ## 9. What is *not* committed
 
 Two generated things live outside the repo:
@@ -413,3 +536,5 @@ Things that will quietly break the system if changed without care:
 6. **Never a uniform array in a shader** consumed by ShaderEffect.
 7. **Weight never exceeds 400.**
 8. **Shadows and scrims come from `shade`**, never `bg-0`.
+9. **The editor and Spotify themes never read `color.*`** — both are
+   terminal-derived, and the desktop accent stays in its three places.

@@ -10,12 +10,17 @@ the interface. Full rationale in **[design.md](design.md)**; what changed and
 why in **[docs/CHANGES.md](docs/CHANGES.md)**; what is coming next in
 **[docs/roadmap.md](docs/roadmap.md)**.
 
+Picking this up cold — or handing it to someone (or something) else? Start with
+**[docs/handoff.md](docs/handoff.md)**.
+
 ```
 design/          token source, generators, shared QML/GLSL/SVG
 quickshell/gelo/ the shell — wallpaper, bar, launcher, notifications, power menu
 sddm/            login theme + installer
 hypr/            compositor config
 ghostty/         terminal
+vscode/          generated VS Code theme extension
+spicetify/       generated Spotify (spicetify) theme
 fastfetch/       fetch tool
 docs/            procedures with real failure modes
 reference/       upstream 43PR material, not loaded at runtime
@@ -83,7 +88,36 @@ design/build-tokens.py
 design/build-shaders.sh
 ```
 
-**5. Log out and back in.** Environment variables set in `hyprland.conf`
+**5. VS Code theme** (optional). Symlink it so regenerating updates it in place:
+
+```bash
+ln -sfn ~/dotfiles/vscode/gelo-xmb ~/.vscode/extensions/gelo-xmb
+```
+
+Then set **both** of these in `~/.config/Code/User/settings.json` and reload the
+window:
+
+```json
+"workbench.colorTheme": "gelo XMB",
+"workbench.preferredHighContrastColorTheme": "gelo XMB"
+```
+
+> Both, not one. Electron reports high contrast on this setup, and when it does
+> VS Code ignores `workbench.colorTheme` and follows the high-contrast key
+> instead. Setting only the obvious one is a **silent** no-op — no error, no
+> notification, the theme just never appears.
+
+**6. Spotify theme** (optional). spicetify **modifies the Spotify install** —
+read **[docs/spotify.md](docs/spotify.md)** first; it covers restore and the
+one command that destroys your way back to stock.
+
+```bash
+ln -sfn ~/dotfiles/spicetify/gelo-xmb ~/.config/spicetify/Themes/gelo-xmb
+spicetify config current_theme gelo-xmb color_scheme base
+spicetify apply
+```
+
+**7. Log out and back in.** Environment variables set in `hyprland.conf`
 (`XCURSOR_THEME`) only apply to newly started processes.
 
 **The login screen is a separate, opt-in step** — it means switching display
@@ -102,6 +136,8 @@ procedure.
 | mako | Quickshell notifications | uncomment `exec-once = mako` |
 | hyprpaper | shader wallpaper | uncomment `exec-once = hyprpaper` |
 | GDM | SDDM (opt-in, not enabled) | docs/login-screen.md |
+| Halcyon (VS Code) | generated `gelo XMB` theme | `workbench.colorTheme` + the high-contrast key |
+| StarryNight/orange (Spotify) | generated `gelo-xmb` spicetify theme | docs/spotify.md |
 
 **Every compositor-side change lives in `hypr/gelo.conf`**, sourced by one line
 at the bottom of `hyprland.conf`. Delete that line to revert all of them at once.
@@ -238,6 +274,10 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
 | Tray icons invisible | tinting disabled | `tinted: true` in `Bar/TrayRow.qml` |
 | GPU stat missing | no `nvidia-smi` | expected — it hides itself |
 | Weather missing | disabled, or the request failed | `weather.enabled` in tokens |
+| VS Code theme won't apply | high-contrast mode overrides it | also set `workbench.preferredHighContrastColorTheme` |
+| One VS Code surface is grey | that colour key is unset or misspelled | add it in `render_vscode()`; VS Code ignores unknown keys |
+| Spotify unthemed after an update | package upgrade wiped the patch | see docs/spotify.md — `spicetify backup apply` |
+| Spotify still has green/warm bits | surface not routed through `--spice-*` | expected; don't add CSS (design.md §8d) |
 | Notifications not appearing | mako owns the DBus name | `pkill mako` |
 | Clipboard history empty | `wl-paste` watchers not running | `pgrep -af wl-paste` — two expected |
 | Screen never locks itself | hypridle not running | `pgrep -x hypridle`; check `hypr/hypridle.conf` |
