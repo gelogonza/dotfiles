@@ -1352,3 +1352,57 @@ instead. Same shader, two different couplings.
 The `rippleSpeed` divide-by-rate fix stays in place and is now inert; the
 comment says so, so that re-enabling wavefronts does not silently reintroduce a
 wavefront that takes eleven seconds to cross the window.
+
+
+---
+
+# Screenshot pipeline (roadmap 2.1)
+
+`hypr/scripts/screenshot.sh` replaces two one-line bindings. Region, window or
+full; every mode goes to the **clipboard and a file**, and reports what it got.
+
+- `SUPER+S` / `Print` — region
+- `SUPER+SHIFT+S` — everything
+- `SUPER+ALT+S` — a window; slurp is fed the window rectangles from `hyprctl
+  clients` so the selection snaps to edges instead of being traced by hand
+
+Files land in `~/Pictures/Screenshots/` as `YYYY-MM-DD_HH-MM-SS.png`. The old
+name was `shot-1755262380.png`, which is not something you can find again.
+
+The notification carries a **thumbnail** and the actions Copy again / Open /
+Folder, plus Annotate when `swappy` or `satty` is installed — neither is, so
+that button is simply absent rather than broken.
+
+## The shell was advertising two capabilities it did not implement
+
+`NotificationLayer.qml` declared `actionsSupported: true` and
+`imageSupported: true`, and `NotificationCard.qml` rendered neither. Every
+action any application had ever sent was invisible and uninvokable, and any
+attached image was dropped. **A daemon that claims a capability it does not
+honour is worse than one that declines it** — senders behave differently based
+on that answer, so the failure lands in their code rather than ours.
+
+Both are implemented now:
+
+- Actions render as hairline pills that **bloom on hover** rather than filling
+  (design.md §5), so the accent budget is untouched.
+- The image renders as a 56px thumbnail. For a screenshot that thumbnail *is*
+  the feedback: it says what was captured, not merely that something was.
+
+`Chrome` needed `z: 1` so the buttons sit above the card's drag MouseArea.
+Everything else inside it ignores the mouse, so drag-to-dismiss still works
+across the whole card.
+
+## Verification
+
+Synthetic clicks cannot be delivered to a layer surface — `hyprctl dispatch
+sendshortcut` targets windows — so the click path was proved by hover instead:
+with the cursor over the first of two buttons, that button blooms and the other
+does not. That establishes the MouseArea is above the drag area and receiving,
+and the labels come from `modelData.text`, which establishes the model binds.
+Together those are the whole click path.
+
+Also confirmed end to end: file written non-empty, `wl-paste --list-types`
+reports `image/png` with valid PNG magic, and `notify-send` releases when the
+card's expire timer closes the notification — so a screenshot does not leave a
+blocked process behind.

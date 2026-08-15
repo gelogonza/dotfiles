@@ -43,12 +43,12 @@ Obsidian currently runs **Halcyon**, which is what 1.2 replaces. VS Code did
 too, until 1.1 landed; Spotify was on StarryNight/**orange**, which 1.3
 replaced — the one place in the system that was still running a warm hue.
 
-## 2. Design-engineer workflow tools ☐
+## 2. Design-engineer workflow tools ◐
 
 | | Item | Why |
 |---|---|---|
-| 2.1 | Screenshot pipeline | today it is `grim` to `~/Pictures/shot-<epoch>.png` with no clipboard copy and no feedback — you cannot tell it worked. Wanted: region / window / full, to **clipboard *and* file**, with a notification carrying copy / open / annotate actions |
-| 2.2 | Colour picker | `hyprpicker` → hex on the clipboard, and report **which design token it matches**, or the nearest one. Bespoke to someone maintaining a palette; nothing off-the-shelf does it |
+| 2.1 | Screenshot pipeline | ☑ `hypr/scripts/screenshot.sh` — region / window / full, to clipboard **and** file, with a thumbnail notification carrying copy / open / folder / annotate |
+| 2.2 | Colour picker | ☐ hex on the clipboard, and report **which design token it matches**, or the nearest one. Bespoke to someone maintaining a palette; nothing off-the-shelf does it. **`hyprpicker` is not installed** — needs `sudo pacman -S hyprpicker`, or the same job can be done from a `grim` single-pixel capture |
 
 ## 3. Music and ambience ☐
 

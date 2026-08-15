@@ -175,6 +175,9 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + C` | close window |
 | `SUPER + E` | file manager (Nautilus) |
 | `SUPER + SHIFT + V` | clipboard history |
+| `SUPER + S` / `Print` | screenshot a region |
+| `SUPER + SHIFT + S` | screenshot everything |
+| `SUPER + ALT + S` | screenshot a window (snaps to window edges) |
 | `SUPER + 1..0` | switch workspace |
 | `SUPER + SHIFT + 1..0` | move window to workspace |
 
@@ -280,6 +283,7 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
 | Spotify still has green/warm bits | surface not routed through `--spice-*` | expected; don't add CSS (design.md §8d) |
 | Notifications not appearing | mako owns the DBus name | `pkill mako` |
 | Clipboard history empty | `wl-paste` watchers not running | `pgrep -af wl-paste` — two expected |
+| Screenshot has no Annotate button | no annotator installed | `sudo pacman -S swappy` — the button appears by itself |
 | Screen never locks itself | hypridle not running | `pgrep -x hypridle`; check `hypr/hypridle.conf` |
 | Privilege prompts never appear | no polkit agent | `systemctl --user status hyprpolkitagent` |
 | Bluetooth control missing | no controller, or `bluetoothctl` absent | `bluetoothctl show` |
