@@ -292,17 +292,26 @@ Two things that do not work the obvious way:
   be passed explicitly, and `mapToGlobal` does not account for a layer surface's
   margins, so the on-screen origin is derived from the window's anchors.
 
-## Shader: noise → ribbons
+## Shader: three attempts to hit the reference
 
-The first XMB attempt reused the domain-warped fBm shader and did not look like
-the reference at all — fBm is the standard "pretty background" recipe and reads
-as smoke or clouds. The reference is a small number of smooth, wide, horizontal
-bands of light that undulate like silk.
+1. **Domain-warped fBm.** The standard "pretty background" recipe. Reads as
+   smoke or clouds — nothing like XMB. Tonal span was also 11 levels, so the
+   bands were mathematically present and visually absent.
+2. **A few wide sine bands.** Better structure, right tonal range
+   (p50=12 / p95=56), but still wrong: a wide gaussian produces fog — a smear
+   that is brighter in the middle, not a thread of light.
+3. **Many thin filaments.** What actually matches: a tight bright core plus a
+   much wider, much fainter halo, thirteen strands crossing over a broad
+   diffuse haze. The core/halo split is the whole trick — one gaussian cannot
+   make a thread that glows.
 
-It is now built from explicit sine ribbons with gaussian falloff, two summed
-sines per ribbon at a non-integer frequency ratio so they read as cloth rather
-than as a test pattern. Measured tonal range went from a p1–p95 span of 11 levels
-(bands mathematically present, visually absent) to p50=12 / p95=56.
+Filaments ADD to the field rather than mixing into it, which is what lets a thin
+core read as brighter than whatever it crosses instead of merely differently
+coloured. Final field: p50=14 / p95=35 / p99=62.
+
+The ripple wavefront was also pulled from 0.35 to 0.16: at the higher value it
+rendered as a hard cyan ring drawn over the field rather than light moving
+through it, which made a sub-second transient the loudest thing on screen.
 
 ## Reverted from the first XMB pass
 
