@@ -3,6 +3,17 @@
 // The volume slider is always visible rather than hidden behind a popup. It is
 // the one control here that gets adjusted rather than merely toggled, and a
 // 56px track costs less bar space than the interaction of opening something.
+//
+// Volume interaction, in full:
+//   click        -> open pavucontrol (per-app volumes, device switching)
+//   drag         -> set the level directly
+//   scroll       -> nudge the level
+//   right click  -> mute
+//
+// Click and drag share the same mouse area, so they are told apart by movement:
+// a press and release that never moved more than a few pixels is a click, and
+// anything further is a drag. Without that, every drag would also fire the
+// click handler on release and open a window you did not ask for.
 
 import QtQuick
 import Quickshell
@@ -31,8 +42,15 @@ Row {
             MouseArea {
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                acceptedButtons: Qt.LeftButton
-                onClicked: Audio.toggleMute()
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                onClicked: mouseEvent => {
+                    if (mouseEvent.button === Qt.RightButton)
+                        Audio.toggleMute();
+                    else
+                        Audio.openMixer();
+                }
+
                 onWheel: wheel => Audio.adjust(wheel.angleDelta.y > 0 ? 0.05 : -0.05)
             }
         }
@@ -92,13 +110,39 @@ Row {
             }
 
             MouseArea {
+                id: sliderMouse
                 anchors.fill: parent
                 cursorShape: Qt.PointingHandCursor
-                onPressed: mouse => Audio.setVolume(mouse.x / width)
-                onPositionChanged: mouse => {
-                    if (pressed)
-                        Audio.setVolume(mouse.x / width);
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                // Movement past this many pixels turns a press into a drag.
+                readonly property int dragThreshold: 3
+                property real pressX: 0
+                property bool dragging: false
+
+                onPressed: mouseEvent => {
+                    pressX = mouseEvent.x;
+                    dragging = false;
                 }
+
+                onPositionChanged: mouseEvent => {
+                    if (!pressed)
+                        return;
+                    if (!dragging && Math.abs(mouseEvent.x - pressX) > dragThreshold)
+                        dragging = true;
+                    if (dragging)
+                        Audio.setVolume(mouseEvent.x / width);
+                }
+
+                onReleased: mouseEvent => {
+                    if (dragging)
+                        return;                       // it was a drag; already applied
+                    if (mouseEvent.button === Qt.RightButton)
+                        Audio.toggleMute();
+                    else
+                        Audio.openMixer();
+                }
+
                 onWheel: wheel => Audio.adjust(wheel.angleDelta.y > 0 ? 0.05 : -0.05)
             }
         }

@@ -120,7 +120,8 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   list in `quickshell/gelo/Bar/AppLaunchers.qml`.
 - **Git** — resolves the repo from the *focused window* by walking its process
   tree, so a terminal sitting in `$HOME` still shows the project its shell is in.
-- **Volume** — click the icon to mute, scroll or drag the track to adjust.
+- **Volume** — click to open `pavucontrol`, drag the track to set the level,
+  scroll to nudge it, right-click to mute.
 - **Power** — opens a menu: lock, log out, reboot, shut down.
 
 ### Keybinds

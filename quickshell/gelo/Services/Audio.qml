@@ -49,6 +49,16 @@ Singleton {
         return "volume-high";
     }
 
+    // Open the full mixer. Focuses an existing window rather than spawning a
+    // second one — pavucontrol is not single-instance and will happily give you
+    // as many copies as you click for.
+    function openMixer() {
+        Quickshell.execDetached(["sh", "-c",
+            "pgrep -x pavucontrol >/dev/null 2>&1 "
+            + "&& hyprctl dispatch focuswindow class:org.pulseaudio.pavucontrol "
+            + "|| pavucontrol"]);
+    }
+
     PwObjectTracker {
         objects: root.sink ? [root.sink] : []
     }
