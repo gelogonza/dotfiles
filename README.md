@@ -1,171 +1,239 @@
 # dotfiles
 
-Hyprland desktop built as a design system: one token source, one material, one
-motion curve, applied across the bar, launcher, notifications, lock screen and
-login screen.
+A Hyprland desktop built as a design system. One token source drives the bar,
+launcher, notifications, lock screen, login screen, terminal, cursor and
+wallpaper shader.
+
+The visual language is the **PS3 XMB**: cold silver-blue, one glowing accent,
+chrome surfaces, geometric type, and motion that lives in a wave field behind
+the interface. Full rationale in **[design.md](design.md)**; what changed and
+why in **[docs/CHANGES.md](docs/CHANGES.md)**.
 
 ```
-design/          design system — token source + generator + shared QML/GLSL
-quickshell/gelo/ the shell: wallpaper, bar, launcher, notifications
-sddm/            login theme (installed to /usr/share, see docs/login-screen.md)
+design/          token source, generators, shared QML/GLSL/SVG
+quickshell/gelo/ the shell — wallpaper, bar, launcher, notifications, power menu
+sddm/            login theme + installer
 hypr/            compositor config
+ghostty/         terminal
+fastfetch/       fetch tool
 docs/            procedures with real failure modes
-reference/       upstream material kept for reference, not loaded at runtime
+reference/       upstream 43PR material, not loaded at runtime
 ```
 
 ---
 
-## The design system
+## Requirements
 
-**`design/tokens.json` is the single source of truth.** Colour, spacing, type,
-motion and the chrome material are defined there once, and
-`design/build-tokens.py` fans them out to every consumer:
-
-| Generated | Consumed by |
-|---|---|
-| `quickshell/gelo/Theme/Tokens.qml` | the shell |
-| `sddm/themes/gelo-liquid/Theme/Tokens.qml` | the login theme |
-| `design/tokens.css` | GTK / Waybar fallback tier |
-| `hypr/tokens.conf` | `hyprland.conf`, `hyprlock.conf` |
-| `*/Components/{Chrome,Glow,Reflection}.qml` | both QML roots, from `design/qml/` |
-| `*/Shaders/xmb.frag` | both QML roots, from `design/shaders/xmb.frag` |
-
-Four languages, two QML roots that cannot import each other (the login theme is
-installed to `/usr/share` and cannot read `$HOME`, which is mode 700). Generating
-is what keeps them from drifting.
+Arch. Everything below is in the official repos except the fonts.
 
 ```bash
-design/build-tokens.py           # regenerate everything
-design/build-tokens.py --check   # fail if anything is stale (CI / pre-commit)
-design/build-shaders.sh          # bake .frag -> .qsb (Qt6 rejects raw GLSL)
-design/build-cursor.py           # recolour the cursor theme (run once per clone)
+sudo pacman -S --needed \
+  hyprland quickshell qt6-shadertools qt6-wayland qt6-5compat qt6-declarative \
+  hyprlock ghostty fastfetch \
+  grim slurp cliphist wl-clipboard brightnessctl playerctl jq \
+  pipewire pipewire-pulse wireplumber \
+  adwaita-cursors inter-font
 ```
 
-`build-cursor.py` writes to `~/.local/share/icons/gelo-cursor` rather than into
-the repo: it is ~12MB of binaries derived from Adwaita (CC-BY-SA 3.0), and
-carrying a recoloured copy here would drag the attribution along with it.
-
-Generated files carry a do-not-edit header and are committed, so a fresh clone
-works without running anything.
-
-The visual language is **PS3 XMB**: cold near-black blue, one glowing cyan
-accent, chrome surfaces, geometric type (Michroma), and motion that lives in the
-wave field behind the interface.
-
-### Rules the system actually enforces
-
-**Accent appears in exactly three places.** Active workspace indicator
-(`BlobIndicator`), focused window border (`col.active_border`), and the cursor
-(`design/build-cursor.py`). Nowhere else. Selection states, hover states, notification
-urgency and login failure all carry meaning through elevation, weight and
-opacity instead. Failure states reuse `--accent` at low opacity rather than
-introducing a red — a fourth colour would also be a fourth accent location.
-
-**Everything snaps to a 4px grid**, including the bar height, the blob, and the
-password field.
-
-**One motion curve** — `cubic-bezier(0.22, 1, 0.36, 1)` — shared by QML
-animations, Hyprland window animations and hyprlock. `--dur-slow` (400ms) is
-specifically the ripple propagation time.
-
-**Weight is not a hierarchy tool.** Michroma has exactly one weight, so
-hierarchy comes from size, opacity, tracking and glow.
-
-### Chrome / reflection
-
-The material language is brushed metal, glow and reflection — **not** frosted
-glass. There is no backdrop blur anywhere, and the compositor layerrules that
-used to produce it have been removed.
-
-1. **Brushed metal.** Raised surfaces carry a vertical gradient, `bg-1` fading a
-   few percent darker at the bottom. Enough to read as material, not enough to
-   read as a gradient.
-2. **Selection is glow, not outline or fill.** Nothing gets boxed when selected;
-   it blooms. `Glow.qml` renders a blurred, accent-tinted, enlarged copy of the
-   content behind it.
-3. **Reflection beneath elements** — a flipped, faded, gradient-masked copy.
-   `Reflection.qml`. It samples the slice at the waterline, not the top of the
-   item, or the mirror comes out as a disconnected fragment.
-4. **Motion lives in the wave field behind the UI.** Interactions emit a ripple
-   that propagates through the wallpaper shader (`Services/Ripples.qml` →
-   `Shaders/xmb.frag`).
-
-The one exception to rule 4 is the workspace indicator, which keeps its
-travelling blob: the element moves *and* the field responds.
+Optional: `sddm` (login screen), `nvidia-utils` (the GPU stat hides itself
+without it), `bluez bluez-utils` (the Bluetooth control hides itself without a
+radio).
 
 ---
 
-## Components
+## Install
 
-**Wallpaper** — the XMB wave field on the background layer, and the surface every
-interaction ripple propagates through. It is a **ribbon** field: explicit sine
-curves with gaussian falloff, not fBm noise. Noise reads as smoke; XMB is smooth
-horizontal bands of light. Also carries no accent — the field is built from
-`bg-1`/`bg-2`/`border` only, so the accent budget stays intact.
+**1. Clone and link.** The repo *is* your `~/.config`; every app reads it
+through a symlink.
 
-**Bar** — workspaces, window title, git context, tray, clock.
-The workspace indicator is the blob: its two edges animate independently
-(leading fast, trailing slow), so it stretches across the gap and settles rather
-than sliding. Measured 24px → 37px → 24px through a switch.
-The **git module** resolves the repo from the focused window by walking its
-process tree shallowest-first, so a terminal sitting in `$HOME` correctly falls
-through to the shell that is `cd`'d into your project.
+```bash
+git clone https://github.com/gelogonza/dotfiles ~/Coding/dotfiles-gelo
+ln -s ~/Coding/dotfiles-gelo ~/dotfiles
 
-**Terminal** — dark steel-blue, translucent, blurred, so it sits in the wave
-field rather than punching a hole in it. Theme generated from tokens into
-`ghostty/gelo-theme`. Measured text contrast 8.71:1 (WCAG AAA).
+for d in hypr quickshell ghostty fastfetch gtk-3.0 gtk-4.0 mako cava wofi; do
+  ln -sfn ~/dotfiles/$d ~/.config/$d
+done
+```
 
-**Launcher** (`SUPER+R`, `SUPER+D`) — command palette. Fuzzy subsequence ranking
-with bonuses for word-start and contiguous runs. Rows arrive staggered.
-Also scriptable:
+> The indirection through `~/dotfiles` is deliberate: every `~/.config/*` link
+> points there, so the repo can be moved by repointing **one** symlink. Moving
+> the repo without updating it leaves 13 dangling links and a desktop that comes
+> up unstyled on the next login.
+
+**2. Fonts.** Geist is not packaged for Arch.
+
+```bash
+mkdir -p ~/.local/share/fonts
+curl -fsSL -o ~/.local/share/fonts/Geist.ttf \
+  "https://github.com/google/fonts/raw/main/ofl/geist/Geist%5Bwght%5D.ttf"
+fc-cache -f ~/.local/share/fonts
+```
+
+**3. Cursor theme.** Not committed — see [design.md §9](design.md).
+
+```bash
+design/build-cursor.py
+```
+
+**4. Regenerate** (optional on a fresh clone; outputs are committed).
+
+```bash
+design/build-tokens.py
+design/build-shaders.sh
+```
+
+**5. Log out and back in.** Environment variables set in `hyprland.conf`
+(`XCURSOR_THEME`) only apply to newly started processes.
+
+**The login screen is a separate, opt-in step** — it means switching display
+managers, which can leave you without a graphical login. Read
+**[docs/login-screen.md](docs/login-screen.md)** first; it has the TTY recovery
+procedure.
+
+---
+
+## What this replaces
+
+| Was | Now | Roll back by |
+|---|---|---|
+| Waybar | Quickshell bar | uncomment `waybar-launch` in `hyprland.conf` |
+| wofi / hyprlauncher | Quickshell launcher | `$menu` in `hyprland.conf` |
+| mako | Quickshell notifications | uncomment `exec-once = mako` |
+| hyprpaper | shader wallpaper | uncomment `exec-once = hyprpaper` |
+| GDM | SDDM (opt-in, not enabled) | docs/login-screen.md |
+
+**Every compositor-side change lives in `hypr/gelo.conf`**, sourced by one line
+at the bottom of `hyprland.conf`. Delete that line to revert all of them at once.
+
+---
+
+## The bar
+
+```
+[ workspaces | app launchers ]     [ date  time ]     [ weather | CPU MEM GPU | git | tray | vol  bt  power ]
+                                   [ window title ]
+```
+
+- **Workspaces** — click to switch. The active one is a travelling blob that
+  stretches as it moves and fires a ripple into the wallpaper behind it.
+- **Launchers** — Ghostty, VS Code, Chrome, Obsidian, Blender. Edit the `apps`
+  list in `quickshell/gelo/Bar/AppLaunchers.qml`.
+- **Git** — resolves the repo from the *focused window* by walking its process
+  tree, so a terminal sitting in `$HOME` still shows the project its shell is in.
+- **Volume** — click the icon to mute, scroll or drag the track to adjust.
+- **Power** — opens a menu: lock, log out, reboot, shut down.
+
+### Keybinds
+
+| Key | Action |
+|---|---|
+| `SUPER + R` / `SUPER + D` | command palette |
+| `SUPER + L` | lock |
+| `SUPER + Q` / `SUPER + Return` | terminal |
+| `SUPER + C` | close window |
+| `SUPER + 1..0` | switch workspace |
+| `SUPER + SHIFT + 1..0` | move window to workspace |
+
+The launcher is also scriptable:
 
 ```bash
 qs -c gelo ipc call launcher toggle
 qs -c gelo ipc call launcher search fire
 ```
 
-**Notifications** — chrome cards, slide in from the right, drag or click to
-dismiss. Arriving and dismissing both ripple the field. Critical notifications
-stay until acknowledged.
+---
 
-**Lock** (`SUPER+L`) — deliberately plain. Chrome on the password field, no
-shader. This is the path back into a running session, so it should feel instant.
+## Changing things
 
-**Login** — the one surface with a real GLSL shader. See
-[docs/login-screen.md](docs/login-screen.md); it is not active until you switch
-display managers, and that file has the recovery procedure.
+**Colour, type, spacing, motion, materials — all of it:**
+
+```bash
+$EDITOR design/tokens.json
+design/build-tokens.py
+design/build-shaders.sh          # if you touched colours the shader reads
+design/build-cursor.py           # if you touched the accent
+sudo sddm/install.sh             # if the login theme is installed
+```
+
+Then restart the shell:
+
+```bash
+pkill -x quickshell; setsid quickshell -c gelo >/dev/null 2>&1 &
+```
+
+**Switch the font** — one line in `tokens.json`. Figtree, Inter Display and
+Nimbus Sans are already installed as alternatives.
+
+**Enable weather** — off by default, because it sends a request to a
+third-party server every 15 minutes and, with no location set, that server
+geolocates you by IP. Set `weather.enabled` and preferably an explicit
+`weather.location` (a city name is coarser than your IP).
 
 ---
 
-## What replaced what
+## Do / don't
 
-| Was | Now | Rollback |
+**Do**
+
+- Edit `design/tokens.json` and regenerate.
+- Edit `design/qml/*` for shared components, `design/shaders/*` for shaders,
+  `design/icons/*` for icons — then regenerate.
+- Run `design/build-tokens.py --check` before committing; it fails if any
+  generated file is stale.
+- Keep a TTY (`Ctrl+Alt+F2`) available the first time you touch the lock screen
+  or the display manager.
+
+**Don't**
+
+- **Don't edit any file with a `GENERATED FILE — DO NOT EDIT` banner.** Your
+  change is one regenerate away from being erased. Edit the source in `design/`.
+- **Don't edit `quickshell/gelo/Components/*`, `*/Shaders/*` or `*/icons/*`** —
+  those are copies. The originals live in `design/`.
+- **Don't move the repo** without repointing `~/dotfiles`.
+- **Don't add a fourth accent location.** See design.md §3.
+- **Don't run mako alongside the shell.** `org.freedesktop.Notifications` is a
+  single-owner DBus name — whichever starts first wins and the other silently
+  does nothing.
+- **Don't enable blur on the shell layer surfaces.** It softens the hairline and
+  washes out the glow, which are the two things carrying the material.
+- **Don't `systemctl stop gdm`** while logged in — that kills your session.
+  Switch display managers, then reboot.
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause | Fix |
 |---|---|---|
-| Waybar | Quickshell bar | uncomment `waybar-launch` in `hyprland.conf` |
-| wofi / hyprlauncher | Quickshell launcher | `$menu` in `hyprland.conf` |
-| mako | Quickshell notifications | uncomment `exec-once = mako` |
-| hyprpaper | shader wallpaper | uncomment `exec-once = hyprpaper` |
-| GDM | SDDM (opt-in, not yet active) | see docs/login-screen.md |
+| Desktop comes up unstyled | `~/dotfiles` doesn't resolve | `ln -s <repo> ~/dotfiles` |
+| Bar missing entirely | shell not running, or a QML error | run `quickshell -c gelo` and read stderr |
+| Boxes instead of glyphs | Geist not installed | install fonts, then `fc-cache -f` |
+| Wallpaper is a flat colour | shader not baked | `design/build-shaders.sh` |
+| Old cursor still showing | env vars only apply to new processes | log out and back in |
+| Tray icons invisible | tinting disabled | `tinted: true` in `Bar/TrayRow.qml` |
+| GPU stat missing | no `nvidia-smi` | expected — it hides itself |
+| Weather missing | disabled, or the request failed | `weather.enabled` in tokens |
+| Notifications not appearing | mako owns the DBus name | `pkill mako` |
 
-All compositor-side changes live in `hypr/gelo.conf`, sourced by one line at the
-bottom of `hyprland.conf`. Delete that line to revert every one of them.
+Shell logs: run `quickshell -c gelo` in a terminal, or read
+`/run/user/1000/quickshell/by-id/*/log.qslog`.
 
-`org.freedesktop.Notifications` is a single-owner DBus name — running mako
-alongside the shell means whichever starts first wins and the other silently
-does nothing.
+Compositor: `hyprctl configerrors`, `hyprctl layers`.
 
 ---
 
 ## Known gaps
 
-- **hyprlock is unverified.** The config is written and bound, but hyprlock has
-  no dry-run mode and a failed lock can leave a session locked, so it was not
-  tested. Test it deliberately: `hyprlock --grace 30` lets any keypress dismiss
-  it without a password. Keep a TTY (`Ctrl+Alt+F2`) available the first time.
+- **hyprlock is unverified.** The config is written and bound to `SUPER+L`, but
+  hyprlock has no dry-run mode and a failed lock can leave a session locked, so
+  it has not been tested end to end. Test it deliberately with
+  `hyprlock --grace 30` — any keypress dismisses it without a password — and
+  keep a TTY available.
 - **The wallpaper shader does not stop when occluded.** wlr-layer-shell exposes
   no occlusion signal, so it keeps rendering behind maximised windows. If
-  battery or thermals matter, replace the `Wallpaper{}` block with a static
-  image rather than micro-optimising the shader.
-- **Quickshell's `DesktopEntries` returns nothing** on this system (both
-  `byId()` and `heuristicLookup()` return null), which is why the launcher
-  builds its own index via `scripts/list-apps.py`.
+  battery or thermals matter, replace the `Wallpaper{}` block in `shell.qml`
+  with a static image rather than micro-optimising the GLSL.
+- **Quickshell's `DesktopEntries` returns nothing** on this system, which is why
+  the launcher builds its own index via `scripts/list-apps.py`.
+- **The fastfetch logo path points outside the repo** and renders nothing on a
+  fresh clone.
