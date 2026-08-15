@@ -387,3 +387,51 @@ shape rather than its silhouette, which is right for everything it wraps.
 Related: the launcher's row bloom sits BEHIND the icon rather than wrapping it.
 Blurring app artwork tints the halo with whatever colours the icon already has —
 a dark icon produced a dark glow no matter what colorization was applied.
+
+
+---
+
+# Terminal, login verification, shader pass 4
+
+## Terminal is now a token consumer
+
+`design/tokens.json` grew a `terminal` group, and the generator emits
+`ghostty/gelo-theme`, included from `ghostty/config` via `config-file`. That
+makes ghostty the **fifth** target language the token source feeds.
+
+The previous config had a `black-orange.png` background image — warm, and
+fighting a palette that forbids warm hues. Removed.
+
+**Honest deviation, flagged in the token source:** ANSI 1/3/9/11 are genuinely
+red and yellow. They are load-bearing semantics — git diff, build warnings,
+test failures — and remapping them into the blue scale would break every tool
+that assumes them. They are kept desaturated and cool-leaning so they sit in
+the palette rather than shouting out of it.
+
+Two tuning findings:
+
+- At surface colour and 0.86 opacity the terminal washed out to near-white
+  (measured 245,253,255) and the blur under it became invisible. Translucency
+  only reads if something is left to see through. Now `#b9d5ef` at 0.68.
+- Hyprland's blur `vibrancy` defaults to ~0.17 and boosts saturation of the
+  blurred result, which over a blue field pulled the terminal toward cyan
+  (R=228, G=B=249 — a hue shift, not a tint). Set to 0.
+
+Compositor blur is back on, for a different reason than before: it is not for
+the shell surfaces (those are layer surfaces with no blur layerrules and are
+untouched), but for windows that opt in by running translucent. Right now that
+is the terminal.
+
+## Login screen verified on the light palette
+
+Re-checked in `sddm-greeter-qt6 --test-mode` after the inversion. It renders the
+XMB filament shader, the Geist clock and the chrome password field, and the
+shader animates — 31.8% of pixels changing over 4 seconds. Still installed but
+NOT enabled; `docs/login-screen.md` is unchanged.
+
+## Shader pass 4
+
+Thirteen filaments down to eleven — the lower band was dense enough that
+individual threads stopped reading as threads. Drift rates ~1.35x, and the
+desktop clock from 0.16 to 0.25 units/sec: at 0.16 the field read as a still
+image unless you stared at it.

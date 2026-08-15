@@ -51,14 +51,16 @@ window-padding-x = 14
 window-padding-y = 14
 
 # background
-
-
-background-blur=9
-background-image = /home/gelo/Pictures/black-orange.png
-background-image-fit = cover
+#
+# Colours, opacity and blur all come from design/tokens.json — edit there and
+# run design/build-tokens.py, do not set them here.
+#
+# The previous black-orange background image was dropped: the palette is
+# deliberately free of warm hues, and a photographic backdrop fights the
+# compositor blur that makes the terminal sit in the wave field.
+config-file = gelo-theme
 
 # cursor
-cursor-color = #d0d0d0
 cursor-style = bar
 
 

@@ -144,21 +144,24 @@ void main() {
     // the upper strands are broad ribbons, the lower ones are fine threads.
     // A uniform thickness reads as a pattern; the taper gives the field a
     // near edge and a far edge, so it has depth rather than repetition.
+    //
+    // Eleven strands, down from thirteen — the lower band was dense enough that
+    // individual threads stopped being legible as threads. Drift rates are also
+    // ~1.35x the original: enough that the field is perceptibly alive at a
+    // glance, still slow enough to ignore while working.
     float f = 0.0;
     //                      yc     amp    freq  speed    core    halo
-    f += 0.55 * filament(p, 0.185, 0.075, 2.4,  0.13,  0.0090, 0.075, t);
-    f += 0.70 * filament(p, 0.255, 0.068, 3.1, -0.16,  0.0075, 0.068, t);
-    f += 0.85 * filament(p, 0.325, 0.082, 2.8,  0.21,  0.0060, 0.060, t);
-    f += 1.00 * filament(p, 0.395, 0.070, 3.6, -0.25,  0.0048, 0.052, t);
-    f += 0.95 * filament(p, 0.450, 0.060, 4.7,  0.50,  0.0036, 0.044, t);
-    f += 0.90 * filament(p, 0.500, 0.075, 3.3, -0.38,  0.0028, 0.038, t);
-    f += 0.80 * filament(p, 0.548, 0.068, 6.1,  0.31,  0.0020, 0.032, t);
-    f += 0.70 * filament(p, 0.595, 0.090, 2.6, -0.22,  0.0016, 0.030, t);
-    f += 0.60 * filament(p, 0.645, 0.082, 5.2,  0.19,  0.0013, 0.028, t);
-    f += 0.50 * filament(p, 0.700, 0.105, 3.9,  0.17,  0.0011, 0.026, t);
-    f += 0.40 * filament(p, 0.755, 0.098, 4.1, -0.14,  0.0009, 0.024, t);
-    f += 0.30 * filament(p, 0.815, 0.120, 5.7,  0.24,  0.0008, 0.022, t);
-    f += 0.22 * filament(p, 0.875, 0.112, 3.4, -0.11,  0.0007, 0.020, t);
+    f += 0.55 * filament(p, 0.185, 0.075, 2.4,  0.18,  0.0090, 0.075, t);
+    f += 0.70 * filament(p, 0.255, 0.068, 3.1, -0.22,  0.0075, 0.068, t);
+    f += 0.85 * filament(p, 0.325, 0.082, 2.8,  0.29,  0.0060, 0.060, t);
+    f += 1.00 * filament(p, 0.395, 0.070, 3.6, -0.34,  0.0048, 0.052, t);
+    f += 0.95 * filament(p, 0.455, 0.060, 4.7,  0.68,  0.0036, 0.044, t);
+    f += 0.90 * filament(p, 0.515, 0.075, 3.3, -0.52,  0.0028, 0.038, t);
+    f += 0.78 * filament(p, 0.575, 0.068, 6.1,  0.42,  0.0020, 0.032, t);
+    f += 0.62 * filament(p, 0.640, 0.090, 2.6, -0.30,  0.0016, 0.030, t);
+    f += 0.48 * filament(p, 0.710, 0.098, 4.1,  0.26,  0.0013, 0.026, t);
+    f += 0.32 * filament(p, 0.785, 0.120, 5.7, -0.19,  0.0009, 0.023, t);
+    f += 0.22 * filament(p, 0.860, 0.112, 3.4,  0.15,  0.0007, 0.020, t);
 
     // --- tone -------------------------------------------------------------
     // A faint cold vertical gradient underneath, so the frame is not flat where

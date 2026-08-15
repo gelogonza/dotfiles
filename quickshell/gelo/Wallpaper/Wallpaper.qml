@@ -81,12 +81,12 @@ PanelWindow {
             return Qt.vector4d(c.r, c.g, c.b, c.a);
         }
 
-        // 576 units/hour = 0.16 units/sec — slower than the login screen's 0.28.
+        // 900 units/hour = 0.25 units/sec, still under the login screen's 0.28.
         // This is ambient behind real work rather than something you sit and
-        // look at, so it stays under the threshold of noticing.
+        // look at, but at 0.16 it read as a still image unless you stared.
         NumberAnimation on time {
             from: 0
-            to: 576
+            to: 900
             duration: 3600000
             loops: Animation.Infinite
             running: field.visible

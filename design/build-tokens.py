@@ -251,6 +251,35 @@ def render_css(t: dict) -> str:
 
 
 # --------------------------------------------------------------------------
+# ghostty
+# --------------------------------------------------------------------------
+
+def render_ghostty(t: dict) -> str:
+    term = t["terminal"]
+    L = [
+        f"# {BANNER}",
+        "#",
+        "# Included by ghostty/config via `config-file = gelo-theme`.",
+        "",
+        f'background = {term["background"].lstrip("#")}',
+        f'foreground = {term["foreground"].lstrip("#")}',
+        f'cursor-color = {term["cursor"].lstrip("#")}',
+        f'selection-background = {term["selectionBackground"].lstrip("#")}',
+        f'selection-foreground = {term["selectionForeground"].lstrip("#")}',
+        "",
+        f'background-opacity = {term["opacity"]}',
+        f'background-blur = {term["blur"]}',
+        "",
+        "# ANSI 0-15. See the note in design/tokens.json about why 1/3/9/11 are",
+        "# genuinely warm in a palette that otherwise forbids it.",
+    ]
+    for i, c in enumerate(term["ansi"]):
+        L.append(f'palette = {i}={c}')
+    L.append("")
+    return "\n".join(L)
+
+
+# --------------------------------------------------------------------------
 # hyprlang
 # --------------------------------------------------------------------------
 
@@ -378,6 +407,7 @@ def main() -> int:
         ROOT / "sddm/themes/gelo-liquid/Theme/qmldir": render_qmldir(),
         ROOT / "design/tokens.css": render_css(tokens),
         ROOT / "hypr/tokens.conf": render_hypr(tokens),
+        ROOT / "ghostty/gelo-theme": render_ghostty(tokens),
     }
     outputs.update(render_components())
     outputs.update(render_shaders())
