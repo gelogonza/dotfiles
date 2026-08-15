@@ -1,0 +1,16 @@
+/* GENERATED FILE — DO NOT EDIT. Source: design/tokens.json (run design/build-tokens.py) */
+
+/* GTK3 reads a much smaller set of names than libadwaita. */
+
+@define-color theme_bg_color #eef1f8;
+@define-color theme_fg_color #1b4c78;
+@define-color theme_base_color #f8fbff;
+@define-color theme_text_color #1b4c78;
+@define-color theme_selected_bg_color #3478c4;
+@define-color theme_selected_fg_color #ffffff;
+@define-color insensitive_bg_color #eef1f8;
+@define-color insensitive_fg_color #5a7fb5;
+@define-color borders #bed7eb;
+@define-color warning_color #d2b46e;
+@define-color error_color #d9738a;
+@define-color success_color #5cb894;

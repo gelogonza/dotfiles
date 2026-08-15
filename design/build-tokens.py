@@ -263,6 +263,104 @@ def render_css(t: dict) -> str:
 
 
 # --------------------------------------------------------------------------
+# GTK / libadwaita
+# --------------------------------------------------------------------------
+
+def render_gtk(t: dict, adwaita: bool) -> str:
+    """@define-color overrides for GTK3 and GTK4/libadwaita.
+
+    libadwaita does not honour arbitrary GTK themes — the whole point of it is
+    that apps look the same everywhere — but it *does* read named colours from
+    ~/.config/gtk-4.0/gtk.css. Overriding those is the supported way to retheme
+    Nautilus and friends without fighting the toolkit.
+
+    GTK3 apps read a much smaller set of names, hence the two variants.
+    """
+    c = t["color"]
+    term = t["terminal"]
+
+    # ANSI red/green/yellow, reused for destructive/success/warning. Same
+    # reasoning as the terminal: these are semantics, not decoration — a delete
+    # confirmation that is not red is a worse dialog, palette purity aside.
+    red, green, yellow = term["ansi"][1], term["ansi"][2], term["ansi"][3]
+
+    L = [
+        f"/* {BANNER} */",
+        "",
+    ]
+
+    if adwaita:
+        L += [
+            "/* libadwaita named palette. Anything not listed here keeps its",
+            "   upstream value, which is deliberate — overriding the full set",
+            "   produces a theme that breaks on every libadwaita release. */",
+            "",
+            f'@define-color window_bg_color {c["bg-0"]};',
+            f'@define-color window_fg_color {c["text-1"]};',
+            f'@define-color view_bg_color {c["bg-1"]};',
+            f'@define-color view_fg_color {c["text-1"]};',
+            f'@define-color headerbar_bg_color {c["bg-1"]};',
+            f'@define-color headerbar_fg_color {c["text-1"]};',
+            f'@define-color headerbar_border_color {c["border"]};',
+            f'@define-color headerbar_backdrop_color {c["bg-0"]};',
+            f'@define-color sidebar_bg_color {c["bg-2"]};',
+            f'@define-color sidebar_fg_color {c["text-1"]};',
+            f'@define-color sidebar_backdrop_color {c["bg-0"]};',
+            f'@define-color secondary_sidebar_bg_color {c["bg-2"]};',
+            f'@define-color secondary_sidebar_fg_color {c["text-1"]};',
+            f'@define-color card_bg_color {c["bg-1"]};',
+            f'@define-color card_fg_color {c["text-1"]};',
+            f'@define-color dialog_bg_color {c["bg-0"]};',
+            f'@define-color dialog_fg_color {c["text-1"]};',
+            f'@define-color popover_bg_color {c["bg-1"]};',
+            f'@define-color popover_fg_color {c["text-1"]};',
+            f'@define-color thumbnail_bg_color {c["bg-1"]};',
+            f'@define-color thumbnail_fg_color {c["text-1"]};',
+            "",
+            f'@define-color accent_bg_color {c["accent"]};',
+            f'@define-color accent_fg_color {c["accent-ink"]};',
+            "/* accent_color is used for TEXT on light surfaces, so it needs the",
+            "   darker step or links fail contrast against view_bg. */",
+            f'@define-color accent_color {c["accent-dim"]};',
+            "",
+            f'@define-color destructive_bg_color {red};',
+            f'@define-color destructive_fg_color {c["accent-ink"]};',
+            f'@define-color destructive_color {red};',
+            f'@define-color success_bg_color {green};',
+            f'@define-color success_fg_color {c["accent-ink"]};',
+            f'@define-color success_color {green};',
+            f'@define-color warning_bg_color {yellow};',
+            f'@define-color warning_fg_color {c["accent-ink"]};',
+            f'@define-color warning_color {yellow};',
+            f'@define-color error_bg_color {red};',
+            f'@define-color error_fg_color {c["accent-ink"]};',
+            f'@define-color error_color {red};',
+            "",
+            f'@define-color borders {c["border"]};',
+        ]
+    else:
+        L += [
+            "/* GTK3 reads a much smaller set of names than libadwaita. */",
+            "",
+            f'@define-color theme_bg_color {c["bg-0"]};',
+            f'@define-color theme_fg_color {c["text-1"]};',
+            f'@define-color theme_base_color {c["bg-1"]};',
+            f'@define-color theme_text_color {c["text-1"]};',
+            f'@define-color theme_selected_bg_color {c["accent"]};',
+            f'@define-color theme_selected_fg_color {c["accent-ink"]};',
+            f'@define-color insensitive_bg_color {c["bg-0"]};',
+            f'@define-color insensitive_fg_color {c["text-2"]};',
+            f'@define-color borders {c["border"]};',
+            f'@define-color warning_color {yellow};',
+            f'@define-color error_color {red};',
+            f'@define-color success_color {green};',
+        ]
+
+    L.append("")
+    return "\n".join(L)
+
+
+# --------------------------------------------------------------------------
 # ghostty
 # --------------------------------------------------------------------------
 
@@ -440,6 +538,8 @@ def main() -> int:
         ROOT / "design/tokens.css": render_css(tokens),
         ROOT / "hypr/tokens.conf": render_hypr(tokens),
         ROOT / "ghostty/gelo-theme": render_ghostty(tokens),
+        ROOT / "gtk-4.0/gtk.css": render_gtk(tokens, adwaita=True),
+        ROOT / "gtk-3.0/gtk.css": render_gtk(tokens, adwaita=False),
     }
     outputs.update(render_components())
     outputs.update(render_shaders())
