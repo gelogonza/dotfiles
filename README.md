@@ -124,7 +124,8 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   scroll to nudge it, right-click to mute.
 - **Bluetooth** — click to open `blueman-manager`, right-click to disconnect
   every connected device. Hidden entirely if the machine has no controller.
-- **Power** — opens a menu: lock, log out, reboot, shut down.
+- **Power** — opens a menu: lock, sleep, log out, reboot, shut down. Sleep
+  locks on the way down, so the machine never resumes to an open desktop.
 
 ### Keybinds
 
@@ -135,6 +136,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + SHIFT + L` | lock (Quickshell, shader — **untested**, see docs/lock-screen.md) |
 | `SUPER + Q` / `SUPER + Return` | terminal |
 | `SUPER + C` | close window |
+| `SUPER + E` | file manager (Nautilus) |
 | `SUPER + SHIFT + V` | clipboard history |
 | `SUPER + 1..0` | switch workspace |
 | `SUPER + SHIFT + 1..0` | move window to workspace |
@@ -155,6 +157,7 @@ The launcher is also scriptable:
 qs -c gelo ipc call launcher toggle
 qs -c gelo ipc call launcher search fire
 qs -c gelo ipc call launcher clipboard
+qs -c gelo ipc call power toggle
 ```
 
 ---
@@ -176,6 +179,11 @@ Then restart the shell:
 ```bash
 pkill -x quickshell; setsid quickshell -c gelo >/dev/null 2>&1 &
 ```
+
+**GTK apps** (Nautilus, file dialogs) follow the palette through
+`@define-color` overrides generated into `gtk-4.0/gtk.css`. libadwaita ignores
+custom *themes* by design, but it does read those named colours — that is the
+supported way to retheme it. Restart the app to pick up changes.
 
 **Switch the font** — one line in `tokens.json`. Figtree, Inter Display and
 Nimbus Sans are already installed as alternatives.

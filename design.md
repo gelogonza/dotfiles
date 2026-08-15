@@ -14,7 +14,7 @@ the bug.
 ## 1. The pipeline
 
 `design/tokens.json` is the single source of truth.
-`design/build-tokens.py` fans it out to **six** targets in four languages:
+`design/build-tokens.py` fans it out to **seven** targets in four languages:
 
 | Generated | Consumer | Language |
 |---|---|---|
@@ -23,6 +23,7 @@ the bug.
 | `design/tokens.css` | GTK / any web-ish surface | CSS |
 | `hypr/tokens.conf` | `hyprland.conf`, `hyprlock.conf` | hyprlang |
 | `ghostty/gelo-theme` | terminal | ghostty config |
+| `gtk-{3,4}.0/gtk.css` | GTK3 / libadwaita apps | CSS |
 | `*/Components/*.qml`, `*/Shaders/*.frag`, `*/icons/*.svg` | both QML roots | copied |
 
 ```bash
@@ -362,6 +363,28 @@ accent-fill with antialiasing intact.
 - **XCursor, not hyprcursor** — hyprcursor scales better but leaves every
   XWayland client on the system default, which is the exact inconsistency this
   removes.
+
+---
+
+## 8b. GTK / libadwaita
+
+libadwaita deliberately ignores custom GTK *themes* — its whole premise is that
+apps look the same everywhere. It does read named colours from
+`~/.config/gtk-4.0/gtk.css`, and overriding those is the supported way to
+retheme Nautilus and every GTK file dialog.
+
+Only the names actually needed are overridden. Overriding the full libadwaita
+palette produces a theme that breaks on every release; leaving the rest at
+upstream values means new widgets degrade to stock rather than to garbage.
+
+`destructive` / `error` / `warning` / `success` reuse the terminal's ANSI red,
+yellow and green. Same reasoning as §3: a delete confirmation that is not red is
+a worse dialog, palette purity notwithstanding.
+
+GTK3 reads a much smaller set of names than libadwaita, hence two generated
+files. `settings.ini` stays hand-maintained — it holds preferences (dark-mode
+flag, cursor size) rather than design tokens — but it must name **Adwaita** as
+the theme, since that is the base whose colours the CSS overrides.
 
 ---
 
