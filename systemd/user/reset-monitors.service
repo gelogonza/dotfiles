@@ -1,0 +1,8 @@
+[Unit]
+Description=Reset GNOME Monitor Layout
+
+[Service]
+ExecStart=%h/.local/bin/reset-monitors.sh
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,29 @@
+# Font
+font=Inter 11
+
+# Positioning
+anchor=top-right
+margin=12
+padding=14
+width=320
+
+# Timing
+default-timeout=4000
+ignore-timeout=false
+
+# Colors (match Waybar)
+background-color=#ffffffee
+text-color=#111111
+border-color=#00000000
+border-size=0
+border-radius=18
+
+# Icons
+icon-location=left
+max-icon-size=40
+
+# Progress bars (volume, etc.)
+progress-color=over #0000001a
+
+# Grouping
+group-by=app-name

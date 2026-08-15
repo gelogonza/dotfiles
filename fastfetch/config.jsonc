@@ -1,0 +1,35 @@
+{
+  "logo": {
+    "type": "file",
+    "source": "/home/gelo/Downloads/ascii-art.txt",
+    "color": {
+      "1": "38;2;252;148;56"
+    },
+    "padding": {
+      "right": 3
+    }
+  },
+
+  "display": {
+    "color": {
+      "keys": "38;2;252;148;56",
+      "separator": "38;2;252;148;56",
+      "output": "white"
+    }
+  },
+
+  "modules": [
+    "os",
+    "host",
+    "kernel",
+    "uptime",
+    "packages",
+    "display",
+    "cpu",
+    "gpu",
+    "memory",
+    "disk",
+    "battery",
+    "locale"
+  ]
+}

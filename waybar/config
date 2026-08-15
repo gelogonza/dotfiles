@@ -1,0 +1,135 @@
+{
+  "position": "top",
+  "layer": "top",
+  "exclusive": true,
+  "gtk-layer-shell": true,
+
+  "margin-top": 10,
+  "margin-left": 10,
+  "margin-right": 10,
+  "height": 40,
+  "spacing": 8,
+
+  "modules-left": [
+    "custom/weather",
+    "custom/spotify",
+    "custom/chrome",
+    "custom/discord",
+    "custom/vscode",
+    "custom/ghostty",
+    "cpu",
+    "memory"
+  ],
+
+  "modules-center": [
+    "hyprland/workspaces",
+    "hyprland/window",
+    "clock"
+  ],
+
+  "modules-right": [
+    "pulseaudio",
+    "tray",
+    "custom/power"
+  ],
+
+  "tray": {
+    "icon-size": 16,
+    "spacing": 6
+  },
+
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "on-click": "activate",
+    "sort-by-number": true
+  },
+
+  "clock": {
+    "format": "{:%I:%M %p}",
+    "tooltip": false
+  },
+
+  "cpu": {
+    "format": "󰍛  {usage}%",
+    "interval": 1
+  },
+
+  "memory": {
+    "format": "  {used:0.1f}G",
+    "interval": 3
+  },
+
+  "pulseaudio": {
+    "format": "{icon}   {volume}%",
+    "format-muted": "󰝟",
+    "format-icons": {
+      "default": ["", "", ""]
+    },
+    "on-click": "pavucontrol",
+    "on-click-right": "~/.config/waybar/scripts/audio-devices.sh",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_SINK@ 5%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_SINK@ 5%-",
+    "tooltip": false
+  },
+
+  "custom/weather": {
+    "exec": "~/.config/waybar/scripts/weather.sh",
+    "interval": 600,
+    "format": "{}",
+    "tooltip": false
+  },
+
+ "custom/spotify": {
+  "exec": "echo ",
+  "format": "{}",
+  "on-click": "sh -c 'spotify'",
+  "interval": 30,
+  "tooltip": false
+},
+
+"custom/chrome": {
+  "exec": "echo ",
+  "format": "{}",
+  "on-click": "sh -c 'google-chrome-stable'",
+  "interval": 30,
+  "tooltip": false
+},
+
+"custom/discord": {
+  "exec": "echo ",
+  "format": "{}",
+  "on-click": "sh -c 'discord'",
+  "interval": 30,
+  "tooltip": false
+},
+
+"custom/ghostty": {
+  "exec": "echo ",
+  "format": "{}",
+  "on-click": "sh -c 'ghostty'",
+  "interval": 30,
+  "tooltip": false
+},
+
+"custom/vscode": {
+  "exec": "echo 󰨞",
+  "format": "{}",
+  "on-click": "sh -c 'code'",
+  "interval": 30,
+  "tooltip": false
+},
+
+"custom/power": {
+  "exec": "echo ⏻",
+  "interval": 30,
+  "tooltip": false,
+  "on-click": "~/.config/waybar/scripts/powermenu.sh"
+ },
+
+ "hyprland/window": {
+  "format": "{}",
+  "max-length": 60,
+  "tooltip": false
+}
+
+}

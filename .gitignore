@@ -1,0 +1,30 @@
+# Logs (regenerated at runtime, not config)
+*.log
+logs/
+
+# Caches
+.cache/
+cache/
+Cache/
+*.cache
+
+# OBS Studio runtime/profiling data and plugin registry — regenerated
+# automatically, not authored config
+obs-studio/logs/
+obs-studio/profiler_data/
+obs-studio/plugin_manager/
+
+# OBS websocket plugin stores its remote-control password in plaintext here
+obs-studio/plugin_config/obs-websocket/config.json
+
+# Lockfiles / transient runtime state
+*.lock
+lockfile
+.sentinel
+queue.sqlite3
+
+# Editor/OS backup junk
+*.bak
+*~
+*.swp
+.DS_Store

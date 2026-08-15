@@ -1,0 +1,133 @@
+* {
+  font-family: Inter, "JetBrainsMono Nerd Font", sans-serif;
+  font-size: 12px;
+}
+
+/* Waybar shell */
+window#waybar {
+  background: rgb(255, 255, 255);
+  border-radius: 19px;
+  padding: 8px 20px;
+  color: #111111;
+}
+
+/* Workspaces */
+#workspaces button {
+  background: transparent;
+  padding: 4px 6px;
+  margin: 0 4px;
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 6px;
+  font-weight: 600;
+  opacity: 0.55;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  color: black;
+}
+
+#workspaces button:hover {
+  opacity: 0.75;
+  border: 1px solid rgb(252, 148, 56);
+  background: rgb(252, 148, 56);
+  box-shadow: none;
+  outline: none;
+  color: black;
+}
+
+#workspaces button.active {
+  opacity: 1;
+  border: 1px solid rgb(252, 148, 56);
+  background: rgb(252, 148, 56);
+  box-shadow: none;
+  outline: none;
+  color: white;
+}
+
+/* Window title */
+#hyprland-window {
+  padding: 2px 14px;
+  margin: 0 6px;
+  font-weight: 500;
+  opacity: 0.9;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+}
+
+/* Status modules */
+#clock,
+#cpu,
+#memory,
+#pulseaudio,
+#tray
+{
+  padding: 2px 14px;
+  font-size: 12px;
+  margin: 0 4px;
+  background: rgb(252, 148, 56);
+  border-radius: 8px;
+  color: white;
+  font-weight:bold
+}
+
+#custom-weather {
+  padding: 2px 12px;
+  font-size: 12px;
+  margin: 0 4px;
+  opacity: 0.85;
+  background: #ffffff;
+  border-radius: 10px;
+}
+
+/* App launcher icons */
+#custom-spotify,
+#custom-chrome,
+#custom-discord,
+#custom-ghostty,
+#custom-vscode {
+  font-size: 18px;
+  padding: 0 8px;
+  opacity: 0.75;
+  transition: opacity 0.15s ease;
+  color: rgb(252, 148, 56);
+}
+
+#custom-spotify:hover,
+#custom-chrome:hover,
+#custom-discord:hover,
+#custom-ghostty:hover,
+#custom-vscode:hover {
+  opacity: 1;
+  background: rgb(252, 148, 56);
+  border-radius: 8px;
+  color: white;
+}
+
+#custom-power {
+  padding: 0 12px;
+  margin: 0 6px;
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+#custom-power:hover {
+  opacity: 1;
+}
+
+#pulseaudio {
+	padding: 0 12px;
+	margin: 0 6px;
+	opacity: 1;
+	font-size: 13px
+}
+
+#pulseaudio:hover {
+	opacity: 0.85;
+}
+
+#custom-spotify {
+  padding: 2px 16px;
+  margin: 0 6px;
+  opacity: 0.95;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+}
