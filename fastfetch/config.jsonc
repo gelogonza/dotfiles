@@ -16,9 +16,9 @@
 {
   "logo": {
     "type": "file",
-    // NOTE: this path is outside the repo, so it is not portable — a fresh
-    // clone on another machine renders no logo until this points somewhere real.
-    "source": "/home/gelo/Downloads/ascii-art.txt",
+    // Lives in the repo, so a fresh clone renders the logo. Absolute because
+    // fastfetch resolves this relative to the working directory, not the config.
+    "source": "/home/gelo/Coding/dotfiles-gelo/fastfetch/globe.txt",
     "color": {
       "1": "38;2;140;198;247",
       "2": "38;2;52;120;196"

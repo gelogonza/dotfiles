@@ -29,7 +29,7 @@ Arch. Everything below is in the official repos except the fonts.
 ```bash
 sudo pacman -S --needed \
   hyprland quickshell qt6-shadertools qt6-wayland qt6-5compat qt6-declarative \
-  hyprlock ghostty fastfetch \
+  hyprlock hypridle hyprpolkitagent ghostty fastfetch \
   grim slurp cliphist wl-clipboard brightnessctl playerctl jq \
   pipewire pipewire-pulse wireplumber \
   adwaita-cursors inter-font
@@ -135,14 +135,26 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + SHIFT + L` | lock (Quickshell, shader — **untested**, see docs/lock-screen.md) |
 | `SUPER + Q` / `SUPER + Return` | terminal |
 | `SUPER + C` | close window |
+| `SUPER + SHIFT + V` | clipboard history |
 | `SUPER + 1..0` | switch workspace |
 | `SUPER + SHIFT + 1..0` | move window to workspace |
+
+**Clipboard history** lives in the launcher rather than a separate picker —
+same fuzzy search, same chrome. `SUPER+SHIFT+V` rather than `SUPER+V` because
+`SUPER+V` is already `togglefloating`, and Hyprland fires *both* bindings for a
+chord instead of picking one. Swap them in `hyprland.conf` if you prefer.
+
+**Idle**: locks at 5 minutes, displays off at 10 (`hypr/hypridle.conf`). It
+calls **hyprlock**, not the Quickshell lock — an idle timer firing an untested
+lock while you are away is exactly how you get stranded. One line to change once
+you have verified it.
 
 The launcher is also scriptable:
 
 ```bash
 qs -c gelo ipc call launcher toggle
 qs -c gelo ipc call launcher search fire
+qs -c gelo ipc call launcher clipboard
 ```
 
 ---
@@ -218,6 +230,9 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
 | GPU stat missing | no `nvidia-smi` | expected — it hides itself |
 | Weather missing | disabled, or the request failed | `weather.enabled` in tokens |
 | Notifications not appearing | mako owns the DBus name | `pkill mako` |
+| Clipboard history empty | `wl-paste` watchers not running | `pgrep -af wl-paste` — two expected |
+| Screen never locks itself | hypridle not running | `pgrep -x hypridle`; check `hypr/hypridle.conf` |
+| Privilege prompts never appear | no polkit agent | `systemctl --user status hyprpolkitagent` |
 | Bluetooth control missing | no controller, or `bluetoothctl` absent | `bluetoothctl show` |
 
 Shell logs: run `quickshell -c gelo` in a terminal, or read
@@ -241,5 +256,3 @@ Compositor: `hyprctl configerrors`, `hyprctl layers`.
   with a static image rather than micro-optimising the GLSL.
 - **Quickshell's `DesktopEntries` returns nothing** on this system, which is why
   the launcher builds its own index via `scripts/list-apps.py`.
-- **The fastfetch logo path points outside the repo** and renders nothing on a
-  fresh clone.
