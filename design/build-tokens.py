@@ -1129,14 +1129,14 @@ _SPICETIFY_JS = r"""// __BANNER__
   var PALETTE_HUE = 207.5;
 
   var BASE_RATE = 0.16;
-  var FPS_CAP = 30;
+  var FPS_CAP = 60;              // the surge waits up to a frame to render
   var KEY = "gelo-xmb-field";
 
   // Every default is the value the token source produces. Reset returns here.
   var DEFAULTS = {
     fieldGain: 1, sat: 1, tint: 0.65,
     scrim: 0.68, panel: 0.88, ui: 1,
-    reactivity: 1, rate: 1, spin: 14,
+    reactivity: 1, rate: 1, spin: 14, lead: 0.12,
     enabled: true, coolLock: true, turntable: true, waveform: true,
     // Colour SOURCE, not a colour. "tokens" is design/tokens.json and is the
     // default, so the system's palette is what you get until you ask for
@@ -1968,17 +1968,24 @@ _SPICETIFY_JS = r"""// __BANNER__
 
       var pos = S.Player.getProgress() / 1000;
       if (WAVE.dur) refreshWave(Math.max(0, Math.min(1, pos / WAVE.dur)), false);
-      if (idx > 0 && beats[idx - 1] && pos < beats[idx - 1].start - 1) idx = 0;
 
-      while (idx < beats.length && beats[idx].start <= pos) {
-        if (pos - beats[idx].start < 0.25 && beats[idx].confidence > floor) {
+      // Fire AHEAD of the timestamp. The analysis timeline is where the beat
+      // is in the file, not where it is in the air — Spotify's output
+      // buffering puts the two apart, and the poll and frame cap add their own
+      // delay on top. Anticipating by `lead` cancels the lot. The right value
+      // depends on the output path, hence a slider rather than a constant.
+      var p = pos + CFG.lead;
+      if (idx > 0 && beats[idx - 1] && p < beats[idx - 1].start - 1) idx = 0;
+
+      while (idx < beats.length && beats[idx].start <= p) {
+        if (p - beats[idx].start < 0.25 && beats[idx].confidence > floor) {
           // Off-centre and low, so the field answers the music rather than
           // pulsing at it from the middle of the screen.
           ripple();
         }
         idx++;
       }
-    }, 60);
+    }, 20);
   }
 
   // ------------------------------------------------------------------
@@ -1996,6 +2003,7 @@ _SPICETIFY_JS = r"""// __BANNER__
     ["ui", "UI opacity", 0.3, 1, 0.01],
     ["panel", "Right panel", 0.3, 1, 0.01],
     ["reactivity", "Beat reactivity", 0, 2, 0.05],
+    ["lead", "Beat lead", 0, 0.4, 0.01],
     ["rate", "Drift rate", 0, 2, 0.05],
     ["spin", "Spin period (s)", 3, 40, 1]
   ];
@@ -2257,6 +2265,7 @@ _SPICETIFY_JS = r"""// __BANNER__
   function fmt(key, v) {
     if (key === "hue") return Math.round(v) + "°";
     if (key === "spin") return Math.round(v) + "s";
+    if (key === "lead") return Math.round(v * 1000) + "ms";
     return Number(v).toFixed(2);
   }
 
