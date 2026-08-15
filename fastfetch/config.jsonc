@@ -1,9 +1,27 @@
+// fastfetch
+//
+// Colours are the palette from design/tokens.json, written by hand rather than
+// generated: fastfetch has no include mechanism, so a generated fragment would
+// have nowhere to be included from. If you change the palette, change these
+// four values too.
+//
+//   accent      #3478c4  ->  38;2;52;120;196
+//   accent-dim  #2e68a8  ->  38;2;46;104;168
+//   chrome-edge #8cc6f7  ->  38;2;140;198;247
+//   text-1      #dfe9f4  ->  38;2;223;233;244   (terminal foreground)
+//   text-2      #5a7fb5  ->  38;2;90;127;181
+//
+// The previous scheme was warm orange (252,148,56), which is the one hue family
+// this system does not contain.
 {
   "logo": {
     "type": "file",
+    // NOTE: this path is outside the repo, so it is not portable — a fresh
+    // clone on another machine renders no logo until this points somewhere real.
     "source": "/home/gelo/Downloads/ascii-art.txt",
     "color": {
-      "1": "38;2;252;148;56"
+      "1": "38;2;140;198;247",
+      "2": "38;2;52;120;196"
     },
     "padding": {
       "right": 3
@@ -12,10 +30,13 @@
 
   "display": {
     "color": {
-      "keys": "38;2;252;148;56",
-      "separator": "38;2;252;148;56",
-      "output": "white"
-    }
+      // Keys carry the accent; separators sit back so the column reads as one
+      // block rather than as a grid.
+      "keys": "38;2;52;120;196",
+      "separator": "38;2;90;127;181",
+      "output": "38;2;223;233;244"
+    },
+    "separator": "  "
   },
 
   "modules": [
