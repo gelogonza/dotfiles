@@ -9,6 +9,7 @@ import Quickshell
 import "root:/Bar"
 import "root:/Launcher"
 import "root:/Notifications"
+import "root:/PowerMenu"
 import "root:/Wallpaper"
 
 ShellRoot {
@@ -33,4 +34,6 @@ ShellRoot {
 
     // Also single-instance: org.freedesktop.Notifications has one owner.
     NotificationLayer {}
+
+    PowerMenu {}
 }

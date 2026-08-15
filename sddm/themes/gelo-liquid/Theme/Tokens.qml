@@ -76,6 +76,13 @@ QtObject {
         }
     }
 
+    // See design/tokens.json — this is off by default because turning it
+    // on means talking to a third-party server about where you are.
+    readonly property QtObject weather: QtObject {
+        readonly property bool enabled: false
+        readonly property string location: ""
+    }
+
     readonly property QtObject motion: QtObject {
         // Feed straight into `easing.bezierCurve`. QML wants six values:
         // the two control points plus the fixed (1,1) endpoint.
