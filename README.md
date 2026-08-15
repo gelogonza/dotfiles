@@ -122,6 +122,8 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   tree, so a terminal sitting in `$HOME` still shows the project its shell is in.
 - **Volume** — click to open `pavucontrol`, drag the track to set the level,
   scroll to nudge it, right-click to mute.
+- **Bluetooth** — click to open `blueman-manager`, right-click to disconnect
+  every connected device. Hidden entirely if the machine has no controller.
 - **Power** — opens a menu: lock, log out, reboot, shut down.
 
 ### Keybinds
@@ -215,6 +217,7 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
 | GPU stat missing | no `nvidia-smi` | expected — it hides itself |
 | Weather missing | disabled, or the request failed | `weather.enabled` in tokens |
 | Notifications not appearing | mako owns the DBus name | `pkill mako` |
+| Bluetooth control missing | no controller, or `bluetoothctl` absent | `bluetoothctl show` |
 
 Shell logs: run `quickshell -c gelo` in a terminal, or read
 `/run/user/1000/quickshell/by-id/*/log.qslog`.

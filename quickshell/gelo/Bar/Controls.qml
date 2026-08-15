@@ -17,7 +17,6 @@
 
 import QtQuick
 import Quickshell
-import Quickshell.Bluetooth
 import "root:/Theme"
 import "root:/Components"
 import "root:/Services"
@@ -149,31 +148,44 @@ Row {
     }
 
     // --- bluetooth --------------------------------------------------------
+    //   click        -> open blueman
+    //   right click  -> disconnect every connected device
+    //
+    // Hidden entirely when the machine has no controller, rather than shown as
+    // a dead icon.
     Icon {
         id: bt
         anchors.verticalCenter: parent.verticalCenter
         size: 16
 
-        // defaultAdapter can be null briefly at startup and permanently on a
-        // machine with no radio, so fall back to the first adapter and hide the
-        // control entirely when there is none.
-        readonly property var adapter: Bluetooth.defaultAdapter
-            || (Bluetooth.adapters && Bluetooth.adapters.values.length > 0
-                ? Bluetooth.adapters.values[0]
-                : null)
+        visible: Bluetooth.present
+        source: Bluetooth.icon
 
-        readonly property bool on: adapter ? adapter.enabled : false
+        // Three states, and only two colours: something is connected (full
+        // ink), the radio is on but idle, or it is off (receded). Accent is not
+        // available here — it is spent elsewhere.
+        color: Bluetooth.connected > 0 ? Tokens.color.text1
+             : Bluetooth.powered ? Tokens.color.text2
+                                 : Tokens.alpha(Tokens.color.text2, 0.5)
 
-        visible: adapter !== null
-        source: on ? "bluetooth-on" : "bluetooth-off"
-        color: on ? Tokens.color.text1 : Tokens.color.text2
+        Behavior on color {
+            ColorAnimation {
+                duration: Tokens.motion.duration.fast
+                easing.type: Easing.Bezier
+                easing.bezierCurve: Tokens.motion.easeBezier
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                if (bt.adapter)
-                    bt.adapter.enabled = !bt.adapter.enabled;
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+            onClicked: mouseEvent => {
+                if (mouseEvent.button === Qt.RightButton)
+                    Bluetooth.disconnectAll();
+                else
+                    Bluetooth.openManager();
             }
         }
     }
