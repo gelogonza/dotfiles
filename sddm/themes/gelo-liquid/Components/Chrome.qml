@@ -78,8 +78,12 @@ Item {
     }
 
     // --- glow -------------------------------------------------------------
-    // A shadow is just a blurred, offset copy; give it the accent colour, no
-    // offset, and a scale above 1 and it becomes a bloom radiating outward.
+    // A blurred, tinted, scaled copy of the surface sitting behind it.
+    //
+    // Deliberately not a coloured drop shadow: that needs `brightness: -1` to
+    // suppress the copy's own colour, and MultiEffect still paints that
+    // blackened copy over the halo — invisible on a dark surface, a hard black
+    // box on a light one.
     MultiEffect {
         source: surface
         anchors.fill: surface
@@ -87,16 +91,14 @@ Item {
         opacity: root.glowOpacity
         autoPaddingEnabled: true
 
-        // The surface itself is drawn by the layer below; this pass contributes
-        // only the coloured halo.
-        brightness: -1.0
+        scale: Tokens.material.glow.spread
 
-        shadowEnabled: true
-        shadowColor: Tokens.material.glow.tint
-        shadowBlur: 1.0
-        shadowScale: Tokens.material.glow.spread
-        shadowVerticalOffset: 0
-        shadowHorizontalOffset: 0
+        blurEnabled: true
+        blur: 1.0
+        blurMax: Tokens.material.glow.radius
+
+        colorization: 1.0
+        colorizationColor: Tokens.material.glow.tint
     }
 
     // --- surface + depth shadow -------------------------------------------

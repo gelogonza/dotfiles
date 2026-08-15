@@ -324,3 +324,66 @@ responds. `BlobIndicator.qml` was recovered from commit `27bc87d`.
 `design/build-shaders.sh` compiles the *generated* copies of the shaders. Running
 it without regenerating first silently baked the previous version — so it now
 invokes `build-tokens.py` itself rather than relying on anyone remembering.
+
+
+---
+
+# Light XMB pass
+
+## Palette inverted
+
+Cold near-black → near-white silver and silk blue, navy ink, one saturated blue
+accent. Two semantic tokens exist that a dark theme never needed:
+
+- `shade` — the dark colour shadows and scrims are built from. On a light theme
+  this cannot be `bg-0` any more, because `bg-0` is now the *lightest* surface;
+  shadows built from it are invisible and scrims brighten instead of dim.
+- `accent-ink` — what sits ON the accent (the workspace blob). Was `bg-0`;
+  now white.
+
+`field-*` is a separate ramp for the wave shader, kept apart from the UI surface
+tokens so the wallpaper can stay more saturated than the chrome on top of it.
+
+**`accent-ink` is deliberately not named `on-accent`.** That camel-cases to
+`onAccent`, which QML parses as a handler for a signal named `accent` rather
+than as a property — the entire Tokens singleton fails to load, and the error
+points at the line without naming the cause. `build-tokens.py` now rejects any
+token generating an `on[A-Z]*` identifier, with an explanation.
+
+## Type
+
+Michroma → **Geist**. Michroma is the literal XMB face but too mannered for a
+bar that is read constantly rather than looked at. Geist is variable, so unlike
+Michroma the 300/400 weight tokens actually apply again. Figtree, Inter Display
+and Nimbus Sans are installed as one-token alternatives.
+
+## Shader
+
+Filament thickness now TAPERS from top to bottom — broad ribbons at the top of
+the frame, fine threads at the bottom. Uniform thickness reads as a pattern; the
+taper gives the field a near and a far edge.
+
+Additive strength had to drop hard for the light palette: at the dark-theme
+values 10% of the frame clipped at 250+ and the middle read as blown out. A
+light surface is already most of the way to white before anything is added.
+Final: p5=158 / p50=187 / p95=228, 0.4% clipped.
+
+## Glow rebuilt
+
+The bloom was a `MultiEffect` over a `ShaderEffectSource`. Both variants broke
+on the light palette:
+
+1. Coloured drop shadow — needs `brightness: -1` to suppress the copy's colour,
+   and MultiEffect still paints that blackened copy over the halo. Invisible on
+   dark, a hard black box on light.
+2. Colourised blur — samples the transparent-black surround, so the halo picks
+   up dark fringing. Measured (107,128,151) grey-blue instead of the accent
+   (52,120,196).
+
+It is now concentric rounded rects at quadratic falloff: no render target, no
+fringing, identical on light or dark. The bloom takes the content's bounding
+shape rather than its silhouette, which is right for everything it wraps.
+
+Related: the launcher's row bloom sits BEHIND the icon rather than wrapping it.
+Blurring app artwork tints the halo with whatever colours the icon already has —
+a dark icon produced a dark glow no matter what colorization was applied.

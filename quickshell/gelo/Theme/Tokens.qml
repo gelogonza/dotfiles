@@ -13,15 +13,22 @@ QtObject {
     }
 
     readonly property QtObject color: QtObject {
-        readonly property color bg0: "#05070c"
-        readonly property color bg1: "#0b0f18"
-        readonly property color bg2: "#131a28"
-        readonly property color border: "#1c2536"
-        readonly property color text1: "#eef2f7"
-        readonly property color text2: "#6b7686"
-        readonly property color accent: "#4fc8ff"
-        readonly property color accentDim: "#2a7fa8"
-        readonly property color glow: "#334fc8ff"
+        readonly property color bg0: "#eef1f8"
+        readonly property color bg1: "#f8fbff"
+        readonly property color bg2: "#dceaf8"
+        readonly property color border: "#bed7eb"
+        readonly property color text1: "#1b4c78"
+        readonly property color text2: "#5a7fb5"
+        readonly property color accent: "#3478c4"
+        readonly property color accentDim: "#2e68a8"
+        readonly property color glow: "#334a8cd0"
+        readonly property color shade: "#1f466b"
+        readonly property color accentInk: "#ffffff"
+        readonly property color fieldBase: "#7cb8e8"
+        readonly property color fieldMid: "#a8d3f2"
+        readonly property color fieldHigh: "#eef1f8"
+        readonly property color fieldEdge: "#edf6ff"
+        readonly property color fieldLine: "#e6f4ff"
     }
 
     readonly property QtObject space: QtObject {
@@ -48,12 +55,12 @@ QtObject {
     }
 
     readonly property QtObject typography: QtObject {
-        readonly property string display: "Michroma"
+        readonly property string display: "Geist"
 
         // QML's font value type exposes `family` (one string) and has no
         // `families` list, so per-glyph fallback is fontconfig's job, not
         // ours. This list is here for the CSS tier, which can express it.
-        readonly property var families: ["Michroma", "Inter Display"]
+        readonly property var families: ["Geist", "Inter Display"]
 
         readonly property real trackingEm: 0.02
 
@@ -96,7 +103,9 @@ QtObject {
             readonly property color surfaceTop: root.alpha(root.color.bg1, surfaceOpacity)
             readonly property color surfaceBottom: root.alpha(Qt.darker(root.color.bg1, 1.0 + gradientDarken), surfaceOpacity)
             readonly property color stroke: root.alpha(root.color.border, strokeOpacity)
-            readonly property color shadow: root.alpha(root.color.bg0, shadowOpacity)
+            // Built from `shade`, not bg-0. On the light palette bg-0 is the
+            // lightest surface, so a shadow made from it would be invisible.
+            readonly property color shadow: root.alpha(root.color.shade, shadowOpacity)
         }
 
         readonly property QtObject glow: QtObject {

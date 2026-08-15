@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -38,6 +39,17 @@ def camel(name: str) -> str:
     out = head
     for part in rest:
         out += part if part.isdigit() else part.capitalize()
+
+    # `onFoo` is how QML spells a handler for a signal named `foo`. A property
+    # with that shape does not become a property — the engine tries to parse the
+    # value as a script and the entire singleton fails to load, with an error
+    # that points at the line but not at the cause.
+    if re.fullmatch(r"on[A-Z].*", out):
+        raise SystemExit(
+            f"error: token '{name}' generates QML identifier '{out}', which QML "
+            f"reads as a signal handler. Rename the token (e.g. 'accent-ink' "
+            f"rather than 'on-accent')."
+        )
     return out
 
 
@@ -158,7 +170,9 @@ def render_qml(t: dict) -> str:
             "readonly property color surfaceTop: root.alpha(root.color.bg1, surfaceOpacity)",
             "readonly property color surfaceBottom: root.alpha(Qt.darker(root.color.bg1, 1.0 + gradientDarken), surfaceOpacity)",
             "readonly property color stroke: root.alpha(root.color.border, strokeOpacity)",
-            "readonly property color shadow: root.alpha(root.color.bg0, shadowOpacity)",
+            "// Built from `shade`, not bg-0. On the light palette bg-0 is the",
+            "// lightest surface, so a shadow made from it would be invisible.",
+            "readonly property color shadow: root.alpha(root.color.shade, shadowOpacity)",
         ],
         "glow": [
             "readonly property color tint: root.color.accent",

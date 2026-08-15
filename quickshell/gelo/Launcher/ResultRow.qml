@@ -70,26 +70,26 @@ Item {
         }
     }
 
+    // The bloom sits behind the icon rather than wrapping it: Glow takes the
+    // bounding shape of whatever it contains, and an empty Glow sized to the
+    // icon gives a clean disc of light under it.
     Glow {
+        anchors.centerIn: icon
+        width: icon.width
+        height: icon.height
+        amount: root.selected ? 1 : 0
+    }
+
+    IconImage {
         id: icon
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: Tokens.space.lg
-        width: 20
-        height: 20
-
-        // The bloom originates at the icon, so the row lights from its leading
-        // edge rather than being uniformly washed.
-        amount: root.selected ? 1 : 0
-
-        IconImage {
-            anchors.fill: parent
-            implicitSize: 20
-            source: root.app && root.app.icon
-                ? Quickshell.iconPath(root.app.icon, true)
-                : ""
-            opacity: root.selected ? 1.0 : 0.8
-        }
+        implicitSize: 20
+        source: root.app && root.app.icon
+            ? Quickshell.iconPath(root.app.icon, true)
+            : ""
+        opacity: root.selected ? 1.0 : 0.8
     }
 
     Text {

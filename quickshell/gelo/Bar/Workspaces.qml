@@ -107,10 +107,10 @@ Item {
                         font.pixelSize: Tokens.typography.size.caption
                         font.weight: Tokens.typography.weight.light
                         font.letterSpacing: Tokens.tracking(Tokens.typography.size.caption)
-                        // On the blob, the darkest background reads out of the
-                        // accent. Off it, occupied workspaces sit brighter than
-                        // empty ones.
-                        color: cellItem.isFocused ? Tokens.color.bg0 : cellItem.isOccupied ? Tokens.color.text1 : Tokens.color.text2
+                        // On the blob, `accent-ink` reads out of the accent.
+                        // Off it, occupied workspaces sit stronger than empty
+                        // ones.
+                        color: cellItem.isFocused ? Tokens.color.accentInk : cellItem.isOccupied ? Tokens.color.text1 : Tokens.color.text2
 
                         Behavior on color {
                             ColorAnimation {

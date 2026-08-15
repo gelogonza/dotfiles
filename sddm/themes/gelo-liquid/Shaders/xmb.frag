@@ -17,9 +17,10 @@
 // sines at a non-integer frequency ratio so it reads as cloth rather than as a
 // test pattern, and each drifts at its own rate so they cross and separate.
 //
-// The field carries NO accent colour. It is built from bg-1 / bg-2 / border
-// only, so it reads as cold light rather than as a fourth accent location. The
-// single exception is the transient ripple wavefront below.
+// The field carries NO accent colour. It is built from the field-* ramp only,
+// which is kept separate from the UI surface tokens so the wallpaper can be
+// more saturated than the chrome sitting on top of it. The single exception is
+// the transient ripple wavefront below.
 //
 // `time` arrives pre-scaled; the caller sets the rate through its
 // NumberAnimation, so the login screen and the desktop can run this at
@@ -39,6 +40,7 @@ layout(std140, binding = 0) uniform buf {
     vec4 colorMid;
     vec4 colorHigh;
     vec4 colorEdge;
+    vec4 colorLine;
     vec4 colorAccent;
     float rippleSpeed;
     float rippleWidth;
@@ -138,23 +140,25 @@ void main() {
     hz += 0.40 * haze(p, vec2(0.20, 0.62), vec2(0.40, 0.13), t, 0.11);
 
     // --- filaments --------------------------------------------------------
-    // Many thin strands, not a few thick bands. They are clustered around the
-    // middle of the frame and thin out toward the edges, and each drifts at its
-    // own rate so they cross and separate instead of moving as a block.
+    // Ordered top of frame to bottom, and thickness TAPERS as they descend:
+    // the upper strands are broad ribbons, the lower ones are fine threads.
+    // A uniform thickness reads as a pattern; the taper gives the field a
+    // near edge and a far edge, so it has depth rather than repetition.
     float f = 0.0;
-    f += 1.00 * filament(p, 0.500, 0.060, 4.7,  0.50, 0.0016, 0.030, t);
-    f += 0.80 * filament(p, 0.470, 0.075, 3.3, -0.38, 0.0013, 0.026, t);
-    f += 0.85 * filament(p, 0.535, 0.068, 6.1,  0.31, 0.0015, 0.028, t);
-    f += 0.65 * filament(p, 0.445, 0.090, 2.6, -0.25, 0.0011, 0.034, t);
-    f += 0.70 * filament(p, 0.575, 0.082, 5.2,  0.22, 0.0012, 0.024, t);
-    f += 0.55 * filament(p, 0.405, 0.105, 3.9,  0.17, 0.0010, 0.038, t);
-    f += 0.50 * filament(p, 0.625, 0.098, 4.1, -0.19, 0.0010, 0.030, t);
-    f += 0.40 * filament(p, 0.355, 0.120, 5.7,  0.28, 0.0009, 0.042, t);
-    f += 0.38 * filament(p, 0.680, 0.115, 3.1,  0.14, 0.0009, 0.034, t);
-    f += 0.28 * filament(p, 0.300, 0.135, 4.5, -0.12, 0.0008, 0.046, t);
-    f += 0.26 * filament(p, 0.745, 0.128, 5.9,  0.24, 0.0008, 0.038, t);
-    f += 0.20 * filament(p, 0.240, 0.150, 3.6,  0.09, 0.0007, 0.050, t);
-    f += 0.18 * filament(p, 0.810, 0.142, 4.9, -0.16, 0.0007, 0.042, t);
+    //                      yc     amp    freq  speed    core    halo
+    f += 0.55 * filament(p, 0.185, 0.075, 2.4,  0.13,  0.0090, 0.075, t);
+    f += 0.70 * filament(p, 0.255, 0.068, 3.1, -0.16,  0.0075, 0.068, t);
+    f += 0.85 * filament(p, 0.325, 0.082, 2.8,  0.21,  0.0060, 0.060, t);
+    f += 1.00 * filament(p, 0.395, 0.070, 3.6, -0.25,  0.0048, 0.052, t);
+    f += 0.95 * filament(p, 0.450, 0.060, 4.7,  0.50,  0.0036, 0.044, t);
+    f += 0.90 * filament(p, 0.500, 0.075, 3.3, -0.38,  0.0028, 0.038, t);
+    f += 0.80 * filament(p, 0.548, 0.068, 6.1,  0.31,  0.0020, 0.032, t);
+    f += 0.70 * filament(p, 0.595, 0.090, 2.6, -0.22,  0.0016, 0.030, t);
+    f += 0.60 * filament(p, 0.645, 0.082, 5.2,  0.19,  0.0013, 0.028, t);
+    f += 0.50 * filament(p, 0.700, 0.105, 3.9,  0.17,  0.0011, 0.026, t);
+    f += 0.40 * filament(p, 0.755, 0.098, 4.1, -0.14,  0.0009, 0.024, t);
+    f += 0.30 * filament(p, 0.815, 0.120, 5.7,  0.24,  0.0008, 0.022, t);
+    f += 0.22 * filament(p, 0.875, 0.112, 3.4, -0.11,  0.0007, 0.020, t);
 
     // --- tone -------------------------------------------------------------
     // A faint cold vertical gradient underneath, so the frame is not flat where
@@ -163,14 +167,21 @@ void main() {
 
     // The haze lifts the field toward bg-2 / border. Broad and very low
     // contrast — it should never be readable as a shape on its own.
-    col = mix(col, colorHigh.rgb, clamp(hz * 0.55, 0.0, 1.0));
+    col = mix(col, colorHigh.rgb, clamp(hz * 0.40, 0.0, 1.0));
     col = mix(col, colorEdge.rgb, clamp((hz - 0.75) * 0.45, 0.0, 1.0));
 
     // Filaments are light, so they ADD rather than mix — that is what lets a
-    // thin core read as brighter than the surface it crosses instead of just
-    // being a different colour.
-    col += colorEdge.rgb * clamp(f, 0.0, 2.2) * 0.55;
-    col += vec3(0.62, 0.72, 0.86) * smoothstep(0.85, 1.9, f) * 0.10;
+    // strand read as brighter than the surface it crosses instead of just
+    // being a different colour. On the light palette the field is already near
+    // silver, so the strands have to reach past it toward white to register.
+    //
+    // Measured tuning: at 0.30 / 0.16 the overlapping strands summed into a
+    // white wash — 10% of the frame clipped at 250+ and the whole middle read
+    // as blown out rather than as light. Additive terms have to be far gentler
+    // on a light field than on a dark one, because the surface is already most
+    // of the way to white before anything is added.
+    col += colorLine.rgb * clamp(f, 0.0, 2.2) * 0.15;
+    col += vec3(1.0) * smoothstep(1.10, 2.2, f) * 0.07;
 
     // The ripple wavefront carries accent light. This is the only place the
     // accent appears outside its three sanctioned locations, and it is

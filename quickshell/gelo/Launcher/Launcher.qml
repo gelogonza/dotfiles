@@ -110,10 +110,11 @@ PanelWindow {
 
     // --- scrim ------------------------------------------------------------
     // Dimming the desktop is what makes the palette read as a modal surface
-    // rather than as another panel.
+    // rather than as another panel. Built from `shade`: on the light palette
+    // bg-0 is the lightest surface and would brighten rather than dim.
     Rectangle {
         anchors.fill: parent
-        color: Tokens.alpha(Tokens.color.bg0, 0.45)
+        color: Tokens.alpha(Tokens.color.shade, 0.38)
         opacity: launcher.open ? 1 : 0
 
         Behavior on opacity {

@@ -44,10 +44,13 @@ Rectangle {
         property real time: 0
         property vector2d resolution: Qt.vector2d(width, height)
 
-        property vector4d colorBase: toVec(Tokens.color.bg0)
-        property vector4d colorMid: toVec(Tokens.color.bg1)
-        property vector4d colorHigh: toVec(Tokens.color.bg2)
-        property vector4d colorEdge: toVec(Tokens.color.border)
+        // The wave field has its own ramp, separate from the UI surface
+        // tokens, so it can stay more saturated than the chrome on top of it.
+        property vector4d colorBase: toVec(Tokens.color.fieldBase)
+        property vector4d colorMid: toVec(Tokens.color.fieldMid)
+        property vector4d colorHigh: toVec(Tokens.color.fieldHigh)
+        property vector4d colorEdge: toVec(Tokens.color.fieldEdge)
+        property vector4d colorLine: toVec(Tokens.color.fieldLine)
         property vector4d colorAccent: toVec(Tokens.color.accent)
 
         property real rippleSpeed: Tokens.material.ripple.speed
