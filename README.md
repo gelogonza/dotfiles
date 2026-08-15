@@ -38,7 +38,12 @@ is what keeps them from drifting.
 design/build-tokens.py           # regenerate everything
 design/build-tokens.py --check   # fail if anything is stale (CI / pre-commit)
 design/build-shaders.sh          # bake .frag -> .qsb (Qt6 rejects raw GLSL)
+design/build-cursor.py           # recolour the cursor theme (run once per clone)
 ```
+
+`build-cursor.py` writes to `~/.local/share/icons/gelo-cursor` rather than into
+the repo: it is ~12MB of binaries derived from Adwaita (CC-BY-SA 3.0), and
+carrying a recoloured copy here would drag the attribution along with it.
 
 Generated files carry a do-not-edit header and are committed, so a fresh clone
 works without running anything.
@@ -49,8 +54,9 @@ wave field behind the interface.
 
 ### Rules the system actually enforces
 
-**Accent appears in exactly three places.** Active workspace indicator, focused
-window border, cursor. Nowhere else. Selection states, hover states, notification
+**Accent appears in exactly three places.** Active workspace indicator
+(`BlobIndicator`), focused window border (`col.active_border`), and the cursor
+(`design/build-cursor.py`). Nowhere else. Selection states, hover states, notification
 urgency and login failure all carry meaning through elevation, weight and
 opacity instead. Failure states reuse `--accent` at low opacity rather than
 introducing a red — a fourth colour would also be a fourth accent location.
@@ -105,6 +111,10 @@ The **git module** resolves the repo from the focused window by walking its
 process tree shallowest-first, so a terminal sitting in `$HOME` correctly falls
 through to the shell that is `cd`'d into your project.
 
+**Terminal** — dark steel-blue, translucent, blurred, so it sits in the wave
+field rather than punching a hole in it. Theme generated from tokens into
+`ghostty/gelo-theme`. Measured text contrast 8.71:1 (WCAG AAA).
+
 **Launcher** (`SUPER+R`, `SUPER+D`) — command palette. Fuzzy subsequence ranking
 with bonuses for word-start and contiguous runs. Rows arrive staggered.
 Also scriptable:
@@ -148,9 +158,6 @@ does nothing.
 
 ## Known gaps
 
-- **Cursor accent is unimplemented.** Two of the three sanctioned accent
-  locations are done (workspace indicator, window border). Recolouring the
-  cursor requires generating a custom hyprcursor theme.
 - **hyprlock is unverified.** The config is written and bound, but hyprlock has
   no dry-run mode and a failed lock can leave a session locked, so it was not
   tested. Test it deliberately: `hyprlock --grace 30` lets any keypress dismiss

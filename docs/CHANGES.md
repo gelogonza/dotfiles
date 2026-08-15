@@ -435,3 +435,57 @@ Thirteen filaments down to eleven — the lower band was dense enough that
 individual threads stopped reading as threads. Drift rates ~1.35x, and the
 desktop clock from 0.16 to 0.25 units/sec: at 0.16 the field read as a still
 image unless you stared at it.
+
+
+---
+
+# Cursor accent, and a darker terminal
+
+## Cursor — accent use 3 of 3
+
+`design/build-cursor.py` recolours an existing XCursor theme to the palette:
+luminance maps onto a fill..outline ramp, so Adwaita's black-fill/white-outline
+cursors become accent-fill/near-white-outline with their antialiasing intact.
+35 cursors and 28 aliases in about two seconds.
+
+Three decisions worth recording:
+
+- **Recolour, not author.** A usable theme is ~35 distinct cursors across six
+  nominal sizes. Drawing them is a project, and a missing one means an app
+  silently falls back to another theme mid-interaction.
+- **XCursor, not hyprcursor.** hyprcursor scales better but leaves every
+  XWayland client on the system default — precisely the inconsistency this was
+  meant to remove.
+- **Not committed.** ~12MB of binaries derived from Adwaita (CC-BY-SA 3.0);
+  shipping a recoloured copy here would carry the attribution obligations into
+  this repo. The script is deterministic, so running it is equivalent.
+
+Pixels are patched in place: the recolour never changes byte length, so the
+table of contents and every offset in it stay valid. Values are un-premultiplied
+before luminance is measured, otherwise semi-transparent edge pixels read as
+darker than they are and get pushed toward the fill colour.
+
+## Terminal: dark, more transparent, AND higher contrast
+
+Asked for both more transparency and better contrast, which on a light desktop
+normally trade against each other — every point of opacity given up lets more
+bright field through and lifts the effective background.
+
+Measured, in order:
+
+| | rendered background | contrast |
+|---|---|---|
+| light bg `#b9d5ef` @ 0.68 | — | washed, blur invisible |
+| dark bg `#14293f` @ 0.62 | (68,105,138) | 4.71:1 — AA only |
+| + blur `brightness = 0.45` | (39,64,89) | **8.71:1 — AAA** |
+
+The lever that resolves the conflict is Hyprland's `decoration:blur:brightness`,
+which darkens the blurred backdrop seen *through* translucent windows. That buys
+contrast without buying it back in opacity, so the terminal ends up more
+transparent than it started AND clears AAA.
+
+Light-on-dark also degrades better here: bleed-through from a bright desktop can
+only lighten the background, which helps light text and hurts dark text.
+
+The ANSI palette was rebuilt for a dark background — the previous set was tuned
+for light and colours 0-7 would have been unreadable.
