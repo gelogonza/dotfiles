@@ -7,7 +7,8 @@ wallpaper shader.
 The visual language is the **PS3 XMB**: cold silver-blue, one glowing accent,
 chrome surfaces, geometric type, and motion that lives in a wave field behind
 the interface. Full rationale in **[design.md](design.md)**; what changed and
-why in **[docs/CHANGES.md](docs/CHANGES.md)**.
+why in **[docs/CHANGES.md](docs/CHANGES.md)**; what is coming next in
+**[docs/roadmap.md](docs/roadmap.md)**.
 
 ```
 design/          token source, generators, shared QML/GLSL/SVG
