@@ -23,6 +23,12 @@ if [[ ! -x "$QSB" ]]; then
     fi
 fi
 
+# The .frag files this compiles are GENERATED copies of design/shaders/*.frag.
+# Running this without regenerating them first silently bakes the previous
+# version of the shader, which is extremely confusing to debug — so do it here
+# rather than relying on remembering the order.
+"$ROOT/design/build-tokens.py" > /dev/null
+
 shopt -s nullglob
 count=0
 

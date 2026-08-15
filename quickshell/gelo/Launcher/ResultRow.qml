@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Widgets
 import QtQuick
 import "root:/Theme"
+import "root:/Components"
 
 Item {
     id: root
@@ -50,23 +51,16 @@ Item {
         }
     }
 
-    // Selection is carried by a raised surface, not by accent — accent is spent
-    // on the workspace indicator, the window border and the cursor.
+    // Selection is a bloom, not a filled row. A very low-opacity plate stays
+    // underneath purely to keep long text legible where it crosses a bright
+    // band in the wallpaper — it is a legibility floor, not the selection cue.
     Rectangle {
         anchors.fill: parent
         anchors.leftMargin: Tokens.space.sm
         anchors.rightMargin: Tokens.space.sm
-        radius: root.selected ? Tokens.material.glass.radiusHover
-                              : Tokens.material.glass.radiusRest
-        color: root.selected ? Tokens.alpha(Tokens.color.bg2, 0.9) : "transparent"
+        radius: Tokens.material.chrome.radius
+        color: root.selected ? Tokens.alpha(Tokens.color.bg2, 0.35) : "transparent"
 
-        Behavior on radius {
-            NumberAnimation {
-                duration: Tokens.motion.duration.slow
-                easing.type: Easing.Bezier
-                easing.bezierCurve: Tokens.motion.easeBezier
-            }
-        }
         Behavior on color {
             ColorAnimation {
                 duration: Tokens.motion.duration.fast
@@ -76,16 +70,26 @@ Item {
         }
     }
 
-    IconImage {
+    Glow {
         id: icon
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: Tokens.space.lg
-        implicitSize: 20
-        source: root.app && root.app.icon
-            ? Quickshell.iconPath(root.app.icon, true)
-            : ""
-        opacity: root.selected ? 1.0 : 0.8
+        width: 20
+        height: 20
+
+        // The bloom originates at the icon, so the row lights from its leading
+        // edge rather than being uniformly washed.
+        amount: root.selected ? 1 : 0
+
+        IconImage {
+            anchors.fill: parent
+            implicitSize: 20
+            source: root.app && root.app.icon
+                ? Quickshell.iconPath(root.app.icon, true)
+                : ""
+            opacity: root.selected ? 1.0 : 0.8
+        }
     }
 
     Text {
@@ -97,10 +101,10 @@ Item {
 
         text: root.app ? root.app.name : ""
         elide: Text.ElideRight
-        font.family: Tokens.typography.mono
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.body
-        font.weight: root.selected ? Tokens.typography.weight.medium
-                                   : Tokens.typography.weight.regular
+        font.weight: root.selected ? Tokens.typography.weight.regular
+                                   : Tokens.typography.weight.light
         color: Tokens.color.text1
     }
 
@@ -114,7 +118,7 @@ Item {
         text: root.app && root.app.comment ? root.app.comment : ""
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignRight
-        font.family: Tokens.typography.mono
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
         color: Tokens.color.text2
         opacity: root.selected ? 1.0 : 0.7

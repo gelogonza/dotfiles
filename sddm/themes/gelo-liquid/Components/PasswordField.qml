@@ -1,16 +1,19 @@
 // Password field for the login screen.
 //
 // Interaction budget, in order of importance:
-//   focus    -> the glass corner radius relaxes outward (the standard morph)
-//   submit   -> one blob pulse radiating from the field
-//   failure  -> shake, plus a pulse tinted with the existing accent
+//   focus    -> the field glows (Chrome handles it)
+//   submit   -> a ripple propagates outward through the background shader
+//   failure  -> shake, plus another ripple
 //
-// Nothing pulses per keystroke. A ripple on every character is the kind of
+// The element itself never deforms — no pulse ring, no morphing border. Motion
+// belongs to the field behind the UI. Main.qml owns the ripple because it owns
+// the shader; this component only reports what happened.
+//
+// Nothing fires per keystroke. A ripple on every character is the kind of
 // effect that demos well once and is intolerable by the third password.
 //
-// The failure state introduces NO new hue. It reuses --accent at low opacity,
-// which keeps the palette closed; a red would be a fourth colour and a fourth
-// accent location.
+// The palette contains no warm hue at all, so failure is conveyed by the shake
+// and by the accent at low opacity — never by a red.
 
 import QtQuick
 import "../Theme"
@@ -28,15 +31,8 @@ Item {
     implicitWidth: 320
     implicitHeight: 48
 
-    function pulse() {
-        ring.tinted = false;
-        ringAnim.restart();
-    }
-
     function fail() {
         input.text = "";
-        ring.tinted = true;
-        ringAnim.restart();
         shake.restart();
     }
 
@@ -66,68 +62,8 @@ Item {
         }
     }
 
-    // --- blob pulse -------------------------------------------------------
-    // Expands past the field and fades. Radius is driven independently of scale
-    // so the shape stays a soft blob rather than a scaling rectangle.
-    Rectangle {
-        id: ring
-
-        property bool tinted: false
-
-        anchors.centerIn: parent
-        width: parent.width
-        height: parent.height
-        radius: Tokens.material.glass.radiusPress
-        color: "transparent"
-        border.width: 1
-        border.color: tinted ? Tokens.alpha(Tokens.color.accent, 0.55)
-                             : Tokens.alpha(Tokens.color.text1, 0.35)
-        opacity: 0
-        scale: 1
-    }
-
-    ParallelAnimation {
-        id: ringAnim
-
-        NumberAnimation {
-            target: ring
-            property: "scale"
-            from: 1.0
-            to: 1.12
-            duration: Tokens.motion.duration.slow
-            easing.type: Easing.Bezier
-            easing.bezierCurve: Tokens.motion.easeBezier
-        }
-        NumberAnimation {
-            target: ring
-            property: "radius"
-            from: Tokens.material.glass.radiusPress
-            to: root.height / 2
-            duration: Tokens.motion.duration.slow
-            easing.type: Easing.Bezier
-            easing.bezierCurve: Tokens.motion.easeBezier
-        }
-        SequentialAnimation {
-            NumberAnimation {
-                target: ring
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: Tokens.motion.duration.fast
-            }
-            NumberAnimation {
-                target: ring
-                property: "opacity"
-                to: 0
-                duration: Tokens.motion.duration.slow
-                easing.type: Easing.Bezier
-                easing.bezierCurve: Tokens.motion.easeBezier
-            }
-        }
-    }
-
     // --- the field --------------------------------------------------------
-    Glass {
+    Chrome {
         id: glass
         anchors.fill: parent
         focused: input.activeFocus
@@ -146,7 +82,7 @@ Item {
             passwordMaskDelay: 0
             enabled: !root.busy
 
-            font.family: Tokens.typography.mono
+            font.family: Tokens.typography.display
             font.pixelSize: Tokens.typography.size.title
             color: Tokens.color.text1
             selectionColor: Tokens.alpha(Tokens.color.text1, 0.2)
@@ -161,7 +97,7 @@ Item {
                 anchors.centerIn: parent
                 visible: input.text.length === 0 && !input.activeFocus
                 text: root.placeholder
-                font.family: Tokens.typography.mono
+                font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.body
                 color: Tokens.color.text2
             }

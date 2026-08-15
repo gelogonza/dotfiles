@@ -1,22 +1,17 @@
-// Desktop wallpaper — the same fluid field as the login screen, on the
-// background layer.
+// Desktop wallpaper — the XMB wave field, and the surface every interaction
+// ripple propagates through.
 //
-// Two reasons this is worth running instead of a static image:
+// This is not decoration. In this design language the UI elements never deform;
+// all interaction motion lives here, behind them. Switching a workspace or
+// opening the launcher fires a ripple into this shader.
 //
-//   1. The bar and launcher get their frost from the compositor blurring
-//      whatever is behind them. Against a near-black PNG there is nothing to
-//      refract and the glass material reads as flat paint. A moving field gives
-//      every glass surface in the system something to be glass *about*.
-//   2. It is the same shader as the login screen, so the desktop is visibly
-//      continuous with the thing you just logged in through.
-//
-// It runs all day, so it is deliberately slower and dimmer than the login
-// variant, and it stops entirely when it cannot be seen.
+// It runs all day, so it is slower than the login variant.
 
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
 import "root:/Theme"
+import "root:/Services"
 
 PanelWindow {
     id: wallpaper
@@ -42,15 +37,14 @@ PanelWindow {
         id: field
 
         anchors.fill: parent
-        fragmentShader: Qt.resolvedUrl("root:/Shaders/fluid.frag.qsb")
+        fragmentShader: Qt.resolvedUrl("root:/Shaders/xmb.frag.qsb")
         blending: false
 
         // NOTE: this only tracks whether the surface exists, NOT whether it is
         // occluded — wlr-layer-shell exposes no occlusion signal, so a maximised
-        // window on top does not stop the shader. A fullscreen fragment shader
-        // per monitor running behind opaque windows is the real cost of this
-        // component; if that ever matters (laptop battery, thermals), the fix is
-        // to swap this file for a static image, not to micro-optimise the GLSL.
+        // window on top does not stop the shader. If that ever matters (laptop
+        // battery, thermals), swap this file for a static image rather than
+        // micro-optimising the GLSL.
         visible: wallpaper.visible
 
         property real time: 0
@@ -60,15 +54,33 @@ PanelWindow {
         property vector4d colorMid: toVec(Tokens.color.bg1)
         property vector4d colorHigh: toVec(Tokens.color.bg2)
         property vector4d colorEdge: toVec(Tokens.color.border)
-        property vector4d colorAccent: toVec(Tokens.color.accentDim)
+        property vector4d colorAccent: toVec(Tokens.color.accent)
+
+        property real rippleSpeed: Tokens.material.ripple.speed
+        property real rippleWidth: Tokens.material.ripple.width
+        property real rippleAmplitude: Tokens.material.ripple.amplitude
+
+        // One property per shader uniform, matched by name. xy = origin,
+        // z = birth time on the same clock as `time`.
+        property vector4d rippleA: slot(0)
+        property vector4d rippleB: slot(1)
+        property vector4d rippleC: slot(2)
+        property vector4d rippleD: slot(3)
+
+        function slot(i) {
+            const s = Ripples.slots;
+            if (!s || i >= s.length)
+                return Qt.vector4d(0, 0, -1000, 0);
+            return Qt.vector4d(s[i].x, s[i].y, s[i].t, 0);
+        }
 
         function toVec(c) {
             return Qt.vector4d(c.r, c.g, c.b, c.a);
         }
 
         // 576 units/hour = 0.16 units/sec — slower than the login screen's 0.28.
-        // This one is ambient behind real work rather than something you sit and
-        // look at, so it should stay under the threshold of noticing.
+        // This is ambient behind real work rather than something you sit and
+        // look at, so it stays under the threshold of noticing.
         NumberAnimation on time {
             from: 0
             to: 576
@@ -76,5 +88,9 @@ PanelWindow {
             loops: Animation.Infinite
             running: field.visible
         }
+
+        // Ripple ages are measured against this same clock, so a ripple stays
+        // in phase with the field it is bending.
+        onTimeChanged: Ripples.now = time
     }
 }

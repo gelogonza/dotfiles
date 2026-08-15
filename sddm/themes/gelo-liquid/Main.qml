@@ -5,9 +5,9 @@
 // looked at while idle, and unlike the lock screen it is not on the critical
 // path back into a running session.
 //
-// Type is sans here (Inter) and mono everywhere else — the login screen is the
-// only place the design system permits it, which is what makes it feel like a
-// different surface rather than a big widget.
+// Type is the one geometric display sans used system-wide, at display size.
+// The login screen is distinguished by scale and by the shader, not by a
+// different typeface.
 
 import QtQuick
 import "Components"
@@ -38,7 +38,7 @@ Rectangle {
         anchors.fill: parent
 
         // Baked with design/build-shaders.sh; Qt 6 will not take raw GLSL.
-        fragmentShader: Qt.resolvedUrl("Shaders/fluid.frag.qsb")
+        fragmentShader: Qt.resolvedUrl("Shaders/xmb.frag.qsb")
         blending: false
 
         property real time: 0
@@ -48,7 +48,23 @@ Rectangle {
         property vector4d colorMid: toVec(Tokens.color.bg1)
         property vector4d colorHigh: toVec(Tokens.color.bg2)
         property vector4d colorEdge: toVec(Tokens.color.border)
-        property vector4d colorAccent: toVec(Tokens.color.accentDim)
+        property vector4d colorAccent: toVec(Tokens.color.accent)
+
+        property real rippleSpeed: Tokens.material.ripple.speed
+        property real rippleWidth: Tokens.material.ripple.width
+        property real rippleAmplitude: Tokens.material.ripple.amplitude
+
+        // The login screen has no shell behind it to emit ripples, so the slots
+        // stay parked in the far past and the shader's age test skips them.
+        // The password field fires into rippleA on submit and on failure.
+        property vector4d rippleA: Qt.vector4d(0.5, 0.62, -1000, 0)
+        property vector4d rippleB: Qt.vector4d(0, 0, -1000, 0)
+        property vector4d rippleC: Qt.vector4d(0, 0, -1000, 0)
+        property vector4d rippleD: Qt.vector4d(0, 0, -1000, 0)
+
+        function ripple() {
+            rippleA = Qt.vector4d(0.5, 0.62, time, 0);
+        }
 
         function toVec(c) {
             return Qt.vector4d(c.r, c.g, c.b, c.a);
@@ -77,9 +93,9 @@ Rectangle {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: Qt.formatDateTime(clock.now, "HH:mm")
-            font.family: Tokens.typography.sans
+            font.family: Tokens.typography.display
             font.pixelSize: 84
-            font.weight: Tokens.typography.weight.regular
+            font.weight: Tokens.typography.weight.light
             // Tight tracking at display size; the default spacing looks loose
             // once type gets this large.
             font.letterSpacing: -2
@@ -89,10 +105,10 @@ Rectangle {
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
             text: Qt.formatDateTime(clock.now, "dddd, d MMMM")
-            font.family: Tokens.typography.sans
+            font.family: Tokens.typography.display
             font.pixelSize: Tokens.typography.size.title
-            font.weight: Tokens.typography.weight.regular
-            font.letterSpacing: Tokens.typography.letterSpacing.wide
+            font.weight: Tokens.typography.weight.light
+            font.letterSpacing: Tokens.tracking(Tokens.typography.size.title)
             color: Tokens.color.text2
         }
     }
@@ -119,9 +135,9 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             text: root.currentUser
             visible: text.length > 0
-            font.family: Tokens.typography.sans
+            font.family: Tokens.typography.display
             font.pixelSize: Tokens.typography.size.title
-            font.weight: Tokens.typography.weight.medium
+            font.weight: Tokens.typography.weight.regular
             color: Tokens.color.text1
         }
 
@@ -132,7 +148,7 @@ Rectangle {
 
             onAccepted: pw => {
                 root.busy = true;
-                pulse();
+                background.ripple();
                 if (typeof sddm !== "undefined" && sddm)
                     sddm.login(root.currentUser, pw, root.sessionIndex);
             }
@@ -142,7 +158,7 @@ Rectangle {
             id: hint
             anchors.horizontalCenter: parent.horizontalCenter
             text: " "
-            font.family: Tokens.typography.mono
+            font.family: Tokens.typography.display
             font.pixelSize: Tokens.typography.size.caption
             color: Tokens.color.text2
             opacity: text.trim().length > 0 ? 1 : 0
@@ -174,6 +190,7 @@ Rectangle {
         function onLoginFailed() {
             root.busy = false;
             hint.text = "Incorrect password";
+            background.ripple();
             password.fail();
             password.focusField();
         }

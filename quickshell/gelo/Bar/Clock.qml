@@ -15,18 +15,18 @@ Row {
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Qt.formatDateTime(clock.date, "ddd d MMM")
-        font.family: Tokens.typography.mono
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
-        font.weight: Tokens.typography.weight.regular
+        font.weight: Tokens.typography.weight.light
         color: Tokens.color.text2
     }
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Qt.formatDateTime(clock.date, "HH:mm")
-        font.family: Tokens.typography.mono
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.body
-        font.weight: Tokens.typography.weight.medium
+        font.weight: Tokens.typography.weight.regular
         color: Tokens.color.text1
     }
 }

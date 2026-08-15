@@ -1,8 +1,8 @@
 // Command palette.
 //
-// Reference is Raycast / Linear, not dmenu: one glass slab floating in dimmed
-// space, a search field that morphs on focus, and result rows that arrive
-// staggered rather than all at once.
+// Reference is Raycast / Linear, not dmenu: one chrome slab floating in dimmed
+// space, a search field that glows on focus, and result rows that arrive
+// staggered rather than all at once. Opening it ripples the wallpaper.
 //
 // Opened over IPC so a Hyprland keybind can drive it:
 //     qs -c gelo ipc call launcher toggle
@@ -64,6 +64,10 @@ PanelWindow {
         staggering = true;
         staggerWindow.restart();
         field.forceActiveFocus();
+
+        // Opening the palette is an interaction like any other: the motion
+        // belongs in the field behind it.
+        Ripples.emitFromItem(panel, launcher);
     }
 
     function hide() {
@@ -127,7 +131,7 @@ PanelWindow {
     }
 
     // --- palette ----------------------------------------------------------
-    Glass {
+    Chrome {
         id: panel
 
         width: 640
@@ -137,7 +141,10 @@ PanelWindow {
         // Sits above centre — a centred modal reads as heavier and slower.
         y: parent.height * 0.28
 
-        focused: true
+        // Deliberately NOT glowing. Glow means "this is the selected thing";
+        // blooming the whole panel makes the container compete with its own
+        // contents and turns the accent into decoration.
+        glowEnabled: false
 
         opacity: launcher.open ? 1 : 0
         scale: launcher.open ? 1 : 0.97
@@ -176,7 +183,7 @@ PanelWindow {
                 anchors.left: parent.left
                 anchors.leftMargin: Tokens.space.lg
                 text: "›"
-                font.family: Tokens.typography.mono
+                font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.title
                 color: Tokens.color.text2
             }
@@ -190,9 +197,9 @@ PanelWindow {
                 anchors.right: parent.right
                 anchors.rightMargin: Tokens.space.lg
 
-                font.family: Tokens.typography.mono
+                font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.title
-                font.weight: Tokens.typography.weight.regular
+                font.weight: Tokens.typography.weight.light
                 color: Tokens.color.text1
                 selectionColor: Tokens.alpha(Tokens.color.text1, 0.2)
                 selectedTextColor: Tokens.color.text1

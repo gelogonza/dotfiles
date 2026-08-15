@@ -29,11 +29,13 @@ Row {
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        // U+E0A0 — the powerline branch glyph, present in JetBrains Mono Nerd Font.
-        text: " " + Git.branch
-        font.family: Tokens.typography.mono
+        // No branch glyph here: that was U+E0A0 from the Nerd Font, and the
+        // geometric display sans has no such codepoint — it renders as tofu.
+        // The branch name alone is unambiguous in context.
+        text: Git.branch
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
-        font.weight: Tokens.typography.weight.medium
+        font.weight: Tokens.typography.weight.regular
         color: Tokens.color.text1
     }
 
@@ -41,7 +43,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         visible: Git.dirty > 0
         text: "+" + Git.dirty
-        font.family: Tokens.typography.mono
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
         color: Tokens.color.text2
     }
@@ -49,7 +51,7 @@ Row {
     Text {
         anchors.verticalCenter: parent.verticalCenter
         text: Git.commit
-        font.family: Tokens.typography.mono
+        font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
         color: Tokens.color.text2
     }

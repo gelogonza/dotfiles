@@ -24,7 +24,10 @@ PanelWindow {
         right: Tokens.space.lg
     }
 
-    implicitHeight: 36
+    // 48 rather than 36: the workspace numbers carry a reflection beneath them
+    // and it needs somewhere to land. Content is nudged above centre to make
+    // room for it rather than sitting on the vertical midline.
+    implicitHeight: 48
     color: "transparent"
 
     // Hyprland matches `layerrule { match:namespace = gelo-bar }` against this.
@@ -33,13 +36,16 @@ PanelWindow {
     WlrLayershell.namespace: "gelo-bar"
     WlrLayershell.layer: WlrLayer.Top
 
-    Glass {
+    Chrome {
         anchors.fill: parent
 
         // --- left ---------------------------------------------------------
         Workspaces {
             id: workspaces
+
+            window: bar
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -Tokens.space.xs
             anchors.left: parent.left
             anchors.leftMargin: Tokens.space.md
         }

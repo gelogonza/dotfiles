@@ -2,14 +2,15 @@
 
 :root {
   /* colour */
-  --bg-0: #0d0e12;
-  --bg-1: #16181d;
-  --bg-2: #1f222a;
-  --border: #2a2d36;
-  --text-1: #e8e6e0;
-  --text-2: #8f8d87;
-  --accent: #d97757;
-  --accent-dim: #a85f45;
+  --bg-0: #05070c;
+  --bg-1: #0b0f18;
+  --bg-2: #131a28;
+  --border: #1c2536;
+  --text-1: #eef2f7;
+  --text-2: #6b7686;
+  --accent: #4fc8ff;
+  --accent-dim: #2a7fa8;
+  --glow: #4fc8ff33;
 
   /* spacing — 4px grid */
   --space-xs: 4px;
@@ -27,31 +28,42 @@
   --radius-full: 999px;
 
   /* type */
-  --font-mono: "JetBrainsMono Nerd Font", monospace;
-  --font-sans: "Inter", sans-serif;
+  --font-display: "Michroma", "Inter Display", sans-serif;
   --text-caption: 11px;
   --text-body: 13px;
   --text-title: 15px;
+  --weight-light: 300;
   --weight-regular: 400;
-  --weight-medium: 500;
+  --tracking: 0.02em;
 
   /* motion */
-  --ease: cubic-bezier(0.16, 1.0, 0.3, 1.0);
-  --dur-fast: 120ms;
-  --dur-base: 200ms;
+  --ease: cubic-bezier(0.22, 1.0, 0.36, 1.0);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
   --dur-slow: 400ms;
   --stagger: 24ms;
 
-  /* liquid-glass material */
-  --glass-blurRadius: 24px;
-  --glass-backgroundOpacity: 0.68;
-  --glass-borderOpacity: 0.55;
-  --glass-specularOpacity: 0.09;
-  --glass-specularHeight: 1px;
-  --glass-shadowRadius: 32px;
-  --glass-shadowOpacity: 0.45;
-  --glass-shadowOffsetY: 8px;
-  --glass-radiusRest: 12;
-  --glass-radiusHover: 16;
-  --glass-radiusPress: 24;
+  /* chrome / reflection material */
+  --chrome-surfaceOpacity: 0.96;
+  --chrome-gradientDarken: 0.06;
+  --chrome-strokeOpacity: 0.9;
+  --chrome-radius: 8px;
+  --chrome-shadowRadius: 32px;
+  --chrome-shadowOpacity: 0.5;
+  --chrome-shadowOffsetY: 6px;
+  --glow-radius: 20px;
+  --glow-spread: 1.7;
+  --glow-restOpacity: 0.0;
+  --glow-hoverOpacity: 0.3;
+  --glow-activeOpacity: 1.0;
+  --reflection-opacity: 0.16;
+  --reflection-heightRatio: 0.55;
+  --reflection-gap: 1;
+  --blob-squashX: 1.08;
+  --blob-squashY: 0.92;
+  --blob-morphDuration: 400;
+  --ripple-speed: 0.55;
+  --ripple-width: 0.05;
+  --ripple-amplitude: 0.55;
+  --ripple-maxConcurrent: 4;
 }

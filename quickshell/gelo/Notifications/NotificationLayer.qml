@@ -82,6 +82,7 @@ PanelWindow {
             delegate: NotificationCard {
                 required property var modelData
                 notif: modelData
+                window: layer
                 width: stack.width
 
                 // Critical notifications stay until acknowledged; everything

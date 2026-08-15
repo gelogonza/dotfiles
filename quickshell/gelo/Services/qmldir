@@ -1,3 +1,4 @@
 # Service singletons (hand-written, not generated).
 singleton Git 1.0 Git.qml
 singleton Apps 1.0 Apps.qml
+singleton Ripples 1.0 Ripples.qml

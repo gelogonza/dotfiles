@@ -50,6 +50,22 @@ def qml_num(v) -> str:
     return str(v) if isinstance(v, int) else repr(float(v))
 
 
+def qml_color(value: str) -> str:
+    """QML parses hex colours as #aarrggbb; the token source uses CSS #rrggbbaa."""
+    h = value.lstrip("#")
+    if len(h) == 8:
+        return f"#{h[6:8]}{h[0:6]}"
+    return value
+
+
+def hypr_color(value: str) -> tuple[str, str]:
+    """Return (rgb-or-rgba form, explicit rgba form) for a hyprlang variable."""
+    h = value.lstrip("#")
+    if len(h) == 8:
+        return f"rgba({h})", f"rgba({h})"
+    return f"rgb({h})", f"rgba({h}ff)"
+
+
 # --------------------------------------------------------------------------
 # QML singleton
 # --------------------------------------------------------------------------
@@ -57,7 +73,6 @@ def qml_num(v) -> str:
 def render_qml(t: dict) -> str:
     color, space, radius = t["color"], t["space"], t["radius"]
     typo, motion, mat = t["type"], t["motion"], t["material"]
-    glass, blob = mat["glass"], mat["blob"]
 
     L: list[str] = [
         f"// {BANNER}",
@@ -68,8 +83,8 @@ def render_qml(t: dict) -> str:
         "QtObject {",
         "    id: root",
         "",
-        "    // Returns `c` at alpha `a`. The glass material is defined as a base colour",
-        "    // plus an opacity, so nearly every surface in the system goes through here.",
+        "    // Returns `c` at alpha `a`. Materials are defined as a base colour plus an",
+        "    // opacity, so nearly every surface in the system goes through here.",
         "    function alpha(c, a) {",
         "        return Qt.rgba(c.r, c.g, c.b, a);",
         "    }",
@@ -77,7 +92,7 @@ def render_qml(t: dict) -> str:
         "    readonly property QtObject color: QtObject {",
     ]
     for k, v in color.items():
-        L.append(f'        readonly property color {camel(k)}: "{v}"')
+        L.append(f'        readonly property color {camel(k)}: "{qml_color(v)}"')
     L += ["    }", "", "    readonly property QtObject space: QtObject {"]
     for k, v in space.items():
         L.append(f"        readonly property int {k}: {v}")
@@ -87,9 +102,23 @@ def render_qml(t: dict) -> str:
     L += [
         "    }",
         "",
+        "    // Open tracking is part of the XMB feel. QML letterSpacing is in",
+        "    // pixels, so it has to be derived from the size it is applied at.",
+        "    function tracking(pixelSize) {",
+        "        return pixelSize * root.typography.trackingEm;",
+        "    }",
+        "",
         "    readonly property QtObject typography: QtObject {",
-        f'        readonly property string mono: "{typo["mono"]}"',
-        f'        readonly property string sans: "{typo["sans"]}"',
+        f'        readonly property string display: "{typo["display"]}"',
+        "",
+        "        // QML's font value type exposes `family` (one string) and has no",
+        "        // `families` list, so per-glyph fallback is fontconfig's job, not",
+        "        // ours. This list is here for the CSS tier, which can express it.",
+        "        readonly property var families: ["
+        + ", ".join(f'"{f}"' for f in typo["families"])
+        + "]",
+        "",
+        f'        readonly property real trackingEm: {qml_num(typo["trackingEm"])}',
         "",
         "        readonly property QtObject size: QtObject {",
     ]
@@ -98,9 +127,6 @@ def render_qml(t: dict) -> str:
     L += ["        }", "", "        readonly property QtObject weight: QtObject {"]
     for k, v in typo["weight"].items():
         L.append(f"            readonly property int {k}: {v}")
-    L += ["        }", "", "        readonly property QtObject letterSpacing: QtObject {"]
-    for k, v in typo["letterSpacing"].items():
-        L.append(f"            readonly property real {k}: {qml_num(v)}")
     L += ["        }", "    }", "", "    readonly property QtObject motion: QtObject {"]
 
     e = motion["ease"]
@@ -122,26 +148,34 @@ def render_qml(t: dict) -> str:
         "    }",
         "",
         "    readonly property QtObject material: QtObject {",
-        "        readonly property QtObject glass: QtObject {",
     ]
-    for k, v in glass.items():
-        kind = "int" if isinstance(v, int) else "real"
-        L.append(f"            readonly property {kind} {k}: {qml_num(v)}")
-    L += [
-        "",
-        "            // Derived surfaces — the actual paintable values components bind to.",
-        "            readonly property color background: root.alpha(root.color.bg1, backgroundOpacity)",
-        "            readonly property color stroke: root.alpha(root.color.border, borderOpacity)",
-        "            readonly property color specular: root.alpha(root.color.text1, specularOpacity)",
-        "            readonly property color shadow: root.alpha(root.color.bg0, shadowOpacity)",
-        "        }",
-        "",
-        "        readonly property QtObject blob: QtObject {",
-    ]
-    for k, v in blob.items():
-        kind = "int" if isinstance(v, int) else "real"
-        L.append(f"            readonly property {kind} {k}: {qml_num(v)}")
-    L += ["        }", "    }", "}", ""]
+
+    # Paintable values derived from the raw numbers above, so components never
+    # have to recombine a base colour with an opacity themselves.
+    derived = {
+        "chrome": [
+            "// The brushed-metal gradient stops, and the hairline/shadow that frame them.",
+            "readonly property color surfaceTop: root.alpha(root.color.bg1, surfaceOpacity)",
+            "readonly property color surfaceBottom: root.alpha(Qt.darker(root.color.bg1, 1.0 + gradientDarken), surfaceOpacity)",
+            "readonly property color stroke: root.alpha(root.color.border, strokeOpacity)",
+            "readonly property color shadow: root.alpha(root.color.bg0, shadowOpacity)",
+        ],
+        "glow": [
+            "readonly property color tint: root.color.accent",
+        ],
+    }
+
+    for group, values in mat.items():
+        L.append(f"        readonly property QtObject {group}: QtObject {{")
+        for k, v in values.items():
+            kind = "int" if isinstance(v, int) else "real"
+            L.append(f"            readonly property {kind} {k}: {qml_num(v)}")
+        for line in derived.get(group, []):
+            L.append(f"            {line}" if line.startswith("//") else f"            {line}")
+        L.append("        }")
+        L.append("")
+
+    L += ["    }", "}", ""]
     return "\n".join(L)
 
 
@@ -176,12 +210,13 @@ def render_css(t: dict) -> str:
 
     L.append("")
     L.append("  /* type */")
-    L.append(f'  --font-mono: "{t["type"]["mono"]}", monospace;')
-    L.append(f'  --font-sans: "{t["type"]["sans"]}", sans-serif;')
+    fams = ", ".join(f'"{f}"' for f in t["type"]["families"])
+    L.append(f"  --font-display: {fams}, sans-serif;")
     for k, v in t["type"]["size"].items():
         L.append(f"  --text-{k}: {v}px;")
     for k, v in t["type"]["weight"].items():
         L.append(f"  --weight-{k}: {v};")
+    L.append(f'  --tracking: {t["type"]["trackingEm"]}em;')
 
     L.append("")
     L.append("  /* motion */")
@@ -191,10 +226,11 @@ def render_css(t: dict) -> str:
     L.append(f'  --stagger: {t["motion"]["stagger"]}ms;')
 
     L.append("")
-    L.append("  /* liquid-glass material */")
-    for k, v in t["material"]["glass"].items():
-        unit = "px" if k.endswith(("Radius", "Height", "OffsetY")) else ""
-        L.append(f"  --glass-{k}: {v}{unit};")
+    L.append("  /* chrome / reflection material */")
+    for group, values in t["material"].items():
+        for k, v in values.items():
+            unit = "px" if k.endswith(("Radius", "OffsetY")) or k == "radius" else ""
+            L.append(f"  --{group}-{k}: {v}{unit};")
 
     L += ["}", ""]
     return "\n".join(L)
@@ -216,9 +252,9 @@ def render_hypr(t: dict) -> str:
         "# --- colour ---",
     ]
     for k, v in t["color"].items():
-        h = v.lstrip("#")
-        L.append(f"${snake(k)} = rgb({h})")
-        L.append(f"${snake(k)}_rgba = rgba({h}ff)")
+        plain, rgba = hypr_color(v)
+        L.append(f"${snake(k)} = {plain}")
+        L.append(f"${snake(k)}_rgba = {rgba}")
 
     L += ["", "# --- spacing (4px grid) ---"]
     for k, v in t["space"].items():
@@ -229,8 +265,7 @@ def render_hypr(t: dict) -> str:
         L.append(f"$radius_{k} = {v}")
 
     L += ["", "# --- type ---"]
-    L.append(f'$font_mono = {t["type"]["mono"]}')
-    L.append(f'$font_sans = {t["type"]["sans"]}')
+    L.append(f'$font_display = {t["type"]["display"]}')
     for k, v in t["type"]["size"].items():
         L.append(f"$text_{k} = {v}")
 
@@ -242,11 +277,11 @@ def render_hypr(t: dict) -> str:
         # hyprland animation speeds are in deciseconds
         L.append(f"$dur_{k} = {round(v / 100)}")
 
-    L += ["", "# --- glass ---"]
-    g = t["material"]["glass"]
-    L.append(f'$glass_blur = {g["blurRadius"]}')
-    L.append(f'$glass_opacity = {g["backgroundOpacity"]}')
-    L.append(f'$glass_radius = {g["radiusRest"]}')
+    L += ["", "# --- chrome ---"]
+    c = t["material"]["chrome"]
+    L.append(f'$chrome_opacity = {c["surfaceOpacity"]}')
+    L.append(f'$chrome_radius = {c["radius"]}')
+    L.append(f'$chrome_shadow = {c["shadowRadius"]}')
     L.append("")
     return "\n".join(L)
 
@@ -258,14 +293,22 @@ def render_hypr(t: dict) -> str:
 # --------------------------------------------------------------------------
 # The shell and the SDDM theme are separate QML roots — the login theme is
 # installed to /usr/share/sddm/themes and has to be self-contained, so it cannot
-# import anything out of ~/.config. Rather than keep two copies of the glass
+# import anything out of ~/.config. Rather than keep two copies of the chrome
 # material that quietly drift apart, the component has one source and is copied
 # into each root with its Theme import rewritten for that location.
 
 SHARED_COMPONENTS = {
-    "Glass.qml": {
-        ROOT / "quickshell/gelo/Components/Glass.qml": 'root:/Theme',
-        ROOT / "sddm/themes/gelo-liquid/Components/Glass.qml": '../Theme',
+    "Chrome.qml": {
+        ROOT / "quickshell/gelo/Components/Chrome.qml": 'root:/Theme',
+        ROOT / "sddm/themes/gelo-liquid/Components/Chrome.qml": '../Theme',
+    },
+    "Glow.qml": {
+        ROOT / "quickshell/gelo/Components/Glow.qml": 'root:/Theme',
+        ROOT / "sddm/themes/gelo-liquid/Components/Glow.qml": '../Theme',
+    },
+    "Reflection.qml": {
+        ROOT / "quickshell/gelo/Components/Reflection.qml": 'root:/Theme',
+        ROOT / "sddm/themes/gelo-liquid/Components/Reflection.qml": '../Theme',
     },
 }
 
@@ -274,9 +317,9 @@ SHARED_COMPONENTS = {
 # theme cannot reach into ~/.config. The .frag is the source; the .qsb bundles
 # next to each copy are produced by design/build-shaders.sh.
 SHARED_SHADERS = {
-    "fluid.frag": [
-        ROOT / "sddm/themes/gelo-liquid/Shaders/fluid.frag",
-        ROOT / "quickshell/gelo/Shaders/fluid.frag",
+    "xmb.frag": [
+        ROOT / "sddm/themes/gelo-liquid/Shaders/xmb.frag",
+        ROOT / "quickshell/gelo/Shaders/xmb.frag",
     ],
 }
 

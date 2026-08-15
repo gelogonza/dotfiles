@@ -3,11 +3,13 @@ import Quickshell.Services.Notifications
 import QtQuick
 import "root:/Theme"
 import "root:/Components"
+import "root:/Services"
 
 Item {
     id: root
 
     required property var notif
+    property var window: null
 
     // Horizontal travel past which a release dismisses instead of springing back.
     readonly property int dismissThreshold: 96
@@ -29,7 +31,10 @@ Item {
     // Drag feedback is continuous rather than binary at the threshold.
     opacity: revealed * Math.max(0.25, 1 - Math.abs(x) / (dismissThreshold * 2))
 
-    Component.onCompleted: enter.start()
+    Component.onCompleted: {
+        enter.start();
+        Ripples.emitFromItem(root, root.window);
+    }
 
     ParallelAnimation {
         id: enter
@@ -48,27 +53,11 @@ Item {
     }
 
     // --- dismissal --------------------------------------------------------
-    // Squash first, then fly out. Compressing before release is what gives the
-    // card a sense of mass — it reads as flicked away rather than deleted.
+    // Slides out and fades. No squash: in this language elements do not deform
+    // — the card fires a ripple into the wallpaper behind it instead, and that
+    // is where the physicality lives.
     SequentialAnimation {
         id: exit
-
-        ParallelAnimation {
-            NumberAnimation {
-                target: squash; property: "xScale"
-                to: Tokens.material.blob.squashX
-                duration: Tokens.motion.duration.fast
-                easing.type: Easing.Bezier
-                easing.bezierCurve: Tokens.motion.easeBezier
-            }
-            NumberAnimation {
-                target: squash; property: "yScale"
-                to: Tokens.material.blob.squashY
-                duration: Tokens.motion.duration.fast
-                easing.type: Easing.Bezier
-                easing.bezierCurve: Tokens.motion.easeBezier
-            }
-        }
 
         ParallelAnimation {
             NumberAnimation {
@@ -93,6 +82,7 @@ Item {
 
         ScriptAction {
             script: {
+                Ripples.emitFromItem(root, root.window);
                 if (root.notif)
                     root.notif.dismiss();
                 root.dismissed();
@@ -116,18 +106,12 @@ Item {
         epsilon: 0.5
     }
 
-    transform: Scale {
-        id: squash
-        origin.x: root.width / 2
-        origin.y: root.height / 2
-    }
-
-    Glass {
+    Chrome {
         anchors.fill: parent
         // Urgent notifications sit slightly proud of the others.
         cornerRadius: root.notif && root.notif.urgency === NotificationUrgency.Critical
-            ? Tokens.material.glass.radiusHover
-            : Tokens.material.glass.radiusRest
+            ? Tokens.material.chrome.radius
+            : Tokens.material.chrome.radius
 
         Column {
             id: content
@@ -143,9 +127,9 @@ Item {
                 text: root.notif ? root.notif.appName : ""
                 visible: text.length > 0
                 elide: Text.ElideRight
-                font.family: Tokens.typography.mono
+                font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.caption
-                font.letterSpacing: Tokens.typography.letterSpacing.wide
+                font.letterSpacing: Tokens.tracking(Tokens.typography.size.caption)
                 color: Tokens.color.text2
             }
 
@@ -156,9 +140,9 @@ Item {
                 elide: Text.ElideRight
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
-                font.family: Tokens.typography.mono
+                font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.body
-                font.weight: Tokens.typography.weight.medium
+                font.weight: Tokens.typography.weight.regular
                 color: Tokens.color.text1
             }
 
@@ -170,7 +154,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 3
                 textFormat: Text.PlainText
-                font.family: Tokens.typography.mono
+                font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.caption
                 color: Tokens.color.text2
             }

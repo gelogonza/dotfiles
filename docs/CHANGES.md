@@ -233,3 +233,85 @@ cannot both run; whichever starts first wins and the other silently does nothing
 - **Cursor accent (3 of 3) unimplemented** — needs a generated hyprcursor theme.
 - **hyprlock unverified** — see above.
 - **Wallpaper shader does not stop when occluded** — no occlusion signal exists.
+
+
+---
+
+# Retheme — PS3 XMB
+
+The palette, type, material language and interaction model were all replaced in
+a second pass. Everything below supersedes the corresponding section above.
+
+## Palette and type
+
+Cold near-black blue with a single glowing cyan accent, and **no warm hue
+anywhere** — the absence of orange/coral/amber is what keeps it from reading as
+a generic AI-product palette. `--glow` is an 8-digit `#rrggbbaa` token; the
+generator re-orders it per target because QML parses hex as `#aarrggbb` while
+CSS uses `#rrggbbaa`.
+
+Type is **Michroma**, fetched from Google Fonts into `~/.local/share/fonts` (no
+sudo needed). It has exactly one weight, so hierarchy cannot come from weight —
+it comes from size, opacity, tracking and glow, which is what the reference does
+anyway. Note QML's font value type exposes `family` but **not** `families`, so
+per-glyph fallback is fontconfig's job; the fallback chain in the tokens is
+consumed by the CSS tier only.
+
+Dropping the mono face broke the git module's Nerd Font branch glyph (U+E0A0),
+which has no codepoint in a display sans and rendered as tofu. It was removed.
+
+## Material: glass → chrome
+
+`Glass.qml` is gone, replaced by `Chrome.qml` (brushed metal), `Glow.qml`
+(selection bloom) and `Reflection.qml` (icons over water). All three are
+generated into both QML roots from `design/qml/`.
+
+All backdrop blur was removed, including the `layerrule` blocks in
+`hypr/gelo.conf` — blurring these surfaces softens the hairline edges and washes
+out the glow, which are the two things now carrying the material.
+
+Caught during the build: applying `focused: true` to the launcher's Chrome panel
+bloomed the entire container, which made the accent read as decoration and the
+container compete with its own contents. Glow belongs on the selected *item*.
+
+## Interaction: ripple field
+
+`Services/Ripples.qml` is a singleton bus. The bar, launcher and notification
+layer are separate Wayland surfaces that cannot draw into each other, but they
+are objects in one Quickshell process, so a singleton carries interaction points
+into the wallpaper's shader uniforms.
+
+Two things that do not work the obvious way:
+
+- **Uniform arrays.** `vec4 ripples[4]` in GLSL cannot receive data from QML —
+  Qt 6's `ShaderEffect` binds uniform-block members to QML properties *by name*,
+  and an array member has no matchable name. It silently never updates. The
+  shader uses four discretely named slots instead.
+- **Window resolution.** `item.Window.window` is null inside a Quickshell layer
+  surface, because `PanelWindow` is not a plain `QQuickWindow`. The window has to
+  be passed explicitly, and `mapToGlobal` does not account for a layer surface's
+  margins, so the on-screen origin is derived from the window's anchors.
+
+## Shader: noise → ribbons
+
+The first XMB attempt reused the domain-warped fBm shader and did not look like
+the reference at all — fBm is the standard "pretty background" recipe and reads
+as smoke or clouds. The reference is a small number of smooth, wide, horizontal
+bands of light that undulate like silk.
+
+It is now built from explicit sine ribbons with gaussian falloff, two summed
+sines per ribbon at a non-integer frequency ratio so they read as cloth rather
+than as a test pattern. Measured tonal range went from a p1–p95 span of 11 levels
+(bands mathematically present, visually absent) to p50=12 / p95=56.
+
+## Reverted from the first XMB pass
+
+The travelling blob indicator was removed in favour of pure glow, then restored
+on request. It now coexists with the ripple: the element travels *and* the field
+responds. `BlobIndicator.qml` was recovered from commit `27bc87d`.
+
+## Build-order footgun, fixed
+
+`design/build-shaders.sh` compiles the *generated* copies of the shaders. Running
+it without regenerating first silently baked the previous version — so it now
+invokes `build-tokens.py` itself rather than relying on anyone remembering.

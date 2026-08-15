@@ -18,7 +18,7 @@ reference/       upstream material kept for reference, not loaded at runtime
 ## The design system
 
 **`design/tokens.json` is the single source of truth.** Colour, spacing, type,
-motion and the glass material are defined there once, and
+motion and the chrome material are defined there once, and
 `design/build-tokens.py` fans them out to every consumer:
 
 | Generated | Consumed by |
@@ -27,8 +27,8 @@ motion and the glass material are defined there once, and
 | `sddm/themes/gelo-liquid/Theme/Tokens.qml` | the login theme |
 | `design/tokens.css` | GTK / Waybar fallback tier |
 | `hypr/tokens.conf` | `hyprland.conf`, `hyprlock.conf` |
-| `*/Components/Glass.qml` | both QML roots, from `design/qml/Glass.qml` |
-| `*/Shaders/fluid.frag` | both QML roots, from `design/shaders/fluid.frag` |
+| `*/Components/{Chrome,Glow,Reflection}.qml` | both QML roots, from `design/qml/` |
+| `*/Shaders/xmb.frag` | both QML roots, from `design/shaders/xmb.frag` |
 
 Four languages, two QML roots that cannot import each other (the login theme is
 installed to `/usr/share` and cannot read `$HOME`, which is mode 700). Generating
@@ -43,6 +43,10 @@ design/build-shaders.sh          # bake .frag -> .qsb (Qt6 rejects raw GLSL)
 Generated files carry a do-not-edit header and are committed, so a fresh clone
 works without running anything.
 
+The visual language is **PS3 XMB**: cold near-black blue, one glowing cyan
+accent, chrome surfaces, geometric type (Michroma), and motion that lives in the
+wave field behind the interface.
+
 ### Rules the system actually enforces
 
 **Accent appears in exactly three places.** Active workspace indicator, focused
@@ -54,34 +58,44 @@ introducing a red — a fourth colour would also be a fourth accent location.
 **Everything snaps to a 4px grid**, including the bar height, the blob, and the
 password field.
 
-**One motion curve** — expo-out `cubic-bezier(0.16, 1, 0.3, 1)` — shared by QML
-animations, Hyprland window animations and hyprlock.
+**One motion curve** — `cubic-bezier(0.22, 1, 0.36, 1)` — shared by QML
+animations, Hyprland window animations and hyprlock. `--dur-slow` (400ms) is
+specifically the ripple propagation time.
 
-### Liquid glass
+**Weight is not a hierarchy tool.** Michroma has exactly one weight, so
+hierarchy comes from size, opacity, tracking and glow.
 
-Three rules, applied identically everywhere:
+### Chrome / reflection
 
-1. Depth from a soft, large-radius, low-opacity **shadow** — never a gradient
-   "shine". That is the difference between Apple and Windows Aero.
-2. A **1px specular highlight on the top edge only**, held across the span and
-   faded at the ends.
-3. On interaction the **corner radius relaxes outward** rather than snapping to
-   a hover state. The morph is the affordance.
+The material language is brushed metal, glow and reflection — **not** frosted
+glass. There is no backdrop blur anywhere, and the compositor layerrules that
+used to produce it have been removed.
 
-The backdrop blur is **not** done in Qt — a Wayland client cannot sample what is
-behind its own surface. Each shell surface declares a
-`WlrLayershell.namespace`, and `hypr/gelo.conf` matches a `layerrule` against it
-so the compositor does the frosting. That is why the material needs a
-compositor-side half.
+1. **Brushed metal.** Raised surfaces carry a vertical gradient, `bg-1` fading a
+   few percent darker at the bottom. Enough to read as material, not enough to
+   read as a gradient.
+2. **Selection is glow, not outline or fill.** Nothing gets boxed when selected;
+   it blooms. `Glow.qml` renders a blurred, accent-tinted, enlarged copy of the
+   content behind it.
+3. **Reflection beneath elements** — a flipped, faded, gradient-masked copy.
+   `Reflection.qml`. It samples the slice at the waterline, not the top of the
+   item, or the mirror comes out as a disconnected fragment.
+4. **Motion lives in the wave field behind the UI.** Interactions emit a ripple
+   that propagates through the wallpaper shader (`Services/Ripples.qml` →
+   `Shaders/xmb.frag`).
+
+The one exception to rule 4 is the workspace indicator, which keeps its
+travelling blob: the element moves *and* the field responds.
 
 ---
 
 ## Components
 
-**Wallpaper** — the fluid shader on the background layer. Also what gives the
-glass something to refract: over the previous near-black wallpaper the bar
-measured 17/255 mean brightness and read as flat paint; over the shader it
-measures 29 with a third of its pixels changing as the field moves.
+**Wallpaper** — the XMB wave field on the background layer, and the surface every
+interaction ripple propagates through. It is a **ribbon** field: explicit sine
+curves with gaussian falloff, not fBm noise. Noise reads as smoke; XMB is smooth
+horizontal bands of light. Also carries no accent — the field is built from
+`bg-1`/`bg-2`/`border` only, so the accent budget stays intact.
 
 **Bar** — workspaces, window title, git context, tray, clock.
 The workspace indicator is the blob: its two edges animate independently
@@ -100,10 +114,11 @@ qs -c gelo ipc call launcher toggle
 qs -c gelo ipc call launcher search fire
 ```
 
-**Notifications** — glass cards, slide in from the right, drag or click to
-dismiss with a squash-and-release. Critical notifications stay until acknowledged.
+**Notifications** — chrome cards, slide in from the right, drag or click to
+dismiss. Arriving and dismissing both ripple the field. Critical notifications
+stay until acknowledged.
 
-**Lock** (`SUPER+L`) — deliberately plain. Glass on the password field, no
+**Lock** (`SUPER+L`) — deliberately plain. Chrome on the password field, no
 shader. This is the path back into a running session, so it should feel instant.
 
 **Login** — the one surface with a real GLSL shader. See

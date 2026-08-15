@@ -12,9 +12,9 @@ Text {
     elide: Text.ElideRight
     horizontalAlignment: Text.AlignHCenter
 
-    font.family: Tokens.typography.mono
+    font.family: Tokens.typography.display
     font.pixelSize: Tokens.typography.size.caption
-    font.weight: Tokens.typography.weight.regular
+    font.weight: Tokens.typography.weight.light
     color: Tokens.color.text2
 
     // The title changes constantly (browser tabs, editor buffers). A hard swap
