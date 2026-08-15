@@ -1,0 +1,22 @@
+{
+  "name": "gelo-xmb",
+  "displayName": "gelo XMB",
+  "description": "Generated from design/tokens.json \u2014 do not edit by hand.",
+  "version": "1.0.0",
+  "publisher": "gelo",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "gelo XMB",
+        "uiTheme": "vs-dark",
+        "path": "./themes/gelo-xmb-color-theme.json"
+      }
+    ]
+  }
+}

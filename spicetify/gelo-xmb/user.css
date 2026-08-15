@@ -1,0 +1,126 @@
+/* GENERATED FILE — DO NOT EDIT. Source: design/tokens.json (run design/build-tokens.py) */
+
+/* ------------------------------------------------------------------ *
+ * Chrome — the player bar reads as brushed metal. Measured top-to-bottom
+ * after applying: #14212f -> #0c1926, which is present without reading
+ * as a gradient. A flat fill reads as paint; an obvious ramp reads as
+ * 2000s web design.
+ * ------------------------------------------------------------------ */
+
+[data-testid="now-playing-bar"] {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--spice-player), #fff 3%) 0%,
+      color-mix(in srgb, var(--spice-player), #000 6%) 100%) !important;
+  border-top: 1px solid rgba(var(--spice-rgb-button), 0.198);
+  box-shadow: 0 -6px 32px
+              rgba(var(--spice-rgb-shadow), 0.5);
+}
+
+/* ------------------------------------------------------------------ *
+ * Glow — selection blooms, it does not get boxed. The single most
+ * identifiable trait of the reference, and how the accent survives
+ * being an accent instead of becoming a fill.
+ * ------------------------------------------------------------------ */
+
+.x-progressBar-fillColor,
+.x-progressBar-progressFillColor {
+  background-color: var(--spice-button) !important;
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.75), 0 0 10px rgba(var(--spice-rgb-button), 0.338), 0 0 14px rgba(var(--spice-rgb-button), 0.15);
+}
+
+.x-progressBar-progressBarBg {
+  background-color: rgba(var(--spice-rgb-button-disabled), 0.55) !important;
+}
+
+.progress-bar__slider,
+.x-progressBar-sliderArea .progress-bar__slider {
+  background-color: var(--spice-button) !important;
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.75), 0 0 10px rgba(var(--spice-rgb-button), 0.338), 0 0 14px rgba(var(--spice-rgb-button), 0.15);
+}
+
+/* The play button stays white, and that is not a gap.
+ *
+ * It is an Encore control with colorSet="invertedLight", and spicetify's
+ * replace_colors has already rewired that set to our palette
+ * (`--background-base: var(--spice-text)`). It was following the theme all
+ * along — via `text`, which is white, because Spotify deliberately inverts
+ * its primary transport control.
+ *
+ * Two ways to force it accent were tried and both rejected:
+ *   1. `background-color: ... !important` — does not win; the circle is
+ *      painted by a hashed styled-components class, not by the testid element.
+ *   2. Overriding Encore's colour-set variables on the button — same reason.
+ * Reaching the real element means selecting on a hashed class, which is
+ * exactly the fragility this stylesheet exists to avoid.
+ *
+ * So: light the button instead of repainting it. A white source inside an
+ * accent bloom is closer to the reference than a blue disc anyway — the
+ * reference glows things, it does not tint them. */
+[data-testid="control-button-playpause"] {
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.375), 0 0 10px rgba(var(--spice-rgb-button), 0.169), 0 0 14px rgba(var(--spice-rgb-button), 0.075);
+  transition: box-shadow 150ms cubic-bezier(0.22, 1.0, 0.36, 1.0);
+}
+
+[data-testid="control-button-playpause"]:hover {
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.75), 0 0 10px rgba(var(--spice-rgb-button), 0.338), 0 0 14px rgba(var(--spice-rgb-button), 0.15);
+}
+
+/* Library rows and tracklist rows bloom on hover rather than filling.
+   Radius stays fixed — corner-radius-on-interaction was the old glass
+   affordance; here the affordance is the glow. */
+.main-yourLibraryX-listItem:hover,
+.main-trackList-trackListRow:hover {
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.28), 0 0 10px rgba(var(--spice-rgb-button), 0.126), 0 0 14px rgba(var(--spice-rgb-button), 0.056);
+  transition: box-shadow 250ms cubic-bezier(0.22, 1.0, 0.36, 1.0);
+}
+
+.main-trackList-selected,
+.main-yourLibraryX-listItem[aria-current="true"] {
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.413), 0 0 10px rgba(var(--spice-rgb-button), 0.186), 0 0 14px rgba(var(--spice-rgb-button), 0.083);
+}
+
+/* ------------------------------------------------------------------ *
+ * The cover art, lit rather than mirrored.
+ *
+ * Reflection.qml was tried here first and does not fit: the player bar
+ * gives the art ~16px of clearance before the window edge, so a
+ * `-webkit-box-reflect` mirror is clipped to nothing. Making room means
+ * changing layout, and layout is exactly what this file does not touch
+ * in an app that updates itself.
+ *
+ * A bloom behind the art carries the same "floating, not pasted on"
+ * read and needs no space at all — it grows into the chrome instead of
+ * below it.
+ * ------------------------------------------------------------------ */
+
+[data-testid="now-playing-widget"] [data-testid="cover-art-image"] {
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(var(--spice-rgb-button), 0.256),
+              0 0 28px rgba(var(--spice-rgb-button), 0.112);
+  transition: box-shadow 250ms cubic-bezier(0.22, 1.0, 0.36, 1.0);
+}
+
+[data-testid="now-playing-widget"]:hover [data-testid="cover-art-image"] {
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.28), 0 0 10px rgba(var(--spice-rgb-button), 0.126), 0 0 14px rgba(var(--spice-rgb-button), 0.056);
+}
+
+/* ------------------------------------------------------------------ *
+ * Hairlines. The material is carried by the edge and the glow, so the
+ * edge has to actually be there.
+ * ------------------------------------------------------------------ */
+
+.main-card-card,
+[data-testid="card-container"] {
+  border: 1px solid rgba(var(--spice-rgb-button), 0.10);
+  border-radius: 8px;
+  transition: box-shadow 250ms cubic-bezier(0.22, 1.0, 0.36, 1.0), border-color 250ms cubic-bezier(0.22, 1.0, 0.36, 1.0);
+}
+
+.main-card-card:hover,
+[data-testid="card-container"]:hover {
+  border-color: rgba(var(--spice-rgb-button), 0.28);
+  box-shadow: 0 0 5px rgba(var(--spice-rgb-button), 0.28), 0 0 10px rgba(var(--spice-rgb-button), 0.126), 0 0 14px rgba(var(--spice-rgb-button), 0.056);
+}
