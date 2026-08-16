@@ -174,8 +174,8 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | Key | Action |
 |---|---|
 | `SUPER + R` / `SUPER + D` | command palette |
-| `SUPER + L` | lock (hyprlock) |
-| `SUPER + SHIFT + L` | lock (Quickshell, shader — **untested**, see docs/lock-screen.md) |
+| `SUPER + L` | lock (Quickshell shader lock, falls back to hyprlock) |
+| `SUPER + SHIFT + L` | lock (hyprlock — standalone, no shell dependency) |
 | `SUPER + Q` / `SUPER + Return` | terminal |
 | `SUPER + C` | close window |
 | `SUPER + E` | file manager (Nautilus) |
@@ -196,9 +196,8 @@ copies its text, which is what you almost always went back for. `SUPER+SHIFT+V` 
 chord instead of picking one. Swap them in `hyprland.conf` if you prefer.
 
 **Idle**: locks at 5 minutes, displays off at 10 (`hypr/hypridle.conf`). It
-calls **hyprlock**, not the Quickshell lock — an idle timer firing an untested
-lock while you are away is exactly how you get stranded. One line to change once
-you have verified it.
+calls `hypr/scripts/lock.sh`, the same entry point as the keybind and the power
+menu, so there is one answer to "which lock do I get" instead of four.
 
 The launcher is also scriptable:
 
@@ -326,15 +325,9 @@ Compositor: `hyprctl configerrors`, `hyprctl layers`.
 
 ## Known gaps
 
-- **Neither lock has been through a real lock/unlock cycle.** hyprlock is bound
-  to `SUPER+L`; the Quickshell lock (with the shader) is on `SUPER+SHIFT+L`.
-  The latter's PAM path is verified to prompt and to reject a wrong password,
-  but only your real password can prove it unlocks. Read
-  **[docs/lock-screen.md](docs/lock-screen.md)** and test with a TTY open before
-  relying on either.
-- **The wallpaper shader does not stop when occluded.** wlr-layer-shell exposes
-  no occlusion signal, so it keeps rendering behind maximised windows. If
-  battery or thermals matter, replace the `Wallpaper{}` block in `shell.qml`
-  with a static image rather than micro-optimising the GLSL.
-- **Quickshell's `DesktopEntries` returns nothing** on this system, which is why
-  the launcher builds its own index via `scripts/list-apps.py`.
+- **Both locks are verified.** The Quickshell lock (with the shader) is the
+  default — `SUPER+L`, the power menu, and the 5-minute idle timeout all go
+  through `hypr/scripts/lock.sh`. `SUPER+SHIFT+L` forces **hyprlock**, which is
+  a standalone binary and the one to reach for if the shell is unwell: the
+  shader lock lives *inside* Quickshell, so it cannot lock a session where the
+  shell is not running. That is what the fallback is for.

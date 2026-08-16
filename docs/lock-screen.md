@@ -28,11 +28,11 @@ What has been verified:
   password, and **rejects a wrong one** (`PamResult.Failed`) — it fails closed.
 - The appearance is correct (checked via preview, which engages no lock).
 
-What has **not** been verified, because it needs your actual password:
+**Both locks are verified end to end** (gelo, 2026-08-15): hyprlock on
+`SUPER+SHIFT+L` and the Quickshell shader lock on `SUPER+L` both accept a
+correct password and return the session.
 
-- That a *correct* password unlocks.
-
-That is the one step you have to do.
+The shader lock is now the **default**.
 
 ---
 
@@ -180,3 +180,44 @@ moment the lock mattered:
 **Still unverified, and only you can do it:** that a correct password unlocks.
 Rehearse with `hyprlock --grace 30` first — that proves everything except
 authentication, without your password being the only way out.
+
+---
+
+## Which lock you get, and why there is a fallback
+
+Four things used to invoke a lock independently — the `SUPER+L` bind, the power
+menu, hypridle's idle timeout and its before-sleep hook. "Which lock do I
+actually get" had four answers, and changing it meant changing four files.
+
+They all route through **`hypr/scripts/lock.sh`** now, which prefers the
+Quickshell shader lock and falls back to hyprlock.
+
+**The fallback is not politeness.** The shader lock lives *inside* Quickshell,
+so it cannot lock a session where the shell is not running — and the failure
+mode of "the lock did not happen" is an unlocked machine, not an ugly one.
+hyprlock is a standalone binary with no such dependency, which is why it stays
+on `SUPER+SHIFT+L` as the thing to reach for when the shell is unwell.
+
+The script checks the handler actually exists before trusting it:
+
+```bash
+quickshell -c gelo ipc show | awk '/^target lock$/{f=1;next} /^target /{f=0} f && /function lock\(\)/{ok=1} END{exit !ok}'
+```
+
+That check is there because **`ipc call` exits 0 for a function that does not
+exist** — verified: a bogus function name and a bogus target both return 0, and
+only an unreachable instance returns non-zero. Reachability alone would mean a
+renamed handler silently did nothing and the machine stayed unlocked.
+
+Residual risk, stated rather than hidden: if the shell is running and still
+advertises the handler but is wedged, the call returns 0 and no lock appears.
+Nothing outside the shell can currently distinguish that case.
+
+### hypridle does not hot-reload
+
+Editing `hypridle.conf` does nothing until hypridle restarts — it was observed
+running an eleven-hour-old config here. After changing it:
+
+```bash
+kill $(pgrep -x hypridle); setsid hypridle -c ~/.config/hypr/hypridle.conf &
+```

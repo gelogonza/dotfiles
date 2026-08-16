@@ -52,7 +52,7 @@ PanelWindow {
     // Sleep locks on the way down: hypridle's before_sleep_cmd fires
     // loginctl lock-session, so the machine never resumes to an open desktop.
     readonly property var entries: [
-        { label: "Lock",      icon: "lock",   cmd: "hyprlock" },
+        { label: "Lock",      icon: "lock",   cmd: "~/dotfiles/hypr/scripts/lock.sh" },
         { label: "Sleep",     icon: "sleep",  cmd: "systemctl suspend" },
         { label: "Log out",   icon: "logout", cmd: "hyprctl dispatch exit" },
         { label: "Reboot",    icon: "reboot", cmd: "systemctl reboot" },

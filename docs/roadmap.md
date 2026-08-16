@@ -71,22 +71,11 @@ replaced — the one place in the system that was still running a warm hue.
 
 These predate the roadmap and are still open:
 
-- **Neither lock has completed a real unlock cycle.** hyprlock is on `SUPER+L`,
-  the Quickshell lock on `SUPER+SHIFT+L`, and **hypridle fires hyprlock at 5
-  minutes** — so this is not hypothetical. Everything checkable without locking
-  has now been audited and three config defects fixed
-  (`docs/lock-screen.md`), including a **rescue TTY documented as F2 when this
-  session runs on VT2**. Rehearse with `hyprlock --grace 30`; only "a correct
-  password unlocks" remains, and only you can prove it.
-- **SDDM login is installed but not enabled.** `docs/login-screen.md` has the
-  switch and the recovery procedure.
-- **The wallpaper shader does not stop when occluded** — wlr-layer-shell exposes
-  no occlusion signal. If battery or thermals ever matter, swap the
-  `Wallpaper{}` block for a static image rather than micro-optimising GLSL.
-- **`hyprpolkitagent` renders stock, not XMB.** Quickshell exposes a
-  `PolkitAgent` type, so a themed replacement is possible — but an auth prompt
-  is the wrong place to discover a service does not work, so it stays until
-  there is appetite to verify it properly.
+- ~~Neither lock has completed a real unlock cycle.~~ **Both verified by gelo,
+  2026-08-15.** The Quickshell shader lock is now the default: `SUPER+L`, the
+  power menu and hypridle's 5-minute timeout all route through
+  `hypr/scripts/lock.sh`, which prefers it and falls back to hyprlock if the
+  shell is not running. `SUPER+SHIFT+L` forces hyprlock directly.
 
 ## Principles that constrain all of the above
 

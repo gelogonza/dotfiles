@@ -141,11 +141,10 @@ theme, terminal, GTK theming, idle daemon, polkit agent, power menu with sleep.
 
 **Untested and it matters:**
 
-- **Neither lock has ever completed a real unlock cycle.** hyprlock is on
-  `SUPER+L`, the Quickshell lock on `SUPER+SHIFT+L`, and **hypridle now fires
-  hyprlock automatically at 5 minutes**. PAM is verified to prompt and to reject
-  a wrong password; only gelo's real password can prove it unlocks. See
-  `docs/lock-screen.md`. Do not lock his session to "test" it.
+- **Both locks are verified** (gelo, 2026-08-15). The Quickshell shader lock is
+  the default via `hypr/scripts/lock.sh`, which falls back to hyprlock when the
+  shell is not running — the shader lock lives inside Quickshell and cannot
+  lock a session without it. `SUPER+SHIFT+L` forces hyprlock.
 - SDDM login theme is installed but not enabled (`docs/login-screen.md`).
 
 ---
