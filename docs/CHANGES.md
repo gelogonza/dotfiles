@@ -1734,3 +1734,44 @@ The desktop, a Figma file and a coursework site can now be the *same palette
 object* rather than three copies that drift. One `design/tokens.py` run and
 every one of them moves together — and `--check` fails the build if any of them
 did not.
+
+
+---
+
+# Contrast audit (roadmap 5.4)
+
+`design/build-tokens.py --audit` prints every foreground/background pair the
+system actually puts together, with its WCAG ratio and the threshold that
+applies, and exits non-zero if any fall short.
+
+**The pair list is hand-curated, not generated.** An all-against-all would
+produce hundreds of rows nobody reads and would flag combinations that never
+occur — `field-base` against `text-1` is meaningless, the wave field has no
+text on it. Each row is a claim that this pairing happens, at this threshold.
+
+It audits the **derived** steps too, not just the raw tokens: the editor's
+`muted`/`dim`/`hint` ramp and Spotify's subtext step are computed inside the
+renderers and are as load-bearing as anything in `tokens.json`. They were
+measured by hand during those passes; now they are measured on every run.
+
+## It immediately found a real defect
+
+35 pairs, **3 failures**, all pre-existing:
+
+| pair | ratio | needs |
+|---|---|---|
+| secondary ink on base surface | 3.62 | 4.5 |
+| secondary ink on raised chrome | 3.94 | 4.5 |
+| secondary ink on hover surface | 3.34 | 4.5 |
+
+`text-2` (`#5a7fb5`) has failed AA on every light surface since the palette was
+inverted, and it is the ink for every subtitle in the shell — the CPU/MEM
+labels, the git module, launcher subtitles, notification bodies. Nothing caught
+it because the light pass measured the *shader* carefully and the chrome by eye.
+
+The minimal fix is `#466a9d` — same hue (215.6°) and saturation, lightness
+0.531 → 0.446, giving 4.88 / 5.31 / 4.51. It stays clearly separated from
+`text-1` (luminance gap 0.073), so the two-tier ink hierarchy survives.
+
+That is a palette change affecting every secondary label on the desktop, so it
+is gelo's call rather than the build's.

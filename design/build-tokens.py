@@ -2323,6 +2323,125 @@ _SPICETIFY_JS = r"""// __BANNER__
 
 
 # --------------------------------------------------------------------------
+# Contrast audit
+# --------------------------------------------------------------------------
+
+def _relative_luminance(hex_: str) -> float:
+    h = hex_.lstrip("#")[:6]
+    out = []
+    for i in (0, 2, 4):
+        c = int(h[i:i + 2], 16) / 255
+        out.append(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
+    return 0.2126 * out[0] + 0.7152 * out[1] + 0.0722 * out[2]
+
+
+def contrast(fg: str, bg: str) -> float:
+    """WCAG 2.x contrast ratio. Alpha is ignored — every pair below is opaque
+    on opaque, and a token carrying alpha is composited before it is read."""
+    a, b = _relative_luminance(fg), _relative_luminance(bg)
+    hi, lo = max(a, b), min(a, b)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def audit_pairs(t: dict) -> list:
+    """Every foreground/background pair the system actually puts together.
+
+    Written out by hand on purpose. A generic all-against-all would produce
+    hundreds of rows nobody reads and would flag combinations that never occur
+    — `field-base` against `text-1` is meaningless, the wave field has no text
+    on it. The value is in the list being *curated*: each row is a claim that
+    this pairing happens, and the threshold is the one that applies to it.
+
+    Returns (label, fg, bg, required) tuples. 4.5 is AA for body text, 3.0 is
+    AA for large text and for UI component boundaries.
+    """
+    c = t["color"]
+    term = t["terminal"]
+    ansi = term["ansi"]
+
+    # Derived steps the generated themes use. These are computed in
+    # render_vscode / render_spicetify and are as load-bearing as the raw
+    # tokens, so they are audited with them rather than trusted.
+    bg = term["background"]
+    fg = term["foreground"]
+    editor_muted = _mix(ansi[8], fg, 0.35)
+    editor_dim = _mix(ansi[8], fg, 0.22)
+    editor_hint = _mix(ansi[8], fg, 0.45)
+    editor_raised = _mix(bg, "#ffffff", 0.06)
+    editor_deep = _mix(bg, "#000000", 0.35)
+    spice_sub = _mix(ansi[8], fg, 0.45)
+    spice_card = _mix(bg, "#ffffff", 0.06)
+    field_sub = _mix(ansi[8], fg, 0.60)
+
+    pairs = [
+        # --- desktop chrome ---
+        ("primary ink on base surface", c["text-1"], c["bg-0"], 4.5),
+        ("primary ink on raised chrome", c["text-1"], c["bg-1"], 4.5),
+        ("primary ink on hover surface", c["text-1"], c["bg-2"], 4.5),
+        ("secondary ink on base surface", c["text-2"], c["bg-0"], 4.5),
+        ("secondary ink on raised chrome", c["text-2"], c["bg-1"], 4.5),
+        ("secondary ink on hover surface", c["text-2"], c["bg-2"], 4.5),
+        ("hairline against base surface", c["border"], c["bg-0"], 1.3),
+        ("accent ink on accent", c["accent-ink"], c["accent"], 4.5),
+        ("accent ink on accent-dim", c["accent-ink"], c["accent-dim"], 4.5),
+        ("accent against base surface", c["accent"], c["bg-0"], 3.0),
+
+        # --- terminal ---
+        ("terminal text", fg, bg, 4.5),
+        ("terminal cursor on background", term["cursor"], bg, 3.0),
+    ]
+
+    # ANSI 0 and 8 are the dim slots and are not body text; the rest are.
+    for i, colour in enumerate(ansi):
+        if i in (0, 8):
+            continue
+        pairs.append((f"terminal ansi[{i}]", colour, bg, 4.5))
+
+    pairs += [
+        # --- editor (design.md 8c) ---
+        ("editor comment", editor_muted, bg, 4.5),
+        ("editor line number", editor_dim, bg, 3.0),
+        ("editor placeholder on input", editor_hint, editor_raised, 4.5),
+        ("editor inactive tab on deep", editor_muted, editor_deep, 4.5),
+        ("editor button ink on accent", bg, ansi[12], 4.5),
+
+        # --- Spotify (design.md 8d) ---
+        ("spotify text on main", fg, bg, 4.5),
+        ("spotify subtext on card", spice_sub, spice_card, 4.5),
+        ("spotify subtext on main", spice_sub, bg, 4.5),
+        ("spotify field subtext on main", field_sub, bg, 4.5),
+    ]
+    return pairs
+
+
+def run_audit(t: dict) -> int:
+    """Print the contrast table; return the number of failures."""
+    rows = audit_pairs(t)
+    width = max(len(r[0]) for r in rows)
+    failures = 0
+
+    print("Contrast audit — WCAG 2.x, opaque pairs the system actually uses\n")
+    print(f"  {'pair'.ljust(width)}  {'ratio':>6}  {'min':>5}  result")
+    print(f"  {'-' * width}  {'-' * 6}  {'-' * 5}  ------")
+
+    for label, fg, bg, need in rows:
+        ratio = contrast(fg, bg)
+        ok = ratio >= need
+        if not ok:
+            failures += 1
+        grade = "AAA" if ratio >= 7 else ("AA" if ratio >= 4.5 else "--")
+        mark = grade if ok else "FAIL"
+        print(f"  {label.ljust(width)}  {ratio:6.2f}  {need:5.1f}  {mark}")
+
+    print()
+    if failures:
+        print(f"  {failures} pair(s) below their threshold.")
+    else:
+        print(f"  All {len(rows)} pairs clear their thresholds.")
+    return failures
+
+
+# --------------------------------------------------------------------------
 # Design Tokens Community Group (W3C) — the bridge out of this repo
 # --------------------------------------------------------------------------
 
@@ -2841,9 +2960,14 @@ def render_components() -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="fail if any output is stale")
+    ap.add_argument("--audit", action="store_true",
+                    help="print the contrast table; fail if any pair is below its threshold")
     args = ap.parse_args()
 
     tokens = strip_comments(json.loads(TOKENS.read_text()))
+
+    if args.audit:
+        return 1 if run_audit(tokens) else 0
 
     qml = render_qml(tokens)
     outputs = {
