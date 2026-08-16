@@ -11,7 +11,16 @@ why in **[docs/CHANGES.md](docs/CHANGES.md)**; what is coming next in
 **[docs/roadmap.md](docs/roadmap.md)**.
 
 Picking this up cold — or handing it to someone (or something) else? Start with
-**[docs/handoff.md](docs/handoff.md)**.
+**[docs/handoff.md](docs/handoff.md)**. Live at
+**[gelogonza.github.io/dotfiles](https://gelogonza.github.io/dotfiles/)**.
+
+MIT licensed — take what you want.
+
+Third-party material: the cursor theme is recoloured from **Adwaita**
+(CC-BY-SA 3.0) and is *not* committed here; `design/build-cursor.py` reproduces
+it. **Geist** (Vercel, OFL) is fetched at install time rather than vendored.
+Early keybind and Quickshell-API reference came from **43PR/dotfiles**; none of
+it remains in this tree.
 
 ```
 design/          token source, generators, shared QML/GLSL/SVG
@@ -24,7 +33,6 @@ spicetify/       generated Spotify (spicetify) theme
 fastfetch/       fetch tool
 docs/            procedures with real failure modes, and the generated site
                  (index/xmb/accessibility/bridge .html — GitHub Pages source)
-reference/       upstream 43PR material, not loaded at runtime
 ```
 
 ---

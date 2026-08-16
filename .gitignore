@@ -29,9 +29,8 @@ queue.sqlite3
 *.swp
 .DS_Store
 
-# Upstream 43PR/dotfiles clone, kept locally for reference. It carries its own
-# .git, so committing it would create a nested repo. The parts actually used are
-# extracted into reference/.
+# Upstream 43PR/dotfiles clone, if one is ever pulled down locally again. It
+# carries its own .git, so committing it would nest a repo.
 dotfiles/
 
 # Python bytecode, produced by running the scripts in hypr/scripts
