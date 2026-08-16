@@ -63,4 +63,11 @@ config-file = gelo-theme
 # cursor
 cursor-style = bar
 
+# No "are you sure?" when a window closes with something still running.
+# SUPER+C sends a close request to whatever is focused; ghostty's default is to
+# intercept that and ask. On a tiling desktop where closing a window is a
+# deliberate keystroke rather than a stray click, the dialog is a second
+# keystroke to dismiss and never a rescue.
+confirm-close-surface = false
+
 

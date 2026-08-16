@@ -178,8 +178,8 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + R` / `SUPER + D` | command palette |
 | `SUPER + L` | lock (Quickshell shader lock, falls back to hyprlock) |
 | `SUPER + SHIFT + L` | lock (hyprlock — standalone, no shell dependency) |
-| `SUPER + Q` / `SUPER + Return` | terminal |
-| `SUPER + C` | close window |
+| `SUPER + Q` / `SUPER + Return` | terminal (new window) |
+| `SUPER + C` | close window (no confirm prompt — `confirm-close-surface = false`) |
 | `SUPER + E` | file manager (Nautilus) |
 | `SUPER + SHIFT + V` | clipboard history |
 | `SUPER + SHIFT + N` | notification history |
