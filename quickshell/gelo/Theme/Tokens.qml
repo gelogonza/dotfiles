@@ -18,7 +18,7 @@ QtObject {
         readonly property color bg2: "#dceaf8"
         readonly property color border: "#bed7eb"
         readonly property color text1: "#1b4c78"
-        readonly property color text2: "#5a7fb5"
+        readonly property color text2: "#466a9d"
         readonly property color accent: "#3478c4"
         readonly property color accentDim: "#2e68a8"
         readonly property color glow: "#334a8cd0"

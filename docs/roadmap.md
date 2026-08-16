@@ -86,7 +86,7 @@ The token source stopped being desktop-only.
 | 5.1 | W3C DTCG export → Figma Variables via Tokens Studio | ☑ `design/tokens.dtcg.json` |
 | 5.2 | Typed module for web projects | ☑ `design/tokens.ts` |
 | 5.3 | Living design-system page generated from the tokens | ☐ the artifact to link |
-| 5.4 | `--audit`: fail the build when a token pair drops below AA | ☐ |
+| 5.4 | `--audit`: fail the build when a token pair drops below AA | ☑ 35 pairs, all clearing |
 
 ## Principles that constrain all of the above
 

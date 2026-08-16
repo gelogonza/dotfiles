@@ -10,7 +10,7 @@ export const color = {
   "bg-2": "#dceaf8",
   "border": "#bed7eb",
   "text-1": "#1b4c78",
-  "text-2": "#5a7fb5",
+  "text-2": "#466a9d",
   "accent": "#3478c4",
   "accent-dim": "#2e68a8",
   "glow": "#4a8cd033",

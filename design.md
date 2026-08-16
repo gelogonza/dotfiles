@@ -114,7 +114,7 @@ load-bearing; it is what keeps this from reading as a generic product palette.
 | `bg-2` | `#dceaf8` | hover / active |
 | `border` | `#bed7eb` | hairline |
 | `text-1` | `#1b4c78` | primary ink (navy) |
-| `text-2` | `#5a7fb5` | secondary ink (steel) |
+| `text-2` | `#466a9d` | secondary ink (steel) |
 | `shade` | `#1f466b` | **shadows and scrims are built from this** |
 | `accent` | `#3478c4` | the one accent |
 | `accent-dim` | `#2e68a8` | accent at rest |
@@ -539,5 +539,9 @@ Things that will quietly break the system if changed without care:
 6. **Never a uniform array in a shader** consumed by ShaderEffect.
 7. **Weight never exceeds 400.**
 8. **Shadows and scrims come from `shade`**, never `bg-0`.
-9. **The editor and Spotify themes never read `color.*`** — both are
+9. **Every pair the system puts together clears WCAG AA.** `build-tokens.py
+   --audit` asserts it on 35 curated pairs and fails the build otherwise. This
+   is not aspirational: `text-2` shipped below AA on all three light surfaces
+   from the palette inversion until the audit was written and caught it.
+10. **The editor and Spotify themes never read `color.*`** — both are
    terminal-derived, and the desktop accent stays in its three places.
