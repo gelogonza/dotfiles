@@ -164,9 +164,25 @@ Chrome {
             color: Tokens.color.text2
         }
 
+        // "Nothing on" and "every feed failed" produce the same empty list, and
+        // reporting the first when the second is true is the card lying. The
+        // service already has the errors; it just was not showing them.
+        Text {
+            width: parent.width
+            wrapMode: Text.WordWrap
+            visible: Agenda.configured && Agenda.errors.length > 0
+            text: "Could not read " + Agenda.errors.join(", ")
+                + ". Check the URLs in ~/.config/gelo/calendars.json — a "
+                + "ValueError usually means the placeholder is still there."
+            font.family: Tokens.typography.display
+            font.pixelSize: Tokens.typography.size.caption
+            color: Tokens.color.text1
+        }
+
         Text {
             width: parent.width
             visible: Agenda.configured && Agenda.events.length === 0
+                && Agenda.errors.length === 0
             text: Agenda.loading ? "Loading…" : "Nothing in the next fortnight."
             font.family: Tokens.typography.display
             font.pixelSize: Tokens.typography.size.caption
