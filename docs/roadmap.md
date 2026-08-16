@@ -62,7 +62,7 @@ replaced — the one place in the system that was still running a warm hue.
 | | Item | Why |
 |---|---|---|
 | 4.1 | Notification history | ☑ `Services/NotificationHistory.qml`, browsable as a third launcher mode on `SUPER+SHIFT+N`; persisted, so it survives a shell restart |
-| 4.2 | Window switcher | no Alt+Tab equivalent |
+| 4.2 | Window switcher | ☑ `Services/Windows.qml`, a fourth launcher mode on `SUPER+Tab` / `ALT+Tab` — searchable rather than hold-and-cycle |
 | 4.3 | Idle inhibitor toggle | hypridle locks at 5 min; a bar toggle to suppress it during video. Browsers do appear to inhibit correctly here (one inhibitor was active during testing), so this is a safety net rather than a fix |
 
 ---

@@ -40,6 +40,7 @@ PanelWindow {
     property string mode: "apps"
     readonly property var provider: mode === "clipboard" ? Clipboard
         : mode === "notifications" ? NotificationHistory
+        : mode === "windows" ? Windows
         : Apps
 
     // Stagger is an entrance flourish, not a per-keystroke effect. It plays when
@@ -67,6 +68,8 @@ PanelWindow {
             Clipboard.reload();          // history changes constantly
         else if (mode === "notifications")
             NotificationHistory.reload();
+        else if (mode === "windows")
+            Windows.reload();          // titles arrive on an async refresh
 
         // Clear the field, not the provider's query directly: the field is the
         // source of truth and its onTextChanged is what pushes the query down.
@@ -99,6 +102,8 @@ PanelWindow {
             Clipboard.activate(item);
         else if (mode === "notifications")
             NotificationHistory.activate(item);
+        else if (mode === "windows")
+            Windows.activate(item);
         else
             Apps.launch(item);
     }
@@ -124,6 +129,10 @@ PanelWindow {
         }
         function open(): void {
             launcher.show("apps");
+        }
+
+        function windows(): void {
+            launcher.show("windows");
         }
 
         function notifications(): void {
@@ -250,7 +259,8 @@ PanelWindow {
                     anchors.fill: parent
                     verticalAlignment: Text.AlignVCenter
                     visible: field.text.length === 0
-                    text: launcher.mode === "notifications" ? "Search notifications"
+                    text: launcher.mode === "windows" ? "Switch to a window"
+                        : launcher.mode === "notifications" ? "Search notifications"
                         : launcher.mode === "clipboard" ? "Search clipboard history"
                                                         : "Search applications"
                     font: field.font
@@ -320,11 +330,21 @@ PanelWindow {
                         return modelData.preview;
                     if (launcher.mode === "notifications")
                         return modelData.summary;
+                    if (launcher.mode === "windows")
+                        return modelData.title;
                     return modelData.name;
                 }
                 subtitle: {
                     if (launcher.mode === "clipboard")
                         return "";
+                    if (launcher.mode === "windows") {
+                        // Where it is matters more than what it is called:
+                        // the title is already the row's headline.
+                        const bits = ["workspace " + modelData.workspace];
+                        if (modelData.appClass.length > 0)
+                            bits.unshift(modelData.appClass);
+                        return bits.join("  ·  ");
+                    }
                     if (launcher.mode === "notifications") {
                         // App and age first: scanning a history you are
                         // looking for "the thing Firefox said an hour ago".
@@ -342,9 +362,14 @@ PanelWindow {
                         return modelData.kind === "image" ? "image" : "clipboard";
                     if (launcher.mode === "notifications")
                         return "";
+                    if (launcher.mode === "windows")
+                        return modelData.appClass || "";
                     return modelData.icon || "";
                 }
-                iconTinted: launcher.mode !== "apps"
+                // Window icons are application logos, same as the app list:
+                // flattening them makes five blue smudges (design.md §5).
+                iconTinted: launcher.mode === "clipboard"
+                    || launcher.mode === "notifications"
 
                 rowIndex: index
                 width: list.width

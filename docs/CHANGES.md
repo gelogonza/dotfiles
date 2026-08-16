@@ -1617,3 +1617,40 @@ a log.
 
 Unqueried, the list is newest-first: a history re-sorted by fuzzy score is not
 a history. Same reasoning as the clipboard provider, and the same code shape.
+
+
+---
+
+# Window switcher (roadmap 4.2)
+
+`Services/Windows.qml`, a fourth launcher mode on `SUPER+Tab` and `ALT+Tab`.
+
+**Searchable, not hold-and-cycle.** Alt+Tab is a good interaction for four
+windows and a bad one for fifteen: you tab past the one you wanted and go round
+again. Typing two letters is constant-time however many are open, and this desk
+routinely has a terminal grid, an editor, a browser and a player across five
+workspaces. The `ALT+Tab` binding is there for muscle memory; it opens the same
+palette.
+
+Rows are sorted by workspace so the list reads like the desktop is laid out,
+and **the focused window sorts last** — it is the one you are already looking
+at, so putting it first would waste the top row every time.
+
+Windows are focused by `address:0x…`. Matching on title races with anything
+that renames itself, which browsers and editors do on every tab change.
+
+## Two async gaps behind one symptom
+
+Every window that was not on the active workspace displayed as
+**"workspace -1"**. Hyprland pushes toplevel changes over its event socket, but
+the detail arrives on a refresh, and two separate refreshes are needed:
+
+- `refreshToplevels()` — titles are empty until it lands, so a window opened
+  moments ago is filtered out entirely
+- `refreshWorkspaces()` — a toplevel's `workspace` handle stays null for
+  workspaces the shell has not seen, which is what produced the -1
+
+There is also a fallback to `lastIpcObject.workspace`, which carries the
+workspace even before either refresh completes. Verified against `hyprctl
+clients`: five ghostty on 1, editor and Claude on 2, browser on 3 — the
+switcher agrees on every row.

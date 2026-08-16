@@ -181,6 +181,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + E` | file manager (Nautilus) |
 | `SUPER + SHIFT + V` | clipboard history |
 | `SUPER + SHIFT + N` | notification history |
+| `SUPER + Tab` / `ALT + Tab` | window switcher |
 | `SUPER + S` / `Print` | screenshot a region |
 | `SUPER + SHIFT + S` | screenshot everything |
 | `SUPER + ALT + S` | screenshot a window (snaps to window edges) |
@@ -206,6 +207,7 @@ qs -c gelo ipc call launcher toggle
 qs -c gelo ipc call launcher search fire
 qs -c gelo ipc call launcher clipboard
 qs -c gelo ipc call launcher notifications
+qs -c gelo ipc call launcher windows
 qs -c gelo ipc call power toggle
 ```
 
