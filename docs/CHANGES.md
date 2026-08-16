@@ -1887,3 +1887,49 @@ it through Jekyll, which would try to interpret the Markdown alongside it.
 The split is by *argument*, not by feature: each page makes one claim and shows
 the evidence for it. The material was already there — `CHANGES.md` records the
 failures, and failures are the part of a portfolio that is usually missing.
+
+
+---
+
+# `SUPER+S` was two bindings
+
+Stock Hyprland puts the scratchpad on `SUPER+S` / `SUPER+SHIFT+S`. The
+screenshot binds added later took the same chords, and Hyprland does not resolve
+that — it fires **every** binding matching a chord. `hyprctl binds` showed two
+entries for modmask 64 + `S`, so pressing it started a region selection *and*
+toggled the special workspace underneath it.
+
+The scratchpad moved to `` SUPER+` ``. Verified after `hyprctl reload`: three
+`S` entries, all screenshot; two `grave` entries, both scratchpad.
+
+This is the same rule that put clipboard history on `SUPER+SHIFT+V` rather than
+`SUPER+V` — it was already written down, and the screenshot binds still walked
+into it. `hyprctl binds` is the check: two entries with the same `modmask` and
+`key` is always a collision, never a precedence.
+
+---
+
+# README as a getting-started document
+
+The README had been edited incrementally for every feature and never read end to
+end as a stranger would read it. Auditing it against the tree found the
+documentation drifting from the config in ways that would only surface on
+someone else's machine:
+
+| Was | Actually |
+|---|---|
+| symlink loop covered 9 directories | 13 exist; the warning below it already said "13 dangling links" |
+| `pacman -S` list | missing `nautilus`, `pavucontrol`, `python-dateutil`, `imagemagick`, `xdg-desktop-portal-hyprland` — all reachable from a default keybind or a visible card |
+| "roll back by: uncomment `waybar-launch`" | that wrapper lives in `~/.local/bin`, outside this repo |
+| nothing about monitors or the NVIDIA `env` block | both hardcode my hardware; both break a first login |
+| Known gaps: one bullet | SDDM, polkit, wallpaper occlusion, distro scope and packaging were all undocumented |
+
+`python-dateutil` is the one worth naming twice: it was in neither the package
+list nor the machine, and without it the agenda parses fine and simply
+under-reports — a weekly class appears once and then never again. A silent
+degrade needs a louder note than a crash does.
+
+New sections: **Before you start** (what installing this actually replaces, the
+four machine-specific values, back up first, and that the token layer is usable
+on its own), and **Did it work?** — five commands in the order things fail,
+each with what a pass looks like.
