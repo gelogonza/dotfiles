@@ -166,6 +166,9 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   scroll to nudge it, right-click to mute.
 - **Bluetooth** — click to open `blueman-manager`, right-click to disconnect
   every connected device. Hidden entirely if the machine has no controller.
+- **Keep awake** — the crescent moon. Crossed out and in full ink means the
+  machine will not idle-lock; it holds a logind idle inhibitor for as long as
+  it is on, and the inhibitor dies with the shell so it cannot get stuck.
 - **Power** — opens a menu: lock, sleep, log out, reboot, shut down. Sleep
   locks on the way down, so the machine never resumes to an open desktop.
 
@@ -181,6 +184,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + E` | file manager (Nautilus) |
 | `SUPER + SHIFT + V` | clipboard history |
 | `SUPER + SHIFT + N` | notification history |
+| `SUPER + SHIFT + I` | keep the screen awake (toggle) |
 | `SUPER + Tab` / `ALT + Tab` | window switcher |
 | `SUPER + S` / `Print` | screenshot a region |
 | `SUPER + SHIFT + S` | screenshot everything |
@@ -208,6 +212,7 @@ qs -c gelo ipc call launcher clipboard
 qs -c gelo ipc call launcher notifications
 qs -c gelo ipc call launcher windows
 qs -c gelo ipc call power toggle
+qs -c gelo ipc call idle toggle      # or on / off / status
 ```
 
 ---

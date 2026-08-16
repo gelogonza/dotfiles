@@ -11,3 +11,4 @@ singleton Ui 1.0 Ui.qml
 singleton Weather 1.0 Weather.qml
 singleton NotificationHistory 1.0 NotificationHistory.qml
 singleton Windows 1.0 Windows.qml
+singleton IdleInhibitor 1.0 IdleInhibitor.qml

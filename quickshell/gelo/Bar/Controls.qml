@@ -190,6 +190,36 @@ Row {
         }
     }
 
+    // --- idle inhibitor ---------------------------------------------------
+    //   click -> keep the screen awake, or let it lock on schedule again
+    //
+    // Reads as the state of the machine rather than the state of a switch:
+    // the crossed-out moon means "this will not sleep". Full ink only while
+    // it is holding, because that is the condition worth noticing — an
+    // always-lit control teaches you to stop seeing it.
+    Icon {
+        anchors.verticalCenter: parent.verticalCenter
+        size: 16
+        source: IdleInhibitor.inhibited ? "sleep-off" : "sleep"
+        color: IdleInhibitor.inhibited
+            ? Tokens.color.text1
+            : Tokens.alpha(Tokens.color.text2, 0.5)
+
+        Behavior on color {
+            ColorAnimation {
+                duration: Tokens.motion.duration.fast
+                easing.type: Easing.Bezier
+                easing.bezierCurve: Tokens.motion.easeBezier
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            cursorShape: Qt.PointingHandCursor
+            onClicked: IdleInhibitor.toggle()
+        }
+    }
+
     // --- power ------------------------------------------------------------
     Icon {
         anchors.verticalCenter: parent.verticalCenter

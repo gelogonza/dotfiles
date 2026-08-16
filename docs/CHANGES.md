@@ -1654,3 +1654,33 @@ There is also a fallback to `lastIpcObject.workspace`, which carries the
 workspace even before either refresh completes. Verified against `hyprctl
 clients`: five ghostty on 1, editor and Claude on 2, browser on 3 — the
 switcher agrees on every row.
+
+
+---
+
+# Idle inhibitor (roadmap 4.3)
+
+A crescent moon in the bar controls, `SUPER+SHIFT+I`, or
+`ipc call idle on|off|toggle|status`. Crossed out and in full ink means the
+machine will not idle-lock.
+
+**A logind inhibitor, not a signal to hypridle.** `ignore_dbus_inhibit = false`
+in `hypridle.conf` means hypridle already honours logind inhibitors, so this is
+the supported mechanism rather than a side channel — and anything else that
+respects logind gets the same answer for free.
+
+Verified against logind rather than by watching the clock: holding it sets
+`BlockInhibited` to `"idle"` and lists as `gelo shell … idle … block`;
+releasing clears the property. Both directions, through the IPC handle.
+
+**The inhibitor is the lifetime of a process**, which is a useful property
+rather than an implementation detail: if the shell dies, logind releases it and
+the machine goes back to locking on schedule, instead of staying awake forever
+with nothing left to turn it off.
+
+Full ink only while it is holding. An always-lit control teaches you to stop
+seeing it, and the state worth noticing here is the abnormal one.
+
+The new `sleep-off.svg` needed no registration anywhere — the generated icon
+list picked it up from the directory, which is the fix from the MPRIS pass
+paying for itself.
