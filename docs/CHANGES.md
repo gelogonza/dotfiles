@@ -1541,3 +1541,35 @@ reaches peak 96/100 — so cava, pulse and the theme all work, and what remains 
 a per-app routing choice rather than something for this repo to hardcode.
 Fixing it is either moving Spotify's output to the default sink, or setting
 `source` explicitly. The troubleshooting table now names the check.
+
+
+---
+
+# cava, following the audio
+
+`cava/config` alone could not work on this machine, and not because of anything
+in the config. cava's `source` is **static**, and a monitor source only carries
+audio played to *that* sink — so any fixed choice is wrong half the time on a
+desk that moves between USB speakers and Bluetooth headphones.
+
+`source = auto` follows the **default** sink, which is a different thing again:
+pipewire remembers per-application routing, so an app pinned to a non-default
+sink leaves cava listening to a device with nothing on it. Measured here: the
+default sink was IDLE while Spotify played to a different one, and cava drew an
+empty window that looked exactly like a broken theme.
+
+`hypr/scripts/cava-launch.sh` resolves the sink at launch instead of naming one:
+
+1. the sink of a stream that is actually playing (`Corked: no`)
+2. failing that, any sink in the `RUNNING` state
+3. failing that, the default sink — what cava would have done anyway
+
+Speakers, XM4s, HDMI: whatever is playing when cava starts is what it draws.
+
+It writes a **temp config** rather than editing the real one. The real one is
+generated from `design/tokens.json`, and `build-tokens.py --check` fails on
+staleness — writing a device name into it would break the build every time the
+headphones changed.
+
+The generated config keeps `source = auto`, so running `cava` directly still
+behaves sensibly; the launcher is the thing that makes it correct.

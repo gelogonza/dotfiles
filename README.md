@@ -231,6 +231,22 @@ pkill -x quickshell; setsid quickshell -c gelo >/dev/null 2>&1 &
 custom *themes* by design, but it does read those named colours — that is the
 supported way to retheme it. Restart the app to pick up changes.
 
+**cava** — run it through the launcher, not directly:
+
+```bash
+~/dotfiles/hypr/scripts/cava-launch.sh
+```
+
+cava's `source` is static and a monitor only carries audio played to *that*
+sink, so any fixed choice is wrong half the time on a machine that moves
+between USB speakers and Bluetooth headphones. The launcher resolves the sink
+at start-up — a stream that is actually playing, else a RUNNING sink, else the
+default — so it follows whatever you are listening on. Worth an alias:
+
+```bash
+echo "alias cava='~/dotfiles/hypr/scripts/cava-launch.sh'" >> ~/.zshrc
+```
+
 **Switch the font** — one line in `tokens.json`. Figtree, Inter Display and
 Nimbus Sans are already installed as alternatives.
 
@@ -293,7 +309,7 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
 | Screen never locks itself | hypridle not running | `pgrep -x hypridle`; check `hypr/hypridle.conf` |
 | Privilege prompts never appear | no polkit agent | `systemctl --user status hyprpolkitagent` |
 | Bluetooth control missing | no controller, or `bluetoothctl` absent | `bluetoothctl show` |
-| cava draws nothing | it reads the **default** sink's monitor; the app may be on another sink | `pactl list sink-inputs \| grep Sink:` vs `pactl get-default-sink` |
+| cava draws nothing | run it via `hypr/scripts/cava-launch.sh` — plain `cava` reads only the **default** sink | see below |
 
 Shell logs: run `quickshell -c gelo` in a terminal, or read
 `/run/user/1000/quickshell/by-id/*/log.qslog`.
