@@ -87,7 +87,7 @@ The token source stopped being desktop-only.
 | 5.2 | Typed module for web projects | ☑ `design/tokens.ts` |
 | 5.3 | Living design-system site, generated | ☑ `docs/` — four pages, self-contained, styles itself with its own tokens |
 | 5.4 | `--audit`: fail the build when a token pair drops below AA | ☑ 35 pairs, all clearing |
-| 5.5 | Publish it — GitHub Pages from `docs/` | ◐ generated; the Pages source still has to be switched on in repo settings |
+| 5.5 | Publish it — GitHub Pages from `docs/` | ☑ live at https://gelogonza.github.io/dotfiles/ — every push republishes |
 
 ## 6. Widgets ◐
 
