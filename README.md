@@ -15,7 +15,6 @@ Picking this up cold — or handing it to someone (or something) else? Start wit
 
 ```
 design/          token source, generators, shared QML/GLSL/SVG
-                 └ index.html — the system documented by itself; open it
 quickshell/gelo/ the shell — wallpaper, bar, launcher, notifications, power menu
 sddm/            login theme + installer
 hypr/            compositor config
@@ -23,7 +22,8 @@ ghostty/         terminal
 vscode/          generated VS Code theme extension
 spicetify/       generated Spotify (spicetify) theme
 fastfetch/       fetch tool
-docs/            procedures with real failure modes
+docs/            procedures with real failure modes, and the generated site
+                 (index/xmb/accessibility/bridge .html — GitHub Pages source)
 reference/       upstream 43PR material, not loaded at runtime
 ```
 

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>the bridge — gelo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- GENERATED FILE — DO NOT EDIT. Source: design/tokens.json (run design/build-tokens.py) -->
+<style>
+  :root {
+    --bg-0: #eef1f8; --bg-1: #f8fbff; --bg-2: #dceaf8; --border: #bed7eb;
+    --text-1: #1b4c78; --text-2: #466a9d; --accent: #3478c4;
+    --shade: #1f466b;
+    --ease: cubic-bezier(0.22, 1.0, 0.36, 1.0); --dur: 250ms;
+    --r: 8px; --gap: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: calc(var(--gap) * 2);
+    background: var(--bg-0); color: var(--text-1);
+    font-family: "Geist", "Inter Display", system-ui, sans-serif;
+    font-weight: 300; letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 34px; font-weight: 400; margin: 0 0 4px; }
+  h2 {
+    font-size: 15px; font-weight: 400; margin: calc(var(--gap) * 2.5) 0 var(--gap);
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    color: var(--text-2); text-transform: lowercase;
+  }
+  .lede { color: var(--text-2); margin: 0 0 4px; max-width: 62ch; }
+  code { font-family: ui-monospace, monospace; font-size: 12px; }
+
+  /* The chrome material, described by the page and used by it. */
+  .card {
+    background: linear-gradient(180deg, var(--bg-1) 0%,
+      color-mix(in srgb, var(--bg-1), #000 6%) 100%);
+    border: 1px solid var(--border); border-radius: var(--r);
+    box-shadow: 0 6px 32px color-mix(in srgb, var(--shade) 22%, transparent);
+    padding: var(--gap);
+  }
+
+  .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sw { margin: 0; width: 132px; }
+  .chip {
+    height: 56px; border-radius: var(--r); border: 1px solid var(--border);
+    transition: transform var(--dur) var(--ease);
+  }
+  .sw:hover .chip { transform: translateY(-3px); }
+  .chip.r { background: var(--accent); }
+  figcaption { display: flex; flex-direction: column; margin-top: 6px; font-size: 12px; }
+  figcaption span { color: var(--text-2); }
+  figcaption em { color: var(--text-2); font-style: normal; font-size: 11px; }
+
+  .ansi-row { display: flex; border-radius: var(--r); overflow: hidden;
+              border: 1px solid var(--border); }
+  .ansi { flex: 1; height: 40px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-2); font-weight: 400; font-size: 12px; }
+  td.num { font-family: ui-monospace, monospace; text-align: right; }
+  tr.fail td { color: #b3261e; }
+  .dot { display: inline-block; width: 13px; height: 13px; border-radius: 3px;
+         border: 1px solid var(--border); vertical-align: middle; margin-right: 3px; }
+
+  .spec { margin: 6px 0; }
+  .bar { display: flex; align-items: center; gap: 10px; margin: 5px 0; font-size: 12px; }
+  .bar span { display: block; height: 12px; background: var(--accent); border-radius: 2px; }
+  .bar em { color: var(--text-2); font-style: normal; }
+
+  .mo { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12px; }
+  .mo em { color: var(--text-2); font-style: normal; }
+  .ball {
+    width: 14px; height: 14px; border-radius: 50%; background: var(--accent);
+    animation-name: slide; animation-timing-function: var(--ease);
+    animation-iteration-count: infinite; animation-direction: alternate;
+  }
+  @keyframes slide { to { transform: translateX(210px); } }
+
+  .term { background: #14293f; color: #dfe9f4; border-radius: var(--r);
+          padding: var(--gap); font-family: ui-monospace, monospace; font-size: 13px; }
+  footer { margin-top: calc(var(--gap) * 3); color: var(--text-2); font-size: 12px; }
+  @media (prefers-reduced-motion: reduce) { .ball { animation: none; } }
+
+  nav { max-width: 1080px; margin: 0 auto calc(var(--gap) * 1.5); display: flex;
+        gap: var(--gap); flex-wrap: wrap; }
+  nav a { color: var(--text-2); text-decoration: none; font-size: 13px;
+          padding-bottom: 3px; border-bottom: 1px solid transparent;
+          transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
+  nav a:hover { color: var(--text-1); }
+  nav a.on { color: var(--text-1); border-bottom-color: var(--accent); }
+  .cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+           margin-bottom: calc(var(--gap) * 1.5); }
+  .case { display: block; text-decoration: none; color: inherit; padding: var(--gap);
+          border: 1px solid var(--border); border-radius: var(--r);
+          background: var(--bg-1);
+          transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease); }
+  .case:hover { transform: translateY(-2px);
+                box-shadow: 0 6px 24px color-mix(in srgb, var(--shade) 20%, transparent); }
+  .case h3 { margin: 0 0 6px; font-size: 14px; font-weight: 400; }
+  .case p { margin: 0; font-size: 13px; color: var(--text-2); }
+  pre.code { background: #14293f; color: #dfe9f4; padding: var(--gap);
+             border-radius: var(--r); overflow-x: auto; font-size: 12.5px; line-height: 1.5; }
+  .big { font-size: 22px; margin: 0; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
+  p { max-width: 68ch; }
+</style>
+<nav><a href="index.html">the system</a><a href="xmb.html">the wave field</a><a href="accessibility.html">accessibility</a><a href="bridge.html" class="on">the bridge</a></nav>
+<main>
+<h1>the bridge</h1>
+<p class="lede">The desktop, a Figma file and a web project as the same palette object rather than three copies that drift.</p>
+
+<h2>one source, twelve targets</h2>
+<p>37 colours in <code>design/tokens.json</code> generate a Quickshell
+desktop, an SDDM login theme, a terminal theme, a VS Code extension, a Spotify
+theme, GTK 3 and 4, a cursor, hyprlang variables, a CSS module, this site —
+and the two below. <code>--check</code> fails the build if any of them falls
+behind.</p>
+
+<h2>Figma, without a copy</h2>
+<p><code>design/tokens.dtcg.json</code> is W3C Design Tokens format: what Tokens
+Studio imports to create Figma Variables. Derived rather than hand-maintained,
+because a second file describing the same colours is exactly the duplication
+the generator exists to prevent.</p>
+<p>It carries <code>$description</code> where there is a reason — that the
+accent has exactly three homes, that shadows cannot come from the lightest
+surface on a light palette. <strong>That is the part that does not survive a
+copy-paste</strong>, and the part that stops someone spending the accent on a
+fourth thing six months later.</p>
+
+<h2>typed, so mistakes are loud</h2>
+<p><code>design/tokens.ts</code> exports the palette <code>as const</code> with
+key unions. Importing tokens rather than retyping a hex means a mistake is a
+type error instead of a slightly-wrong blue nobody notices for a month:</p>
+<pre class="code">const typo: ColorToken = "acccent";
+  → TS2820: Type '"acccent"' is not assignable to type
+     '"accent" | "accent-dim" | …'. Did you mean '"accent"'?</pre>
+<p>Verified under <code>tsc --strict</code>, not asserted.</p>
+
+<footer>Generated from <code>design/tokens.json</code> by <code>design/build-tokens.py</code>. Editing these pages by hand is one regenerate away from being erased.</footer>
+</main>

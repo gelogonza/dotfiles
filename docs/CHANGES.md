@@ -1860,3 +1860,30 @@ one produced `Cannot specify left, right, horizontalCenter, fill or centerIn
 anchors for items inside Row` — and it would have taken a slot in the layout.
 `TapHandler` and `HoverHandler` do not participate in positioner layout at all,
 which is what they are for.
+
+
+---
+
+# The site (roadmap 5.3, 5.5)
+
+`design/index.html` became four pages under `docs/`, which is a GitHub Pages
+source directory:
+
+| | |
+|---|---|
+| `index.html` | the system — palette, type, space, motion, the live contrast table |
+| `xmb.html` | the wave field: three approaches, two failures, one shader on two runtimes |
+| `accessibility.html` | the audit, what it found, and why album tinting cannot break contrast |
+| `bridge.html` | one source → twelve targets → Figma Variables and typed TS |
+
+Generated, for the same two reasons the single page was: it cannot go stale
+(`--check` fails if it falls behind the palette), and **it is styled by the
+tokens it documents** — a page about a design system that does not use it is a
+screenshot with extra steps.
+
+`.nojekyll` is included so Pages serves the HTML as written rather than running
+it through Jekyll, which would try to interpret the Markdown alongside it.
+
+The split is by *argument*, not by feature: each page makes one claim and shows
+the evidence for it. The material was already there — `CHANGES.md` records the
+failures, and failures are the part of a portfolio that is usually missing.

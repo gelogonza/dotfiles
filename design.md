@@ -29,7 +29,7 @@ the bug.
 | `cava/config` | cava | cava ini |
 | `design/tokens.dtcg.json` | Figma / any token pipeline | W3C DTCG |
 | `design/tokens.ts` | web projects | TypeScript |
-| `design/index.html` | humans | the system, documented by itself |
+| `docs/*.html` | humans | a four-page site, published from `docs/` |
 | `*/Components/*.qml`, `*/Shaders/*.frag`, `*/icons/*.svg` | both QML roots | copied |
 
 ```bash
