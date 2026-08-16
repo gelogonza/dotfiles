@@ -57,11 +57,11 @@ replaced — the one place in the system that was still running a warm hue.
 | 3.1 | MPRIS now-playing | ☑ `Bar/MediaModule.qml` — title · artist and a play/pause toggle in the left cluster; click the title to raise the player |
 | 3.2 | cava theming | ☑ `cava/config` is generated — blue→cyan gradient from the terminal block |
 
-## 4. Shell completeness ☐
+## 4. Shell completeness ◐
 
 | | Item | Why |
 |---|---|---|
-| 4.1 | Notification history | a missed notification is currently gone forever — nothing persists them |
+| 4.1 | Notification history | ☑ `Services/NotificationHistory.qml`, browsable as a third launcher mode on `SUPER+SHIFT+N`; persisted, so it survives a shell restart |
 | 4.2 | Window switcher | no Alt+Tab equivalent |
 | 4.3 | Idle inhibitor toggle | hypridle locks at 5 min; a bar toggle to suppress it during video. Browsers do appear to inhibit correctly here (one inhibitor was active during testing), so this is a safety net rather than a fix |
 

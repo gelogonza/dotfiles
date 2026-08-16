@@ -9,6 +9,7 @@ import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import QtQuick
 import "root:/Theme"
+import "root:/Services"
 
 PanelWindow {
     id: layer
@@ -68,6 +69,11 @@ PanelWindow {
         // Without this, trackedNotifications stays empty and nothing ever draws.
         onNotification: notification => {
             notification.tracked = true;
+            // Record it before the card's expire timer takes it away. This
+            // layer is deliberately transient — `keepOnReload: false` above,
+            // and cards clear themselves on a timer — so without a store a
+            // notification you did not happen to be looking at is gone.
+            NotificationHistory.push(notification);
         }
     }
 

@@ -1573,3 +1573,47 @@ headphones changed.
 
 The generated config keeps `source = auto`, so running `cava` directly still
 behaves sensibly; the launcher is the thing that makes it correct.
+
+
+---
+
+# Notification history (roadmap 4.1)
+
+`Services/NotificationHistory.qml`, browsable on `SUPER+SHIFT+N`.
+
+**A third launcher mode, not a new surface.** The launcher was already "one UI
+over two providers" with the same `query` / `results` / `activate()` / `reload()`
+contract, and the README already argues clipboard history belongs there rather
+than in a separate picker. A notification history panel would have been a
+fourth window with its own chrome, its own search and its own keybinding, for
+the same job.
+
+Selecting an entry **copies its text**. The reason you go back to a
+notification is almost always a code, a link or a name you now want to paste.
+
+## Persisted, because the failure was losing things
+
+The notification layer is deliberately transient — `keepOnReload: false`, and
+cards clear themselves on a timer. That is right for the surface and it is
+exactly why a notification you were not looking at was gone for good.
+
+Storage is `FileView` + `JsonAdapter` at `Quickshell.statePath()`, with
+`atomicWrites` because the file is rewritten on every notification and a torn
+write would lose the entire history rather than one entry. Verified across a
+shell restart: three notifications recorded, `pkill -x quickshell`, all three
+still listed.
+
+Capped at 200 — enough to answer "what did I miss", not so much that it becomes
+a log.
+
+## Two details worth keeping
+
+- **Repeats are collapsed.** Applications that update a notification in place
+  (progress, now-playing) would otherwise fill the history with near-identical
+  copies of one event, so an entry identical to the newest is dropped.
+- **`wl-copy` is invoked as an argument array, never a shell string.**
+  Notification bodies are arbitrary remote text and must not be able to become
+  a command.
+
+Unqueried, the list is newest-first: a history re-sorted by fuzzy score is not
+a history. Same reasoning as the clipboard provider, and the same code shape.

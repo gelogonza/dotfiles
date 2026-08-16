@@ -38,7 +38,9 @@ PanelWindow {
     // "apps" or "clipboard". The launcher is one UI over two providers rather
     // than two near-identical pickers; both expose query/results/activate.
     property string mode: "apps"
-    readonly property var provider: mode === "clipboard" ? Clipboard : Apps
+    readonly property var provider: mode === "clipboard" ? Clipboard
+        : mode === "notifications" ? NotificationHistory
+        : Apps
 
     // Stagger is an entrance flourish, not a per-keystroke effect. It plays when
     // the palette opens; while typing, rows swap in immediately.
@@ -63,6 +65,8 @@ PanelWindow {
         mode = newMode || "apps";
         if (mode === "clipboard")
             Clipboard.reload();          // history changes constantly
+        else if (mode === "notifications")
+            NotificationHistory.reload();
 
         // Clear the field, not the provider's query directly: the field is the
         // source of truth and its onTextChanged is what pushes the query down.
@@ -93,6 +97,8 @@ PanelWindow {
 
         if (mode === "clipboard")
             Clipboard.activate(item);
+        else if (mode === "notifications")
+            NotificationHistory.activate(item);
         else
             Apps.launch(item);
     }
@@ -118,6 +124,10 @@ PanelWindow {
         }
         function open(): void {
             launcher.show("apps");
+        }
+
+        function notifications(): void {
+            launcher.show("notifications");
         }
 
         function clipboard(): void {
@@ -240,7 +250,8 @@ PanelWindow {
                     anchors.fill: parent
                     verticalAlignment: Text.AlignVCenter
                     visible: field.text.length === 0
-                    text: launcher.mode === "clipboard" ? "Search clipboard history"
+                    text: launcher.mode === "notifications" ? "Search notifications"
+                        : launcher.mode === "clipboard" ? "Search clipboard history"
                                                         : "Search applications"
                     font: field.font
                     color: Tokens.color.text2
@@ -302,14 +313,38 @@ PanelWindow {
                 required property var modelData
                 required property int index
 
-                // Apps supply name/comment/icon; clipboard entries supply a
-                // preview and no icon. The row only knows title/subtitle/icon.
-                title: launcher.mode === "clipboard" ? modelData.preview : modelData.name
-                subtitle: launcher.mode === "clipboard" ? "" : (modelData.comment || "")
-                iconName: launcher.mode === "clipboard"
-                    ? (modelData.kind === "image" ? "image" : "clipboard")
-                    : (modelData.icon || "")
-                iconTinted: launcher.mode === "clipboard"
+                // Each provider supplies its own shape; the row only knows
+                // title/subtitle/icon, so the mapping lives here.
+                title: {
+                    if (launcher.mode === "clipboard")
+                        return modelData.preview;
+                    if (launcher.mode === "notifications")
+                        return modelData.summary;
+                    return modelData.name;
+                }
+                subtitle: {
+                    if (launcher.mode === "clipboard")
+                        return "";
+                    if (launcher.mode === "notifications") {
+                        // App and age first: scanning a history you are
+                        // looking for "the thing Firefox said an hour ago".
+                        const meta = [modelData.appName,
+                                      NotificationHistory.ageLabel(modelData.time)]
+                            .filter(v => v && v.length > 0).join("  ·  ");
+                        return modelData.body && modelData.body.length > 0
+                            ? meta + "  ·  " + modelData.body
+                            : meta;
+                    }
+                    return modelData.comment || "";
+                }
+                iconName: {
+                    if (launcher.mode === "clipboard")
+                        return modelData.kind === "image" ? "image" : "clipboard";
+                    if (launcher.mode === "notifications")
+                        return "";
+                    return modelData.icon || "";
+                }
+                iconTinted: launcher.mode !== "apps"
 
                 rowIndex: index
                 width: list.width

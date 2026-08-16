@@ -180,6 +180,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + C` | close window |
 | `SUPER + E` | file manager (Nautilus) |
 | `SUPER + SHIFT + V` | clipboard history |
+| `SUPER + SHIFT + N` | notification history |
 | `SUPER + S` / `Print` | screenshot a region |
 | `SUPER + SHIFT + S` | screenshot everything |
 | `SUPER + ALT + S` | screenshot a window (snaps to window edges) |
@@ -187,8 +188,9 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + 1..0` | switch workspace |
 | `SUPER + SHIFT + 1..0` | move window to workspace |
 
-**Clipboard history** lives in the launcher rather than a separate picker —
-same fuzzy search, same chrome. `SUPER+SHIFT+V` rather than `SUPER+V` because
+**Clipboard and notification history** live in the launcher rather than
+separate pickers — same fuzzy search, same chrome. Selecting a notification
+copies its text, which is what you almost always went back for. `SUPER+SHIFT+V` rather than `SUPER+V` because
 `SUPER+V` is already `togglefloating`, and Hyprland fires *both* bindings for a
 chord instead of picking one. Swap them in `hyprland.conf` if you prefer.
 
@@ -203,6 +205,7 @@ The launcher is also scriptable:
 qs -c gelo ipc call launcher toggle
 qs -c gelo ipc call launcher search fire
 qs -c gelo ipc call launcher clipboard
+qs -c gelo ipc call launcher notifications
 qs -c gelo ipc call power toggle
 ```
 
