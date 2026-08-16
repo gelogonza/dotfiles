@@ -1684,3 +1684,53 @@ seeing it, and the state worth noticing here is the abnormal one.
 The new `sleep-off.svg` needed no registration anywhere — the generated icon
 list picked it up from the directory, which is the fix from the MPRIS pass
 paying for itself.
+
+
+---
+
+# The token source leaves the desktop
+
+Everything this generator emitted was consumed by *this machine*. Two new
+targets are the way out.
+
+## `design/tokens.dtcg.json` — W3C Design Tokens format
+
+What Tokens Studio imports to create **Figma Variables**, and what most token
+pipelines read. 58 tokens, every one carrying a `$type`
+(`color`, `dimension`, `duration`, `cubicBezier`, `fontFamily`, `fontWeight`,
+`number`).
+
+Derived rather than hand-maintained: a second file describing the same colours
+is exactly the duplication this generator exists to prevent.
+
+`$description` carries the *reason* where there is one — that accent appears in
+exactly three places, that `shade` exists because shadows cannot come from
+`bg-0` on a light palette, that `accent-ink` is not called `on-accent` because
+QML would read it as a signal handler. **That is the part that does not survive
+a copy-paste into Figma**, and the part that stops someone spending the accent
+on a fourth thing six months from now.
+
+## `design/tokens.ts` — typed module for web work
+
+`as const` throughout, with `ColorToken` / `SpaceToken` / `RadiusToken` unions.
+The point of importing tokens rather than retyping a hex is that a mistake
+becomes a type error instead of a slightly-wrong blue nobody notices for a
+month. Verified rather than asserted — `tsc --strict`:
+
+```
+const typo: ColorToken = "acccent";
+  -> TS2820: Type '"acccent"' is not assignable to type
+     '"accent" | "accent-dim" | ... '. Did you mean '"accent"'?
+
+const nope = color["not-a-token"];
+  -> TS7053: Property 'not-a-token' does not exist
+```
+
+Valid usage typechecks clean under `--strict`.
+
+## Why this matters more than another bar module
+
+The desktop, a Figma file and a coursework site can now be the *same palette
+object* rather than three copies that drift. One `design/tokens.py` run and
+every one of them moves together — and `--check` fails the build if any of them
+did not.

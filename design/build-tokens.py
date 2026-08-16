@@ -2323,6 +2323,164 @@ _SPICETIFY_JS = r"""// __BANNER__
 
 
 # --------------------------------------------------------------------------
+# Design Tokens Community Group (W3C) — the bridge out of this repo
+# --------------------------------------------------------------------------
+
+def render_dtcg(t: dict) -> str:
+    """The token source in W3C DTCG format.
+
+    Everything else this script emits is consumed by *this machine*. This one
+    is the way out: DTCG is what Tokens Studio imports to create Figma
+    Variables, and what most token pipelines read. The point is that the
+    desktop, the Figma file and a web project can be the same palette rather
+    than three drifting copies of it.
+
+    Deliberately not hand-maintained alongside `tokens.json`: a second file
+    describing the same colours is exactly the duplication this generator
+    exists to prevent, so it is derived like everything else.
+
+    `$description` carries the *reason* where there is one — that is the part
+    that does not survive a copy-paste into Figma, and the part that stops
+    someone using `accent` for a fourth thing.
+    """
+    color, space, radius = t["color"], t["space"], t["radius"]
+    typo, motion, term = t["type"], t["motion"], t["terminal"]
+
+    def group(desc: str, items: dict) -> dict:
+        out = {"$description": desc}
+        out.update(items)
+        return out
+
+    why = {
+        "accent": "The one accent. Appears in exactly three places system-wide: "
+                  "active workspace, focused window border, cursor. A fourth is a redesign.",
+        "accent-ink": "What sits ON the accent. Not named `on-accent`: that camel-cases "
+                      "to `onAccent`, which QML parses as a signal handler.",
+        "shade": "Shadows and scrims are built from this, never from bg-0 — on a light "
+                 "palette bg-0 is the lightest surface, so shadows made from it vanish.",
+        "glow": "The accent at low alpha. Selection blooms rather than filling.",
+    }
+
+    colors = {}
+    for k, v in color.items():
+        entry = {"$type": "color", "$value": v}
+        if k in why:
+            entry["$description"] = why[k]
+        colors[k] = entry
+
+    spacing = {k: {"$type": "dimension", "$value": f"{v}px"} for k, v in space.items()}
+    radii = {k: {"$type": "dimension", "$value": f"{v}px"} for k, v in radius.items()}
+
+    sizes = {k: {"$type": "dimension", "$value": f"{v}px"}
+             for k, v in typo["size"].items()}
+    weights = {k: {"$type": "fontWeight", "$value": v}
+               for k, v in typo["weight"].items()}
+
+    e = motion["ease"]
+    motion_out = {
+        "$description": "One curve, shared by the shell, the compositor and the lock screen.",
+        "ease": {"$type": "cubicBezier", "$value": e},
+        "duration": {k: {"$type": "duration", "$value": f"{v}ms"}
+                     for k, v in motion["duration"].items()},
+        "stagger": {"$type": "duration", "$value": f'{motion["stagger"]}ms'},
+    }
+
+    ansi = {f"ansi-{i}": {"$type": "color", "$value": c}
+            for i, c in enumerate(term["ansi"])}
+    terminal = {
+        "$description": "The dark surface family. Editors, Spotify and the terminal all "
+                        "derive from here: surfaces you work IN are dark, chrome you work "
+                        "WITH is light.",
+        "background": {"$type": "color", "$value": term["background"]},
+        "foreground": {"$type": "color", "$value": term["foreground"]},
+        "cursor": {"$type": "color", "$value": term["cursor"]},
+    }
+    terminal.update(ansi)
+
+    doc = {
+        "$description": (
+            "Generated from design/tokens.json — the single source for a Hyprland "
+            "desktop, its terminal, editor, login screen and Spotify. Edit the source, "
+            "not this file."
+        ),
+        "color": group("Light XMB. Zero warm hues; the absence of orange and amber is "
+                       "load-bearing.", colors),
+        "space": group("Strict 4px grid.", spacing),
+        "radius": group("Chrome uses 8 — the XMB material is more angular than glass.", radii),
+        "type": {
+            "$description": "Geist, one family. Weight never exceeds 400: hierarchy comes "
+                            "from size, opacity, tracking and glow.",
+            "family": {"$type": "fontFamily", "$value": typo["families"]},
+            "size": sizes,
+            "weight": weights,
+            "tracking": {"$type": "number", "$value": typo["trackingEm"]},
+        },
+        "motion": motion_out,
+        "terminal": terminal,
+    }
+    return json.dumps(doc, indent=2) + "\n"
+
+
+def render_tokens_ts(t: dict) -> str:
+    """A typed module, so a web project consumes the same tokens as the desktop.
+
+    `as const` throughout: the point of importing tokens rather than retyping
+    them is that a typo becomes a type error instead of a slightly-wrong blue.
+    """
+    color, space, radius = t["color"], t["space"], t["radius"]
+    typo, motion, term = t["type"], t["motion"], t["terminal"]
+
+    def obj(d: dict, fmt=lambda v: json.dumps(v)) -> str:
+        return "{\n" + "".join(
+            f"  {json.dumps(k)}: {fmt(v)},\n" for k, v in d.items()) + "}"
+
+    e = motion["ease"]
+    return f"""// {BANNER}
+//
+// The same tokens the desktop is built from. Import these rather than retyping
+// a hex: with `as const`, a wrong name is a type error instead of a slightly
+// wrong blue that nobody notices for a month.
+
+export const color = {obj(color)} as const;
+
+export const space = {obj(space)} as const;
+
+export const radius = {obj(radius)} as const;
+
+export const type = {{
+  family: {json.dumps(typo["families"])},
+  size: {obj(typo["size"])},
+  weight: {obj(typo["weight"])},
+  trackingEm: {typo["trackingEm"]},
+}} as const;
+
+export const motion = {{
+  // Feed straight into a CSS transition; the shell and compositor use the same.
+  ease: "cubic-bezier({e[0]}, {e[1]}, {e[2]}, {e[3]})",
+  bezier: {json.dumps(e)},
+  duration: {obj(motion["duration"])},
+  stagger: {motion["stagger"]},
+}} as const;
+
+// Surfaces you work IN are dark; chrome you work WITH is light. This is the
+// dark family — editors, Spotify and the terminal all derive from it.
+export const terminal = {{
+  background: {json.dumps(term["background"])},
+  foreground: {json.dumps(term["foreground"])},
+  cursor: {json.dumps(term["cursor"])},
+  ansi: {json.dumps(term["ansi"])},
+}} as const;
+
+export type ColorToken = keyof typeof color;
+export type SpaceToken = keyof typeof space;
+export type RadiusToken = keyof typeof radius;
+
+export const tokens = {{ color, space, radius, type, motion, terminal }} as const;
+export default tokens;
+"""
+
+
+# --------------------------------------------------------------------------
 # cava
 # --------------------------------------------------------------------------
 
@@ -2700,6 +2858,8 @@ def main() -> int:
         ROOT / "gtk-3.0/gtk.css": render_gtk(tokens, adwaita=False),
         ROOT / "vscode/gelo-xmb/themes/gelo-xmb-color-theme.json": render_vscode(tokens),
         ROOT / "vscode/gelo-xmb/package.json": render_vscode_manifest(tokens),
+        ROOT / "design/tokens.dtcg.json": render_dtcg(tokens),
+        ROOT / "design/tokens.ts": render_tokens_ts(tokens),
         ROOT / "cava/config": render_cava(tokens),
         ROOT / "spicetify/gelo-xmb/color.ini": render_spicetify(tokens),
         ROOT / "spicetify/gelo-xmb/user.css": render_spicetify_css(tokens),

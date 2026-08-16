@@ -14,7 +14,7 @@ the bug.
 ## 1. The pipeline
 
 `design/tokens.json` is the single source of truth.
-`design/build-tokens.py` fans it out to **nine** targets in seven languages:
+`design/build-tokens.py` fans it out to **eleven** targets in eight languages:
 
 | Generated | Consumer | Language |
 |---|---|---|
@@ -26,6 +26,9 @@ the bug.
 | `gtk-{3,4}.0/gtk.css` | GTK3 / libadwaita apps | CSS |
 | `vscode/gelo-xmb/` | VS Code | theme extension (JSON) |
 | `spicetify/gelo-xmb/` | Spotify | spicetify ini + CSS + JS/GLSL |
+| `cava/config` | cava | cava ini |
+| `design/tokens.dtcg.json` | Figma / any token pipeline | W3C DTCG |
+| `design/tokens.ts` | web projects | TypeScript |
 | `*/Components/*.qml`, `*/Shaders/*.frag`, `*/icons/*.svg` | both QML roots | copied |
 
 ```bash

@@ -1,0 +1,271 @@
+{
+  "$description": "Generated from design/tokens.json \u2014 the single source for a Hyprland desktop, its terminal, editor, login screen and Spotify. Edit the source, not this file.",
+  "color": {
+    "$description": "Light XMB. Zero warm hues; the absence of orange and amber is load-bearing.",
+    "bg-0": {
+      "$type": "color",
+      "$value": "#eef1f8"
+    },
+    "bg-1": {
+      "$type": "color",
+      "$value": "#f8fbff"
+    },
+    "bg-2": {
+      "$type": "color",
+      "$value": "#dceaf8"
+    },
+    "border": {
+      "$type": "color",
+      "$value": "#bed7eb"
+    },
+    "text-1": {
+      "$type": "color",
+      "$value": "#1b4c78"
+    },
+    "text-2": {
+      "$type": "color",
+      "$value": "#5a7fb5"
+    },
+    "accent": {
+      "$type": "color",
+      "$value": "#3478c4",
+      "$description": "The one accent. Appears in exactly three places system-wide: active workspace, focused window border, cursor. A fourth is a redesign."
+    },
+    "accent-dim": {
+      "$type": "color",
+      "$value": "#2e68a8"
+    },
+    "glow": {
+      "$type": "color",
+      "$value": "#4a8cd033",
+      "$description": "The accent at low alpha. Selection blooms rather than filling."
+    },
+    "shade": {
+      "$type": "color",
+      "$value": "#1f466b",
+      "$description": "Shadows and scrims are built from this, never from bg-0 \u2014 on a light palette bg-0 is the lightest surface, so shadows made from it vanish."
+    },
+    "accent-ink": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "What sits ON the accent. Not named `on-accent`: that camel-cases to `onAccent`, which QML parses as a signal handler."
+    },
+    "field-base": {
+      "$type": "color",
+      "$value": "#7cb8e8"
+    },
+    "field-mid": {
+      "$type": "color",
+      "$value": "#a8d3f2"
+    },
+    "field-high": {
+      "$type": "color",
+      "$value": "#eef1f8"
+    },
+    "field-edge": {
+      "$type": "color",
+      "$value": "#edf6ff"
+    },
+    "field-line": {
+      "$type": "color",
+      "$value": "#e6f4ff"
+    }
+  },
+  "space": {
+    "$description": "Strict 4px grid.",
+    "xs": {
+      "$type": "dimension",
+      "$value": "4px"
+    },
+    "sm": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "xxl": {
+      "$type": "dimension",
+      "$value": "32px"
+    }
+  },
+  "radius": {
+    "$description": "Chrome uses 8 \u2014 the XMB material is more angular than glass.",
+    "sm": {
+      "$type": "dimension",
+      "$value": "8px"
+    },
+    "md": {
+      "$type": "dimension",
+      "$value": "12px"
+    },
+    "lg": {
+      "$type": "dimension",
+      "$value": "16px"
+    },
+    "xl": {
+      "$type": "dimension",
+      "$value": "24px"
+    },
+    "full": {
+      "$type": "dimension",
+      "$value": "999px"
+    }
+  },
+  "type": {
+    "$description": "Geist, one family. Weight never exceeds 400: hierarchy comes from size, opacity, tracking and glow.",
+    "family": {
+      "$type": "fontFamily",
+      "$value": [
+        "Geist",
+        "Inter Display"
+      ]
+    },
+    "size": {
+      "caption": {
+        "$type": "dimension",
+        "$value": "11px"
+      },
+      "body": {
+        "$type": "dimension",
+        "$value": "13px"
+      },
+      "title": {
+        "$type": "dimension",
+        "$value": "15px"
+      }
+    },
+    "weight": {
+      "light": {
+        "$type": "fontWeight",
+        "$value": 300
+      },
+      "regular": {
+        "$type": "fontWeight",
+        "$value": 400
+      }
+    },
+    "tracking": {
+      "$type": "number",
+      "$value": 0.02
+    }
+  },
+  "motion": {
+    "$description": "One curve, shared by the shell, the compositor and the lock screen.",
+    "ease": {
+      "$type": "cubicBezier",
+      "$value": [
+        0.22,
+        1.0,
+        0.36,
+        1.0
+      ]
+    },
+    "duration": {
+      "fast": {
+        "$type": "duration",
+        "$value": "150ms"
+      },
+      "base": {
+        "$type": "duration",
+        "$value": "250ms"
+      },
+      "slow": {
+        "$type": "duration",
+        "$value": "400ms"
+      }
+    },
+    "stagger": {
+      "$type": "duration",
+      "$value": "24ms"
+    }
+  },
+  "terminal": {
+    "$description": "The dark surface family. Editors, Spotify and the terminal all derive from here: surfaces you work IN are dark, chrome you work WITH is light.",
+    "background": {
+      "$type": "color",
+      "$value": "#14293f"
+    },
+    "foreground": {
+      "$type": "color",
+      "$value": "#dfe9f4"
+    },
+    "cursor": {
+      "$type": "color",
+      "$value": "#8cc6f7"
+    },
+    "ansi-0": {
+      "$type": "color",
+      "$value": "#1b3350"
+    },
+    "ansi-1": {
+      "$type": "color",
+      "$value": "#d9738a"
+    },
+    "ansi-2": {
+      "$type": "color",
+      "$value": "#5cb894"
+    },
+    "ansi-3": {
+      "$type": "color",
+      "$value": "#d2b46e"
+    },
+    "ansi-4": {
+      "$type": "color",
+      "$value": "#6aa8e6"
+    },
+    "ansi-5": {
+      "$type": "color",
+      "$value": "#a98fd8"
+    },
+    "ansi-6": {
+      "$type": "color",
+      "$value": "#63bfd6"
+    },
+    "ansi-7": {
+      "$type": "color",
+      "$value": "#c3d3e4"
+    },
+    "ansi-8": {
+      "$type": "color",
+      "$value": "#4d6b8f"
+    },
+    "ansi-9": {
+      "$type": "color",
+      "$value": "#ee8ba0"
+    },
+    "ansi-10": {
+      "$type": "color",
+      "$value": "#79d2ac"
+    },
+    "ansi-11": {
+      "$type": "color",
+      "$value": "#ecd08c"
+    },
+    "ansi-12": {
+      "$type": "color",
+      "$value": "#8cc6f7"
+    },
+    "ansi-13": {
+      "$type": "color",
+      "$value": "#c1a9ef"
+    },
+    "ansi-14": {
+      "$type": "color",
+      "$value": "#85dbef"
+    },
+    "ansi-15": {
+      "$type": "color",
+      "$value": "#f2f7fc"
+    }
+  }
+}
