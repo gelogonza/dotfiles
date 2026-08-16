@@ -38,25 +38,44 @@ That is the one step you have to do.
 
 ## Testing it
 
-1. **Open a TTY first.** `Ctrl+Alt+F2`, log in, and leave it logged in. Return
-   with `Ctrl+Alt+F1`. If anything goes wrong, that session is your way back.
-2. Check the appearance without locking anything:
+1. **Open a rescue TTY first — `Ctrl+Alt+F3`.** Log in and leave it logged in.
+   Return to the desktop with `Ctrl+Alt+F2`.
+
+   > **Not F2.** This graphical session *runs on VT2*
+   > (`loginctl show-session $XDG_SESSION_ID -p VTNr`), so `Ctrl+Alt+F2` takes
+   > you straight back to the locked screen rather than to a shell. This file
+   > said F2 for a long time, which would have been discovered at the exact
+   > moment it mattered. VTs 1 and 3–6 are free, and logind spawns a getty on
+   > switch (`NAutoVTs=6`), so F3 gives a login prompt on demand.
+2. **Rehearse with a grace period.** `--grace N` accepts *any* keypress for the
+   first N seconds without a password, so you can confirm the lock draws,
+   accepts input and dismisses — without your password being the only way out:
+
+   ```bash
+   hyprlock --grace 30
+   ```
+
+   If it renders and a keypress dismisses it, the config parses, the fonts
+   resolve and the compositor hands over the session correctly. Only
+   authentication is left unproven.
+
+3. Check the Quickshell lock's appearance without locking anything:
 
    ```bash
    qs -c gelo ipc call lock preview      # toggles; click or call again to dismiss
    ```
 
-3. Lock for real:
+4. Lock for real:
 
    ```bash
    qs -c gelo ipc call lock lock         # or SUPER+SHIFT+L
    ```
 
-4. Type a **wrong** password first. Expect a shake, a ripple through the field,
+5. Type a **wrong** password first. Expect a shake, a ripple through the field,
    and "Incorrect password".
-5. Type your real password. Expect it to unlock.
+6. Type your real password. Expect it to unlock.
 
-Note that step 4 costs one `faillock` attempt. The default policy is `deny=3`
+Note that step 5 costs one `faillock` attempt. The default policy is `deny=3`
 with `unlock_time=600`, so entries expire on their own; `faillock --user $USER`
 shows the current count.
 
@@ -64,7 +83,8 @@ shows the current count.
 
 ## If you get stuck
 
-1. `Ctrl+Alt+F2` for a TTY, log in.
+1. `Ctrl+Alt+F3` for a TTY, log in. (**Not F2** — that is this session's own
+   VT; see the note above.)
 2. Unlock the graphical session:
 
    ```bash
@@ -124,3 +144,39 @@ to disk, and never interpolated into a shell command.
 **Restarting the shell while locked** kills the lock UI. The compositor keeps
 the session locked, so recover via TTY as above. This is the main practical
 hazard of using a shell-hosted lock, and the reason hyprlock stays bound.
+
+---
+
+## Pre-flight audit (2026-08-15)
+
+Everything checkable without locking the session was checked. Findings:
+
+| Check | Result |
+|---|---|
+| `/etc/pam.d/hyprlock` | present, `auth include login` |
+| `pam_unix.so` / `pam_faillock.so` / `pam_systemd.so` | all resolve |
+| hyprlock | v0.9.6 |
+| Geist (`$font_display`) | 10 faces installed, `fc-match` resolves |
+| hypridle | running, locks at 300s via `loginctl lock-session` |
+| Every `$var` in `hyprlock.conf` | resolves against `tokens.conf` — **after two fixes** |
+| Rescue VT | **was documented wrong** — see above |
+
+Three defects found and fixed, none of which would have shown up until the
+moment the lock mattered:
+
+1. **`rounding = $glass_radius` — undefined.** The variable died with the
+   glass → chrome rename and nothing referenced it afterwards, so it sat in the
+   lock config as a silent no-op. Now `$chrome_radius`.
+2. **`inner_color = rgba(16181dae)` — a hardcoded near-black** left over from
+   the dark palette, on a system where every other surface comes from the token
+   source and the palette has since been inverted. Now `rgba(f8fbffe6)`, light
+   surface with navy ink, matching every other input.
+3. **`fail_color = $glow`** — the accent at 20% alpha, over a blurred and
+   dimmed screenshot. As the *only* signal that a password was rejected that is
+   close to invisible. Now `$accent_rgba`: same hue family as `check_color`,
+   separated by intensity rather than by a new colour, which is how this system
+   builds hierarchy everywhere else.
+
+**Still unverified, and only you can do it:** that a correct password unlocks.
+Rehearse with `hyprlock --grace 30` first — that proves everything except
+authentication, without your password being the only way out.

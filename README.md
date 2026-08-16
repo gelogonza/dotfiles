@@ -271,8 +271,9 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
   `design/icons/*` for icons — then regenerate.
 - Run `design/build-tokens.py --check` before committing; it fails if any
   generated file is stale.
-- Keep a TTY (`Ctrl+Alt+F2`) available the first time you touch the lock screen
-  or the display manager.
+- Keep a rescue TTY (`Ctrl+Alt+F3`) available the first time you touch the lock
+  screen or the display manager. **Not F2** — this session runs on VT2, so F2
+  returns you to the locked screen rather than to a shell.
 
 **Don't**
 

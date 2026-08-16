@@ -72,9 +72,12 @@ replaced — the one place in the system that was still running a warm hue.
 These predate the roadmap and are still open:
 
 - **Neither lock has completed a real unlock cycle.** hyprlock is on `SUPER+L`,
-  the Quickshell lock on `SUPER+SHIFT+L`, and **hypridle now fires hyprlock at
-  5 minutes** — so this is no longer hypothetical. See `docs/lock-screen.md`;
-  test deliberately with a TTY open.
+  the Quickshell lock on `SUPER+SHIFT+L`, and **hypridle fires hyprlock at 5
+  minutes** — so this is not hypothetical. Everything checkable without locking
+  has now been audited and three config defects fixed
+  (`docs/lock-screen.md`), including a **rescue TTY documented as F2 when this
+  session runs on VT2**. Rehearse with `hyprlock --grace 30`; only "a correct
+  password unlocks" remains, and only you can prove it.
 - **SDDM login is installed but not enabled.** `docs/login-screen.md` has the
   switch and the recovery procedure.
 - **The wallpaper shader does not stop when occluded** — wlr-layer-shell exposes
