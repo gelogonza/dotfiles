@@ -2323,6 +2323,90 @@ _SPICETIFY_JS = r"""// __BANNER__
 
 
 # --------------------------------------------------------------------------
+# cava
+# --------------------------------------------------------------------------
+
+def render_cava(t: dict) -> str:
+    """cava's config, coloured from the TERMINAL block.
+
+    cava draws inside the terminal, so it belongs to the terminal's palette for
+    the same reason the editor does — and the gradient is the wave field stood
+    on end: deep navy at the base rising to ANSI bright blue and cyan.
+
+    **`background` is deliberately left at default.** Setting it would paint an
+    opaque rectangle over the terminal's own background and destroy the
+    translucency and blur that docs/CHANGES.md spent a tuning pass measuring
+    (light bg at 0.68 washed out; dark bg at 0.62 plus blur brightness 0.45
+    reaches 8.71:1). A visualiser is not worth losing that.
+
+    The whole file is generated because the config it replaces set **nothing** —
+    six non-comment lines, all of them section headers. There was no hand-tuning
+    to lose, and cava has no include directive, so a ghostty-style split into a
+    generated theme file is not available.
+    """
+    term = t["terminal"]
+    ansi = term["ansi"]
+    bg = term["background"]
+
+    # Bottom to top, blue rising to cyan.
+    #
+    # cava maps the gradient to the HEIGHT OF THE SCREEN, not to each bar, so a
+    # bar that only reaches a third of the way up never shows anything past the
+    # third stop. The first version started two steps off the terminal
+    # background for subtlety and the result was almost invisible: in a tall
+    # terminal the bars sat entirely inside the dark end of the ramp and read
+    # as slightly-lighter background.
+    #
+    # So the ramp starts at a colour that already stands off the background and
+    # climbs from there. Every bar height gets a legible colour, and a peak
+    # still resolves to cyan.
+    ramp = [
+        ansi[4],                        # ANSI blue
+        _mix(ansi[4], ansi[12], 0.5),
+        ansi[12],                       # ANSI bright blue
+        _mix(ansi[12], ansi[14], 0.5),
+        ansi[14],                       # ANSI bright cyan
+    ]
+
+    L = [
+        f"; {BANNER}",
+        ";",
+        "; Only the values this desktop has an opinion about are set; everything",
+        "; else is left absent so cava keeps its own defaults.",
+        "",
+        "[input]",
+        "",
+        "; Without this cava captures nothing and draws an empty window — which",
+        "; looks exactly like a broken theme. `auto` resolves to the default",
+        "; sink's monitor, so it follows the output device instead of naming one:",
+        "; this desk has nine sources and the default moves between headphones,",
+        "; speakers and SPDIF.",
+        "method = pulse",
+        "source = auto",
+        "",
+        "[general]",
+        "",
+        "; Same value as cava's own default, stated explicitly because the",
+        "; shell animates at 60 too and this should track it if that changes.",
+        "framerate = 60",
+        "autosens = 1",
+        "",
+        "[color]",
+        "",
+        "; Left at the terminal's own background on purpose: setting it here",
+        "; paints over the translucency and blur the terminal is tuned for.",
+        "; background = default",
+        f"foreground = '{ansi[12]}'",
+        "",
+        "gradient = 1",
+    ]
+    for i, c in enumerate(ramp, start=1):
+        L.append(f"gradient_color_{i} = '{c}'")
+    L.append("")
+    return "\n".join(L)
+
+
+# --------------------------------------------------------------------------
 # GTK / libadwaita
 # --------------------------------------------------------------------------
 
@@ -2616,6 +2700,7 @@ def main() -> int:
         ROOT / "gtk-3.0/gtk.css": render_gtk(tokens, adwaita=False),
         ROOT / "vscode/gelo-xmb/themes/gelo-xmb-color-theme.json": render_vscode(tokens),
         ROOT / "vscode/gelo-xmb/package.json": render_vscode_manifest(tokens),
+        ROOT / "cava/config": render_cava(tokens),
         ROOT / "spicetify/gelo-xmb/color.ini": render_spicetify(tokens),
         ROOT / "spicetify/gelo-xmb/user.css": render_spicetify_css(tokens),
         ROOT / "spicetify/gelo-xmb/theme.js": render_spicetify_js(tokens),

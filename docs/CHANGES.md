@@ -1491,3 +1491,53 @@ clicks cannot be delivered to a layer surface, the same limitation as the
 notification action buttons. What is verified from live state: with Spotify
 playing, the module shows the correct track and renders the **pause** glyph,
 which is the `isPlaying` binding working against real data.
+
+
+---
+
+# cava (roadmap 3.2)
+
+`cava/config` is generated now. It draws inside the terminal, so it takes the
+terminal block like the editor and Spotify do: a blue→cyan gradient, ANSI blue
+at the base rising to ANSI bright cyan.
+
+The whole file is generated rather than split ghostty-style into a theme
+include, because cava has no include directive — and there was nothing to lose,
+the config it replaced set **nothing**: six non-comment lines, all section
+headers.
+
+**`background` is deliberately left at cava's default.** Setting it paints an
+opaque rectangle over the terminal's own background and destroys the
+translucency and blur that took a measured tuning pass to land (8.71:1, see the
+terminal section above). A visualiser is not worth that.
+
+## The gradient maps to the screen, not to the bar
+
+First attempt started two steps off the terminal background for subtlety, and
+the result was very nearly invisible. cava maps the gradient to the **height of
+the screen**, so in a tall terminal the bars sat entirely inside the dark end of
+the ramp and read as slightly-lighter background. A bar that reaches a third of
+the way up never sees the third stop.
+
+So the ramp starts at a colour that already stands off the background. Every bar
+height gets a legible colour, and a peak still resolves to cyan.
+
+## It was drawing nothing at all, and the theme was not why
+
+Before any of that: cava rendered an empty window. Isolated with
+`[output] method = raw`, which prints bar values and separates input from
+rendering — **218 frames, every value zero.** It was receiving silence, so no
+palette would have shown anything.
+
+`[input]` was never configured. It is now `method = pulse`, `source = auto`,
+which resolves to the default sink's monitor and therefore follows the output
+device rather than naming one — this desk has nine sources and the default moves
+between headphones, speakers and SPDIF.
+
+**That is still silent here, and the config is right.** Spotify is routed to
+sink 67 (`HiFi__Speaker__sink`) while the default sink is 71 (`C-Media
+iec958`). Pointed at the monitor of the sink that actually has audio, cava
+reaches peak 96/100 — so cava, pulse and the theme all work, and what remains is
+a per-app routing choice rather than something for this repo to hardcode.
+Fixing it is either moving Spotify's output to the default sink, or setting
+`source` explicitly. The troubleshooting table now names the check.

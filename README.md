@@ -293,6 +293,7 @@ geolocates you by IP. Set `weather.enabled` and preferably an explicit
 | Screen never locks itself | hypridle not running | `pgrep -x hypridle`; check `hypr/hypridle.conf` |
 | Privilege prompts never appear | no polkit agent | `systemctl --user status hyprpolkitagent` |
 | Bluetooth control missing | no controller, or `bluetoothctl` absent | `bluetoothctl show` |
+| cava draws nothing | it reads the **default** sink's monitor; the app may be on another sink | `pactl list sink-inputs \| grep Sink:` vs `pactl get-default-sink` |
 
 Shell logs: run `quickshell -c gelo` in a terminal, or read
 `/run/user/1000/quickshell/by-id/*/log.qslog`.

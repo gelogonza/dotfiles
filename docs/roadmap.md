@@ -50,12 +50,12 @@ replaced — the one place in the system that was still running a warm hue.
 | 2.1 | Screenshot pipeline | ☑ `hypr/scripts/screenshot.sh` — region / window / full, to clipboard **and** file, with a thumbnail notification carrying copy / open / folder / annotate |
 | 2.2 | Colour picker | ☑ `hypr/scripts/pick-colour.py` — hex to the clipboard, and the nearest token by CIEDE2000 with the distance |
 
-## 3. Music and ambience ◐
+## 3. Music and ambience ☑
 
 | | Item | Why |
 |---|---|---|
 | 3.1 | MPRIS now-playing | ☑ `Bar/MediaModule.qml` — title · artist and a play/pause toggle in the left cluster; click the title to raise the player |
-| 3.2 | cava theming | `cava/config` is in the repo and still on stock colours |
+| 3.2 | cava theming | ☑ `cava/config` is generated — blue→cyan gradient from the terminal block |
 
 ## 4. Shell completeness ☐
 
