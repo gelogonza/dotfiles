@@ -1805,3 +1805,58 @@ were graded against the 4.5 text bar and displayed as "low". A passing row that
 reads as a failure is how a green table gets ignored, so those now show "ok".
 The thresholds that apply to a hairline are not the thresholds that apply to
 body text.
+
+
+---
+
+# The bar got quieter, and a dashboard appeared
+
+CPU/MEM/GPU and the git context left the bar. Both were "glanceable" only in
+the sense of being permanently visible, and neither was read — **a number you
+never look at is texture**. The git module in particular showed a bare commit
+SHA, which reads as a mystery ID rather than information.
+
+`Dashboard/` replaces them: month calendar, upcoming events, weather, and the
+system meters, behind a deliberate gesture — click the clock, `SUPER+SHIFT+D`,
+or `ipc call dashboard toggle`. The system meters gained the bar the numbers
+never had, because a percentage is something you read and a bar is something
+you glance at.
+
+`Services/Git.qml` and `hypr/scripts/git-context.sh` are deleted rather than
+left orphaned.
+
+## Calendar without OAuth
+
+Google and Outlook both publish a **secret ICS address** per calendar. That
+avoids app registration, token refresh and a browser round-trip entirely —
+`scripts/agenda.py` fetches and parses them.
+
+RRULE expansion is handed to `python-dateutil` rather than reimplemented:
+weekly classes and "every other Tuesday" are exactly what a hand-rolled parser
+gets subtly wrong. Without dateutil the feed still works and recurring events
+simply do not repeat, which is a smaller failure than wrong dates. Verified
+against a synthetic feed covering folded lines, all-day events, timezone
+conversion and `FREQ=WEEKLY;BYDAY=MO,WE,FR`.
+
+**The URLs are bearer secrets**, so they live in `~/.config/gelo/calendars.json`
+— outside this repo, because the repo is `~/.config` and is pushed. Nothing
+prints a URL, including on failure: errors report `name: ExceptionType`.
+
+## Two things the panel taught us about the material
+
+**Chrome is 96% opaque, and that is only correct over the wallpaper.** Measured
+with an editor behind it, the bleed was 8.3% — enough to read VS Code's file
+tree through the calendar. The fix is not to make the material denser
+everywhere: the bar was tuned against the wallpaper and looks right. `Chrome`
+gained an `opaque` opt-out for surfaces that float over arbitrary windows, and
+the dashboard cards take it. Bleed measured afterwards: ~0, the residual being
+the card's own content.
+
+A scrim from `shade` sits behind the panel as well — it says the panel is
+modal, which it is, and it is where every other scrim in the system comes from.
+
+**A `MouseArea` cannot be a child of a `Row`.** Making the clock clickable with
+one produced `Cannot specify left, right, horizontalCenter, fill or centerIn
+anchors for items inside Row` — and it would have taken a slot in the layout.
+`TapHandler` and `HoverHandler` do not participate in positioner layout at all,
+which is what they are for.

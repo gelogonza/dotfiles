@@ -1,6 +1,5 @@
 # Service singletons (hand-written, not generated).
 singleton Fuzzy 1.0 Fuzzy.qml
-singleton Git 1.0 Git.qml
 singleton Apps 1.0 Apps.qml
 singleton Clipboard 1.0 Clipboard.qml
 singleton Ripples 1.0 Ripples.qml
@@ -12,3 +11,4 @@ singleton Weather 1.0 Weather.qml
 singleton NotificationHistory 1.0 NotificationHistory.qml
 singleton Windows 1.0 Windows.qml
 singleton IdleInhibitor 1.0 IdleInhibitor.qml
+singleton Agenda 1.0 Agenda.qml

@@ -127,31 +127,6 @@ PanelWindow {
                 color: Tokens.color.border
             }
 
-            SysStats {
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 1
-                height: Tokens.space.md
-                color: Tokens.color.border
-            }
-
-            GitModule {
-                id: gitModule
-                anchors.verticalCenter: parent.verticalCenter
-            }
-
-            // Only earns its space when there is a repo to separate from.
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                visible: gitModule.visible
-                width: 1
-                height: Tokens.space.md
-                color: Tokens.color.border
-            }
-
             TrayRow {
                 anchors.verticalCenter: parent.verticalCenter
             }

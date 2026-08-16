@@ -34,6 +34,8 @@ Item {
     property bool interactive: false
 
     // --- material overrides ----------------------------------------------
+    property bool opaque: false
+
     property bool glowEnabled: true
     property bool shadowEnabled: true
     property real cornerRadius: Tokens.material.chrome.radius
@@ -67,8 +69,18 @@ Item {
         // Brushed metal. Two stops only — a three-stop gradient starts to read
         // as a highlight, which is a different material.
         gradient: Gradient {
-            GradientStop { position: 0.0; color: Tokens.material.chrome.surfaceTop }
-            GradientStop { position: 1.0; color: Tokens.material.chrome.surfaceBottom }
+            GradientStop {
+                position: 0.0
+                color: root.opaque ? Tokens.color.bg1
+                                   : Tokens.material.chrome.surfaceTop
+            }
+            GradientStop {
+                position: 1.0
+                color: root.opaque
+                    ? Qt.darker(Tokens.color.bg1,
+                                1.0 + Tokens.material.chrome.gradientDarken)
+                    : Tokens.material.chrome.surfaceBottom
+            }
         }
     }
 

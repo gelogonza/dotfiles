@@ -10,6 +10,7 @@ import "root:/Bar"
 import "root:/Launcher"
 import "root:/Lock"
 import "root:/Notifications"
+import "root:/Dashboard"
 import "root:/PowerMenu"
 import "root:/Wallpaper"
 
@@ -36,6 +37,7 @@ ShellRoot {
     // Also single-instance: org.freedesktop.Notifications has one owner.
     NotificationLayer {}
 
+    Dashboard {}
     PowerMenu {}
 
     // ext-session-lock client. See docs/lock-screen.md before relying on it.

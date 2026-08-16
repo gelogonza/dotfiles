@@ -88,6 +88,18 @@ The token source stopped being desktop-only.
 | 5.3 | Living design-system page generated from the tokens | ☑ `design/index.html` — self-contained, styles itself with its own tokens |
 | 5.4 | `--audit`: fail the build when a token pair drops below AA | ☑ 35 pairs, all clearing |
 
+## 6. Widgets ◐
+
+The bar carries what you glance at; the dashboard carries what you go and look
+at. Click the clock or `SUPER+SHIFT+D`.
+
+| | Item | Status |
+|---|---|---|
+| 6.1 | Dashboard panel | ☑ month calendar, agenda, weather, system |
+| 6.2 | Calendar via ICS (Google / Outlook, no OAuth) | ☑ `scripts/agenda.py` |
+| 6.3 | Controls in the dashboard — playback, network, quick toggles | ☐ |
+| 6.4 | Notification history in the dashboard rather than the launcher | ☐ maybe; it is fine where it is |
+
 ## Principles that constrain all of the above
 
 From `design.md §10` — worth re-reading before adding a surface:

@@ -6,6 +6,7 @@
 import Quickshell
 import QtQuick
 import "root:/Theme"
+import "root:/Services"
 
 Row {
     id: root
@@ -34,5 +35,19 @@ Row {
         font.pixelSize: Tokens.typography.size.title
         font.weight: Tokens.typography.weight.regular
         color: Tokens.color.text1
+    }
+
+    // The date is the natural handle for a panel about dates.
+    //
+    // Handlers rather than a MouseArea: this root is a Row, so a MouseArea
+    // child would both take a slot in the layout and trip "cannot specify
+    // fill anchors for items inside Row". Pointer handlers do not participate
+    // in positioner layout at all.
+    TapHandler {
+        onTapped: Ui.dashboardOpen = !Ui.dashboardOpen
+    }
+
+    HoverHandler {
+        cursorShape: Qt.PointingHandCursor
     }
 }

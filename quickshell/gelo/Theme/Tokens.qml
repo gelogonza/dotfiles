@@ -79,8 +79,8 @@ QtObject {
     // See design/tokens.json — this is off by default because turning it
     // on means talking to a third-party server about where you are.
     readonly property QtObject weather: QtObject {
-        readonly property bool enabled: false
-        readonly property string location: ""
+        readonly property bool enabled: true
+        readonly property string location: "Bloomington, IN"
     }
 
     readonly property QtObject motion: QtObject {

@@ -150,7 +150,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 ## The bar
 
 ```
-[ workspaces | launchers | now playing ]   [ date  time ]   [ weather | CPU MEM GPU | git | tray | vol  bt  power ]
+[ workspaces | launchers | now playing ]   [ date  time ]   [ weather | tray | vol  bt  awake  power ]
                                    [ window title ]
 ```
 
@@ -161,8 +161,6 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 - **Now playing** — whatever MPRIS player is actually playing, with a
   play/pause toggle. Click the title to raise the player. Hidden when nothing
   is loaded.
-- **Git** — resolves the repo from the *focused window* by walking its process
-  tree, so a terminal sitting in `$HOME` still shows the project its shell is in.
 - **Volume** — click to open `pavucontrol`, drag the track to set the level,
   scroll to nudge it, right-click to mute.
 - **Bluetooth** — click to open `blueman-manager`, right-click to disconnect
@@ -186,6 +184,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 | `SUPER + SHIFT + V` | clipboard history |
 | `SUPER + SHIFT + N` | notification history |
 | `SUPER + SHIFT + I` | keep the screen awake (toggle) |
+| `SUPER + SHIFT + D` | dashboard (or click the clock) |
 | `SUPER + Tab` / `ALT + Tab` | window switcher |
 | `SUPER + S` / `Print` | screenshot a region |
 | `SUPER + SHIFT + S` | screenshot everything |
@@ -214,6 +213,7 @@ qs -c gelo ipc call launcher notifications
 qs -c gelo ipc call launcher windows
 qs -c gelo ipc call power toggle
 qs -c gelo ipc call idle toggle      # or on / off / status
+qs -c gelo ipc call dashboard toggle
 ```
 
 ---
@@ -259,6 +259,27 @@ echo "alias cava='~/dotfiles/hypr/scripts/cava-launch.sh'" >> ~/.zshrc
 
 **Switch the font** — one line in `tokens.json`. Figtree, Inter Display and
 Nimbus Sans are already installed as alternatives.
+
+**Dashboard** — click the clock or `SUPER+SHIFT+D`: month calendar, upcoming
+events, weather, and CPU/MEM/GPU. Those three used to sit in the bar
+permanently; a number you never read is texture, so they moved behind a
+gesture and the bar got quieter.
+
+**Calendar** — Google and Outlook each publish a *secret ICS address* per
+calendar (Google: Settings → calendar → "Secret address in iCal format";
+Outlook: Settings → Calendar → Shared calendars → Publish). No OAuth, no app
+registration. Put them in `~/.config/gelo/calendars.json`:
+
+```json
+[
+  { "name": "personal", "url": "https://calendar.google.com/…/basic.ics" },
+  { "name": "school",   "url": "https://outlook.office365.com/…/calendar.ics" }
+]
+```
+
+> **That file is deliberately outside this repo.** The repo *is* `~/.config`
+> and is pushed to GitHub; those URLs are bearer secrets — anyone with the link
+> reads your calendar. Nothing in the shell ever prints one, including on error.
 
 **Enable weather** — off by default, because it sends a request to a
 third-party server every 15 minutes and, with no location set, that server
