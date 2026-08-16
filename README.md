@@ -149,7 +149,7 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 ## The bar
 
 ```
-[ workspaces | app launchers ]     [ date  time ]     [ weather | CPU MEM GPU | git | tray | vol  bt  power ]
+[ workspaces | launchers | now playing ]   [ date  time ]   [ weather | CPU MEM GPU | git | tray | vol  bt  power ]
                                    [ window title ]
 ```
 
@@ -157,6 +157,9 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   stretches as it moves and fires a ripple into the wallpaper behind it.
 - **Launchers** — Ghostty, VS Code, Chrome, Obsidian, Blender. Edit the `apps`
   list in `quickshell/gelo/Bar/AppLaunchers.qml`.
+- **Now playing** — whatever MPRIS player is actually playing, with a
+  play/pause toggle. Click the title to raise the player. Hidden when nothing
+  is loaded.
 - **Git** — resolves the repo from the *focused window* by walking its process
   tree, so a terminal sitting in `$HOME` still shows the project its shell is in.
 - **Volume** — click to open `pavucontrol`, drag the track to set the level,

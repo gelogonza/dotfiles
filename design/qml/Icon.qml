@@ -42,14 +42,10 @@ Item {
     property bool tinted: true
 
     // Names served by design/icons rather than by the system icon theme.
-    readonly property var ownIcons: [
-        "volume-high", "volume-medium", "volume-low", "volume-muted",
-        "bluetooth-on", "bluetooth-off",
-        "power", "lock", "sleep", "logout", "reboot",
-        "clipboard", "image",
-        "weather-clear", "weather-clouds", "weather-overcast",
-        "weather-showers", "weather-snow", "weather-storm", "weather-fog"
-    ]
+    //! Generated from the contents of design/icons by build-tokens.py — this
+    //! used to be a hand-written list sitting next to the directory it was
+    //! supposed to mirror, so adding an SVG was not enough to make it render.
+    readonly property var ownIcons: [@OWNICONS@]
 
     implicitWidth: size
     implicitHeight: size

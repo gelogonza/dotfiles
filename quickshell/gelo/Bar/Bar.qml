@@ -73,6 +73,20 @@ PanelWindow {
                 anchors.verticalCenter: parent.verticalCenter
                 window: bar
             }
+
+            // Only earns its space when something is loaded in a player.
+            Rectangle {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: mediaModule.visible
+                width: 1
+                height: Tokens.space.lg
+                color: Tokens.color.border
+            }
+
+            MediaModule {
+                id: mediaModule
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
         // --- centre -------------------------------------------------------

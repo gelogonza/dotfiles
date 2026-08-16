@@ -1448,3 +1448,46 @@ a dotted path, rather than naming the groups it knows about. 37 colours today;
 a colour added to the token source is matchable without touching the script.
 That also means it reports `terminal.ansi[9]`-style names, which are the names
 you would actually go and edit.
+
+
+---
+
+# Now playing in the bar (roadmap 3.1)
+
+`Bar/MediaModule.qml`, in the left cluster after the launchers: title · artist,
+a play/pause toggle, and click-the-title to raise the player. Hidden entirely
+when no player has a track, so it costs nothing when nothing is on.
+
+Two decisions worth recording:
+
+- **Whichever player is playing wins**, not `players[0]`. A paused browser tab
+  would otherwise outrank the thing you are listening to.
+- **The title has a fixed width ceiling** (220px, elided). Letting it grow
+  freely means the launchers shuffle sideways every time the track changes,
+  which turns a status readout into layout jitter.
+
+No accent, per §3 — the toggle is text-1 when playing and text-2 when paused,
+the same "quieter state, not a different colour family" the bluetooth and
+volume controls already use.
+
+## The icon list was a second source of truth
+
+`design/icons/` holds the SVGs, and `Icon.qml` held a **hand-written array of
+the names it serves**. Anything not in that array falls through to the system
+icon theme, which returns empty for every status glyph on this machine
+(docs/handoff.md) — so dropping `media-play.svg` into the directory was not
+enough, and the icon silently did not render. No error, no warning, just
+nothing where an icon should be.
+
+The array is now generated from the directory by `build-tokens.py`, so the two
+cannot drift again. This is the same class of bug as the notification server
+advertising capabilities the card did not implement: a declaration sitting next
+to the thing it is supposed to describe, with nothing keeping them in step.
+
+## Verification note
+
+The play/pause toggle's *click* handler is not verified by synthetic input —
+clicks cannot be delivered to a layer surface, the same limitation as the
+notification action buttons. What is verified from live state: with Spotify
+playing, the module shows the correct track and renders the **pause** glyph,
+which is the `isPlaying` binding working against real data.

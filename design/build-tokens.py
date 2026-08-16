@@ -2564,6 +2564,12 @@ def render_shaders() -> dict:
     return out
 
 
+def own_icons_literal() -> str:
+    """The names design/icons serves, as a QML array literal."""
+    names = sorted(p.stem for p in (ROOT / "design/icons").glob("*.svg"))
+    return ", ".join(f'"{n}"' for n in names)
+
+
 def render_components() -> dict:
     out = {}
     for name, targets in SHARED_COMPONENTS.items():
@@ -2578,6 +2584,14 @@ def render_components() -> dict:
             body = source.replace("@THEME@", theme_import)
             icon_root = "root:/icons/" if "quickshell" in str(path) else "../icons/"
             body = body.replace("@ICONROOT@", icon_root)
+            # Icon.qml has to know which names it serves itself rather than
+            # handing to the system icon theme, and that list used to be typed
+            # out by hand next to a directory of SVGs. Dropping a new icon into
+            # design/icons was therefore not enough to make it render: it fell
+            # through to the theme lookup, which returns empty for every status
+            # glyph on this machine (docs/handoff.md), so the icon silently did
+            # not appear. Generate it from the directory instead.
+            body = body.replace("@OWNICONS@", own_icons_literal())
             out[path] = f"// {BANNER.replace('design/tokens.json', 'design/qml/' + name)}\n{body}"
     return out
 

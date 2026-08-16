@@ -40,14 +40,7 @@ Item {
     property bool tinted: true
 
     // Names served by design/icons rather than by the system icon theme.
-    readonly property var ownIcons: [
-        "volume-high", "volume-medium", "volume-low", "volume-muted",
-        "bluetooth-on", "bluetooth-off",
-        "power", "lock", "sleep", "logout", "reboot",
-        "clipboard", "image",
-        "weather-clear", "weather-clouds", "weather-overcast",
-        "weather-showers", "weather-snow", "weather-storm", "weather-fog"
-    ]
+    readonly property var ownIcons: ["bluetooth-off", "bluetooth-on", "clipboard", "image", "lock", "logout", "media-pause", "media-play", "power", "reboot", "sleep", "volume-high", "volume-low", "volume-medium", "volume-muted", "weather-clear", "weather-clouds", "weather-fog", "weather-overcast", "weather-showers", "weather-snow", "weather-storm"]
 
     implicitWidth: size
     implicitHeight: size
