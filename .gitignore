@@ -33,3 +33,16 @@ queue.sqlite3
 # .git, so committing it would create a nested repo. The parts actually used are
 # extracted into reference/.
 dotfiles/
+
+# Python bytecode, produced by running the scripts in hypr/scripts
+__pycache__/
+*.pyc
+
+# VLC's Qt interface state: window geometry, and a recently-played list that
+# leaks file paths from $HOME. vlcrc holds the actual settings; this is runtime.
+vlc/vlc-qt-interface.conf
+
+# Calendar feed URLs are bearer secrets and live in ~/.config/gelo/, outside
+# this repo. Belt and braces in case that ever moves.
+calendars.json
+

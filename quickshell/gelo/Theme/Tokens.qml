@@ -80,7 +80,7 @@ QtObject {
     // on means talking to a third-party server about where you are.
     readonly property QtObject weather: QtObject {
         readonly property bool enabled: true
-        readonly property string location: "Bloomington, IN"
+        readonly property string location: ""
     }
 
     readonly property QtObject motion: QtObject {
