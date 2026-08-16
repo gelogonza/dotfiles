@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>gelo — design system</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- GENERATED FILE — DO NOT EDIT. Source: design/tokens.json (run design/build-tokens.py) -->
+<style>
+  :root {
+    --bg-0: #eef1f8; --bg-1: #f8fbff; --bg-2: #dceaf8; --border: #bed7eb;
+    --text-1: #1b4c78; --text-2: #466a9d; --accent: #3478c4;
+    --shade: #1f466b;
+    --ease: cubic-bezier(0.22, 1.0, 0.36, 1.0); --dur: 250ms;
+    --r: 8px; --gap: 16px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: calc(var(--gap) * 2);
+    background: var(--bg-0); color: var(--text-1);
+    font-family: "Geist", "Inter Display", system-ui, sans-serif;
+    font-weight: 300; letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 34px; font-weight: 400; margin: 0 0 4px; }
+  h2 {
+    font-size: 15px; font-weight: 400; margin: calc(var(--gap) * 2.5) 0 var(--gap);
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    color: var(--text-2); text-transform: lowercase;
+  }
+  .lede { color: var(--text-2); margin: 0 0 4px; max-width: 62ch; }
+  code { font-family: ui-monospace, monospace; font-size: 12px; }
+
+  /* The chrome material, described by the page and used by it. */
+  .card {
+    background: linear-gradient(180deg, var(--bg-1) 0%,
+      color-mix(in srgb, var(--bg-1), #000 6%) 100%);
+    border: 1px solid var(--border); border-radius: var(--r);
+    box-shadow: 0 6px 32px color-mix(in srgb, var(--shade) 22%, transparent);
+    padding: var(--gap);
+  }
+
+  .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sw { margin: 0; width: 132px; }
+  .chip {
+    height: 56px; border-radius: var(--r); border: 1px solid var(--border);
+    transition: transform var(--dur) var(--ease);
+  }
+  .sw:hover .chip { transform: translateY(-3px); }
+  .chip.r { background: var(--accent); }
+  figcaption { display: flex; flex-direction: column; margin-top: 6px; font-size: 12px; }
+  figcaption span { color: var(--text-2); }
+  figcaption em { color: var(--text-2); font-style: normal; font-size: 11px; }
+
+  .ansi-row { display: flex; border-radius: var(--r); overflow: hidden;
+              border: 1px solid var(--border); }
+  .ansi { flex: 1; height: 40px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-2); font-weight: 400; font-size: 12px; }
+  td.num { font-family: ui-monospace, monospace; text-align: right; }
+  tr.fail td { color: #b3261e; }
+  .dot { display: inline-block; width: 13px; height: 13px; border-radius: 3px;
+         border: 1px solid var(--border); vertical-align: middle; margin-right: 3px; }
+
+  .spec { margin: 6px 0; }
+  .bar { display: flex; align-items: center; gap: 10px; margin: 5px 0; font-size: 12px; }
+  .bar span { display: block; height: 12px; background: var(--accent); border-radius: 2px; }
+  .bar em { color: var(--text-2); font-style: normal; }
+
+  .mo { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12px; }
+  .mo em { color: var(--text-2); font-style: normal; }
+  .ball {
+    width: 14px; height: 14px; border-radius: 50%; background: var(--accent);
+    animation-name: slide; animation-timing-function: var(--ease);
+    animation-iteration-count: infinite; animation-direction: alternate;
+  }
+  @keyframes slide { to { transform: translateX(210px); } }
+
+  .term { background: #14293f; color: #dfe9f4; border-radius: var(--r);
+          padding: var(--gap); font-family: ui-monospace, monospace; font-size: 13px; }
+  footer { margin-top: calc(var(--gap) * 3); color: var(--text-2); font-size: 12px; }
+  @media (prefers-reduced-motion: reduce) { .ball { animation: none; } }
+</style>
+
+<main>
+  <h1>gelo — design system</h1>
+  <p class="lede">
+    One file, <code>design/tokens.json</code>, generates this page and everything
+    it documents: a Hyprland shell, a login theme, a terminal, an editor theme,
+    Spotify, GTK, a cursor and a Figma export. <strong>37 colours</strong>,
+    eleven targets, one source. If a token changes, this page changes with it or
+    the build fails.
+  </p>
+  <p class="lede">
+    Reference is the PS3 XMB: cold silver-blue, one glowing accent, chrome
+    surfaces, motion in a wave field <em>behind</em> the interface.
+  </p>
+
+  <h2>surfaces</h2>
+  <div class="grid"><figure class="sw"><div class="chip" style="background:#eef1f8"></div><figcaption><code>bg-0</code><span>#eef1f8</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#f8fbff"></div><figcaption><code>bg-1</code><span>#f8fbff</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#dceaf8"></div><figcaption><code>bg-2</code><span>#dceaf8</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#bed7eb"></div><figcaption><code>border</code><span>#bed7eb</span></figcaption></figure></div>
+
+  <h2>ink</h2>
+  <div class="grid"><figure class="sw"><div class="chip" style="background:#1b4c78"></div><figcaption><code>text-1</code><span>#1b4c78</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#466a9d"></div><figcaption><code>text-2</code><span>#466a9d</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#1f466b"></div><figcaption><code>shade</code><span>#1f466b</span></figcaption></figure></div>
+
+  <h2>accent — three places, system-wide</h2>
+  <p class="lede">
+    Active workspace indicator, focused window border, and the cursor. Nowhere
+    else. Selection, hover and urgency are carried by elevation, ink and opacity
+    instead — a fourth accent location is a redesign, not a tweak.
+  </p>
+  <div class="grid"><figure class="sw"><div class="chip" style="background:#3478c4"></div><figcaption><code>accent</code><span>#3478c4</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#2e68a8"></div><figcaption><code>accent-dim</code><span>#2e68a8</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#ffffff"></div><figcaption><code>accent-ink</code><span>#ffffff</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#4a8cd033"></div><figcaption><code>glow</code><span>#4a8cd033</span></figcaption></figure></div>
+
+  <h2>wave field</h2>
+  <p class="lede">
+    Kept apart from the UI surfaces so the wallpaper can be more saturated than
+    the chrome sitting on it.
+  </p>
+  <div class="grid"><figure class="sw"><div class="chip" style="background:#7cb8e8"></div><figcaption><code>field-base</code><span>#7cb8e8</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#a8d3f2"></div><figcaption><code>field-mid</code><span>#a8d3f2</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#eef1f8"></div><figcaption><code>field-high</code><span>#eef1f8</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#edf6ff"></div><figcaption><code>field-edge</code><span>#edf6ff</span></figcaption></figure><figure class="sw"><div class="chip" style="background:#e6f4ff"></div><figcaption><code>field-line</code><span>#e6f4ff</span></figcaption></figure></div>
+
+  <h2>terminal — ansi</h2>
+  <p class="lede">
+    Surfaces you work <em>in</em> are dark; chrome you work <em>with</em> is
+    light. The editor and Spotify derive from this block, so an editor split and
+    a terminal split are the same colour. ANSI 1/3/9/11 are genuinely red and
+    yellow — load-bearing semantics, kept desaturated and cool-leaning.
+  </p>
+  <div class="ansi-row"><div class="ansi" style="background:#1b3350" title="ansi[0] #1b3350"></div><div class="ansi" style="background:#d9738a" title="ansi[1] #d9738a"></div><div class="ansi" style="background:#5cb894" title="ansi[2] #5cb894"></div><div class="ansi" style="background:#d2b46e" title="ansi[3] #d2b46e"></div><div class="ansi" style="background:#6aa8e6" title="ansi[4] #6aa8e6"></div><div class="ansi" style="background:#a98fd8" title="ansi[5] #a98fd8"></div><div class="ansi" style="background:#63bfd6" title="ansi[6] #63bfd6"></div><div class="ansi" style="background:#c3d3e4" title="ansi[7] #c3d3e4"></div><div class="ansi" style="background:#4d6b8f" title="ansi[8] #4d6b8f"></div><div class="ansi" style="background:#ee8ba0" title="ansi[9] #ee8ba0"></div><div class="ansi" style="background:#79d2ac" title="ansi[10] #79d2ac"></div><div class="ansi" style="background:#ecd08c" title="ansi[11] #ecd08c"></div><div class="ansi" style="background:#8cc6f7" title="ansi[12] #8cc6f7"></div><div class="ansi" style="background:#c1a9ef" title="ansi[13] #c1a9ef"></div><div class="ansi" style="background:#85dbef" title="ansi[14] #85dbef"></div><div class="ansi" style="background:#f2f7fc" title="ansi[15] #f2f7fc"></div></div>
+  <div class="term" style="margin-top:12px">
+    $ git diff --stat<br>
+    &nbsp;design/tokens.json | 1 +-
+  </div>
+
+  <h2>contrast — every pair the system puts together</h2>
+  <p class="lede">
+    Generated by the same function that gates the build:
+    <code>design/build-tokens.py --audit</code> fails if any row falls short.
+    The list is curated rather than exhaustive — each row asserts that this
+    pairing actually happens.
+  </p>
+  <div class="card">
+    <table>
+      <thead><tr><th>pair</th><th>fg / bg</th><th class="num">ratio</th>
+      <th class="num">min</th><th>grade</th></tr></thead>
+      <tbody><tr class="pass"><td>primary ink on base surface</td><td><span class="dot" style="background:#1b4c78"></span><span class="dot" style="background:#eef1f8"></span></td><td class="num">7.90</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>primary ink on raised chrome</td><td><span class="dot" style="background:#1b4c78"></span><span class="dot" style="background:#f8fbff"></span></td><td class="num">8.60</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>primary ink on hover surface</td><td><span class="dot" style="background:#1b4c78"></span><span class="dot" style="background:#dceaf8"></span></td><td class="num">7.30</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>secondary ink on base surface</td><td><span class="dot" style="background:#466a9d"></span><span class="dot" style="background:#eef1f8"></span></td><td class="num">4.88</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>secondary ink on raised chrome</td><td><span class="dot" style="background:#466a9d"></span><span class="dot" style="background:#f8fbff"></span></td><td class="num">5.31</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>secondary ink on hover surface</td><td><span class="dot" style="background:#466a9d"></span><span class="dot" style="background:#dceaf8"></span></td><td class="num">4.51</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>hairline against base surface</td><td><span class="dot" style="background:#bed7eb"></span><span class="dot" style="background:#eef1f8"></span></td><td class="num">1.32</td><td class="num">1.3</td><td>ok</td></tr><tr class="pass"><td>accent ink on accent</td><td><span class="dot" style="background:#ffffff"></span><span class="dot" style="background:#3478c4"></span></td><td class="num">4.54</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>accent ink on accent-dim</td><td><span class="dot" style="background:#ffffff"></span><span class="dot" style="background:#2e68a8"></span></td><td class="num">5.74</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>accent against base surface</td><td><span class="dot" style="background:#3478c4"></span><span class="dot" style="background:#eef1f8"></span></td><td class="num">4.01</td><td class="num">3.0</td><td>ok</td></tr><tr class="pass"><td>terminal text</td><td><span class="dot" style="background:#dfe9f4"></span><span class="dot" style="background:#14293f"></span></td><td class="num">12.05</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal cursor on background</td><td><span class="dot" style="background:#8cc6f7"></span><span class="dot" style="background:#14293f"></span></td><td class="num">8.13</td><td class="num">3.0</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[1]</td><td><span class="dot" style="background:#d9738a"></span><span class="dot" style="background:#14293f"></span></td><td class="num">4.77</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>terminal ansi[2]</td><td><span class="dot" style="background:#5cb894"></span><span class="dot" style="background:#14293f"></span></td><td class="num">6.16</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>terminal ansi[3]</td><td><span class="dot" style="background:#d2b46e"></span><span class="dot" style="background:#14293f"></span></td><td class="num">7.40</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[4]</td><td><span class="dot" style="background:#6aa8e6"></span><span class="dot" style="background:#14293f"></span></td><td class="num">5.89</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>terminal ansi[5]</td><td><span class="dot" style="background:#a98fd8"></span><span class="dot" style="background:#14293f"></span></td><td class="num">5.36</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>terminal ansi[6]</td><td><span class="dot" style="background:#63bfd6"></span><span class="dot" style="background:#14293f"></span></td><td class="num">7.02</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[7]</td><td><span class="dot" style="background:#c3d3e4"></span><span class="dot" style="background:#14293f"></span></td><td class="num">9.70</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[9]</td><td><span class="dot" style="background:#ee8ba0"></span><span class="dot" style="background:#14293f"></span></td><td class="num">6.23</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>terminal ansi[10]</td><td><span class="dot" style="background:#79d2ac"></span><span class="dot" style="background:#14293f"></span></td><td class="num">8.20</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[11]</td><td><span class="dot" style="background:#ecd08c"></span><span class="dot" style="background:#14293f"></span></td><td class="num">9.85</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[12]</td><td><span class="dot" style="background:#8cc6f7"></span><span class="dot" style="background:#14293f"></span></td><td class="num">8.13</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[13]</td><td><span class="dot" style="background:#c1a9ef"></span><span class="dot" style="background:#14293f"></span></td><td class="num">7.18</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[14]</td><td><span class="dot" style="background:#85dbef"></span><span class="dot" style="background:#14293f"></span></td><td class="num">9.43</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>terminal ansi[15]</td><td><span class="dot" style="background:#f2f7fc"></span><span class="dot" style="background:#14293f"></span></td><td class="num">13.73</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>editor comment</td><td><span class="dot" style="background:#8097b2"></span><span class="dot" style="background:#14293f"></span></td><td class="num">4.93</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>editor line number</td><td><span class="dot" style="background:#6d87a5"></span><span class="dot" style="background:#14293f"></span></td><td class="num">3.99</td><td class="num">3.0</td><td>ok</td></tr><tr class="pass"><td>editor placeholder on input</td><td><span class="dot" style="background:#8fa4bc"></span><span class="dot" style="background:#22364b"></span></td><td class="num">4.83</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>editor inactive tab on deep</td><td><span class="dot" style="background:#8097b2"></span><span class="dot" style="background:#0d1b29"></span></td><td class="num">5.79</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>editor button ink on accent</td><td><span class="dot" style="background:#14293f"></span><span class="dot" style="background:#8cc6f7"></span></td><td class="num">8.13</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>spotify text on main</td><td><span class="dot" style="background:#dfe9f4"></span><span class="dot" style="background:#14293f"></span></td><td class="num">12.05</td><td class="num">4.5</td><td>AAA</td></tr><tr class="pass"><td>spotify subtext on card</td><td><span class="dot" style="background:#8fa4bc"></span><span class="dot" style="background:#22364b"></span></td><td class="num">4.83</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>spotify subtext on main</td><td><span class="dot" style="background:#8fa4bc"></span><span class="dot" style="background:#14293f"></span></td><td class="num">5.78</td><td class="num">4.5</td><td>AA</td></tr><tr class="pass"><td>spotify field subtext on main</td><td><span class="dot" style="background:#a5b7cc"></span><span class="dot" style="background:#14293f"></span></td><td class="num">7.22</td><td class="num">4.5</td><td>AAA</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>type</h2>
+  <div class="card"><p class="spec" style="font-size:11px">caption · 11px — The quick brown fox</p><p class="spec" style="font-size:13px">body · 13px — The quick brown fox</p><p class="spec" style="font-size:15px">title · 15px — The quick brown fox</p><hr style="border:0;border-top:1px solid var(--border);margin:12px 0"><p class="spec" style="font-weight:300">light · 300 — Weight never exceeds 400</p><p class="spec" style="font-weight:400">regular · 400 — Weight never exceeds 400</p></div>
+
+  <h2>space — 4px grid</h2>
+  <div class="card"><div class="bar"><span style="width:4px"></span><code>xs</code><em>4px</em></div><div class="bar"><span style="width:8px"></span><code>sm</code><em>8px</em></div><div class="bar"><span style="width:12px"></span><code>md</code><em>12px</em></div><div class="bar"><span style="width:16px"></span><code>lg</code><em>16px</em></div><div class="bar"><span style="width:24px"></span><code>xl</code><em>24px</em></div><div class="bar"><span style="width:32px"></span><code>xxl</code><em>32px</em></div></div>
+
+  <h2>radius</h2>
+  <div class="grid"><figure class="sw"><div class="chip r" style="border-radius:8px"></div><figcaption><code>sm</code><span>8px</span></figcaption></figure><figure class="sw"><div class="chip r" style="border-radius:12px"></div><figcaption><code>md</code><span>12px</span></figcaption></figure><figure class="sw"><div class="chip r" style="border-radius:16px"></div><figcaption><code>lg</code><span>16px</span></figcaption></figure><figure class="sw"><div class="chip r" style="border-radius:24px"></div><figcaption><code>xl</code><span>24px</span></figcaption></figure><figure class="sw"><div class="chip r" style="border-radius:48px"></div><figcaption><code>full</code><span>999px</span></figcaption></figure></div>
+
+  <h2>motion — one curve</h2>
+  <p class="lede">
+    <code>cubic-bezier(0.22, 1.0, 0.36, 1.0)</code>, shared by the shell, the compositor's window
+    animations and the lock screen.
+  </p>
+  <div class="card"><div class="mo"><span class="ball" style="animation-duration:150ms"></span><code>fast</code><em>150ms</em></div><div class="mo"><span class="ball" style="animation-duration:250ms"></span><code>base</code><em>250ms</em></div><div class="mo"><span class="ball" style="animation-duration:400ms"></span><code>slow</code><em>400ms</em></div></div>
+
+  <footer>
+    Generated from <code>design/tokens.json</code>. Do not edit this file —
+    run <code>design/build-tokens.py</code>.
+  </footer>
+</main>

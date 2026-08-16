@@ -15,6 +15,7 @@ Picking this up cold — or handing it to someone (or something) else? Start wit
 
 ```
 design/          token source, generators, shared QML/GLSL/SVG
+                 └ index.html — the system documented by itself; open it
 quickshell/gelo/ the shell — wallpaper, bar, launcher, notifications, power menu
 sddm/            login theme + installer
 hypr/            compositor config

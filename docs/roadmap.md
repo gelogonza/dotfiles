@@ -77,7 +77,7 @@ These predate the roadmap and are still open:
   `hypr/scripts/lock.sh`, which prefers it and falls back to hyprlock if the
   shell is not running. `SUPER+SHIFT+L` forces hyprlock directly.
 
-## 5. Out of the desktop ◐
+## 5. Out of the desktop ☑
 
 The token source stopped being desktop-only.
 
@@ -85,7 +85,7 @@ The token source stopped being desktop-only.
 |---|---|---|
 | 5.1 | W3C DTCG export → Figma Variables via Tokens Studio | ☑ `design/tokens.dtcg.json` |
 | 5.2 | Typed module for web projects | ☑ `design/tokens.ts` |
-| 5.3 | Living design-system page generated from the tokens | ☐ the artifact to link |
+| 5.3 | Living design-system page generated from the tokens | ☑ `design/index.html` — self-contained, styles itself with its own tokens |
 | 5.4 | `--audit`: fail the build when a token pair drops below AA | ☑ 35 pairs, all clearing |
 
 ## Principles that constrain all of the above

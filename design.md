@@ -14,7 +14,7 @@ the bug.
 ## 1. The pipeline
 
 `design/tokens.json` is the single source of truth.
-`design/build-tokens.py` fans it out to **eleven** targets in eight languages:
+`design/build-tokens.py` fans it out to **twelve** targets in eight languages:
 
 | Generated | Consumer | Language |
 |---|---|---|
@@ -29,6 +29,7 @@ the bug.
 | `cava/config` | cava | cava ini |
 | `design/tokens.dtcg.json` | Figma / any token pipeline | W3C DTCG |
 | `design/tokens.ts` | web projects | TypeScript |
+| `design/index.html` | humans | the system, documented by itself |
 | `*/Components/*.qml`, `*/Shaders/*.frag`, `*/icons/*.svg` | both QML roots | copied |
 
 ```bash

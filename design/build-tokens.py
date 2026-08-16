@@ -1104,6 +1104,177 @@ def render_spicetify_js(t: dict) -> str:
 
 # Kept out of the function body so the JavaScript does not have to survive
 # f-string brace doubling, which is how a template this size acquires bugs.
+_SYSTEM_PAGE = r'''<!DOCTYPE html>
+<meta charset="utf-8">
+<title>gelo — design system</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- __BANNER__ -->
+<style>
+  :root {
+    --bg-0: __BG0__; --bg-1: __BG1__; --bg-2: __BG2__; --border: __BORDER__;
+    --text-1: __TEXT1__; --text-2: __TEXT2__; --accent: __ACCENT__;
+    --shade: __SHADE__;
+    --ease: __EASE__; --dur: __DUR_BASE__ms;
+    --r: __RADIUS_SM__px; --gap: __SPACE_LG__px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: calc(var(--gap) * 2);
+    background: var(--bg-0); color: var(--text-1);
+    font-family: __FAMILY__, system-ui, sans-serif;
+    font-weight: 300; letter-spacing: __TRACK__em;
+    line-height: 1.5;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 34px; font-weight: 400; margin: 0 0 4px; }
+  h2 {
+    font-size: 15px; font-weight: 400; margin: calc(var(--gap) * 2.5) 0 var(--gap);
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    color: var(--text-2); text-transform: lowercase;
+  }
+  .lede { color: var(--text-2); margin: 0 0 4px; max-width: 62ch; }
+  code { font-family: ui-monospace, monospace; font-size: 12px; }
+
+  /* The chrome material, described by the page and used by it. */
+  .card {
+    background: linear-gradient(180deg, var(--bg-1) 0%,
+      color-mix(in srgb, var(--bg-1), #000 __CHROME_DARKEN__%) 100%);
+    border: 1px solid var(--border); border-radius: var(--r);
+    box-shadow: 0 6px __SHADOW_R__px color-mix(in srgb, var(--shade) 22%, transparent);
+    padding: var(--gap);
+  }
+
+  .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+  .sw { margin: 0; width: 132px; }
+  .chip {
+    height: 56px; border-radius: var(--r); border: 1px solid var(--border);
+    transition: transform var(--dur) var(--ease);
+  }
+  .sw:hover .chip { transform: translateY(-3px); }
+  .chip.r { background: var(--accent); }
+  figcaption { display: flex; flex-direction: column; margin-top: 6px; font-size: 12px; }
+  figcaption span { color: var(--text-2); }
+  figcaption em { color: var(--text-2); font-style: normal; font-size: 11px; }
+
+  .ansi-row { display: flex; border-radius: var(--r); overflow: hidden;
+              border: 1px solid var(--border); }
+  .ansi { flex: 1; height: 40px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--text-2); font-weight: 400; font-size: 12px; }
+  td.num { font-family: ui-monospace, monospace; text-align: right; }
+  tr.fail td { color: #b3261e; }
+  .dot { display: inline-block; width: 13px; height: 13px; border-radius: 3px;
+         border: 1px solid var(--border); vertical-align: middle; margin-right: 3px; }
+
+  .spec { margin: 6px 0; }
+  .bar { display: flex; align-items: center; gap: 10px; margin: 5px 0; font-size: 12px; }
+  .bar span { display: block; height: 12px; background: var(--accent); border-radius: 2px; }
+  .bar em { color: var(--text-2); font-style: normal; }
+
+  .mo { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12px; }
+  .mo em { color: var(--text-2); font-style: normal; }
+  .ball {
+    width: 14px; height: 14px; border-radius: 50%; background: var(--accent);
+    animation-name: slide; animation-timing-function: var(--ease);
+    animation-iteration-count: infinite; animation-direction: alternate;
+  }
+  @keyframes slide { to { transform: translateX(210px); } }
+
+  .term { background: __TERM_BG__; color: __TERM_FG__; border-radius: var(--r);
+          padding: var(--gap); font-family: ui-monospace, monospace; font-size: 13px; }
+  footer { margin-top: calc(var(--gap) * 3); color: var(--text-2); font-size: 12px; }
+  @media (prefers-reduced-motion: reduce) { .ball { animation: none; } }
+</style>
+
+<main>
+  <h1>gelo — design system</h1>
+  <p class="lede">
+    One file, <code>design/tokens.json</code>, generates this page and everything
+    it documents: a Hyprland shell, a login theme, a terminal, an editor theme,
+    Spotify, GTK, a cursor and a Figma export. <strong>__NTOKENS__ colours</strong>,
+    eleven targets, one source. If a token changes, this page changes with it or
+    the build fails.
+  </p>
+  <p class="lede">
+    Reference is the PS3 XMB: cold silver-blue, one glowing accent, chrome
+    surfaces, motion in a wave field <em>behind</em> the interface.
+  </p>
+
+  <h2>surfaces</h2>
+  <div class="grid">__SURFACES__</div>
+
+  <h2>ink</h2>
+  <div class="grid">__INKS__</div>
+
+  <h2>accent — three places, system-wide</h2>
+  <p class="lede">
+    Active workspace indicator, focused window border, and the cursor. Nowhere
+    else. Selection, hover and urgency are carried by elevation, ink and opacity
+    instead — a fourth accent location is a redesign, not a tweak.
+  </p>
+  <div class="grid">__ACCENTS__</div>
+
+  <h2>wave field</h2>
+  <p class="lede">
+    Kept apart from the UI surfaces so the wallpaper can be more saturated than
+    the chrome sitting on it.
+  </p>
+  <div class="grid">__FIELD__</div>
+
+  <h2>terminal — ansi</h2>
+  <p class="lede">
+    Surfaces you work <em>in</em> are dark; chrome you work <em>with</em> is
+    light. The editor and Spotify derive from this block, so an editor split and
+    a terminal split are the same colour. ANSI 1/3/9/11 are genuinely red and
+    yellow — load-bearing semantics, kept desaturated and cool-leaning.
+  </p>
+  <div class="ansi-row">__ANSI__</div>
+  <div class="term" style="margin-top:12px">
+    $ git diff --stat<br>
+    &nbsp;design/tokens.json | 1 +-
+  </div>
+
+  <h2>contrast — every pair the system puts together</h2>
+  <p class="lede">
+    Generated by the same function that gates the build:
+    <code>design/build-tokens.py --audit</code> fails if any row falls short.
+    The list is curated rather than exhaustive — each row asserts that this
+    pairing actually happens.
+  </p>
+  <div class="card">
+    <table>
+      <thead><tr><th>pair</th><th>fg / bg</th><th class="num">ratio</th>
+      <th class="num">min</th><th>grade</th></tr></thead>
+      <tbody>__AUDIT__</tbody>
+    </table>
+  </div>
+
+  <h2>type</h2>
+  <div class="card">__SIZES__<hr style="border:0;border-top:1px solid var(--border);margin:12px 0">__WEIGHTS__</div>
+
+  <h2>space — 4px grid</h2>
+  <div class="card">__SPACES__</div>
+
+  <h2>radius</h2>
+  <div class="grid">__RADII__</div>
+
+  <h2>motion — one curve</h2>
+  <p class="lede">
+    <code>__EASE__</code>, shared by the shell, the compositor's window
+    animations and the lock screen.
+  </p>
+  <div class="card">__DURATIONS__</div>
+
+  <footer>
+    Generated from <code>design/tokens.json</code>. Do not edit this file —
+    run <code>design/build-tokens.py</code>.
+  </footer>
+</main>
+'''
+
+
 _SPICETIFY_JS = r"""// __BANNER__
 //
 // The XMB wave field, behind Spotify, rippling on the beat.
@@ -2323,6 +2494,135 @@ _SPICETIFY_JS = r"""// __BANNER__
 
 
 # --------------------------------------------------------------------------
+# The design system, as a page
+# --------------------------------------------------------------------------
+
+def render_system_page(t: dict) -> str:
+    """A single self-contained page documenting the system, generated from it.
+
+    Two properties make this worth generating rather than writing:
+
+    * **It cannot go stale.** Every swatch, ratio and specimen is read from
+      `tokens.json` on the same run that produces the shell, the editor theme
+      and the Figma export. A palette change moves the documentation with it or
+      `--check` fails.
+    * **It is built out of the thing it documents.** The page styles itself
+      with its own tokens — the chrome gradient is `material.chrome`, the
+      transitions are `motion.ease`, the type is the type scale. If a token is
+      wrong the page looks wrong, which is a stronger guarantee than a
+      screenshot.
+
+    No build step, no dependencies: one file, inline CSS, opens from disk.
+    """
+    color, space, radius = t["color"], t["space"], t["radius"]
+    typo, motion, mat = t["type"], t["motion"], t["material"]
+    term = t["terminal"]
+    e = motion["ease"]
+    ch = mat["chrome"]
+
+    def swatch(name: str, value: str, note: str = "") -> str:
+        return (f'<figure class="sw"><div class="chip" style="background:{value}"></div>'
+                f'<figcaption><code>{name}</code><span>{value}</span>'
+                f'{f"<em>{note}</em>" if note else ""}</figcaption></figure>')
+
+    surfaces = "".join(swatch(k, color[k]) for k in
+                       ("bg-0", "bg-1", "bg-2", "border") if k in color)
+    inks = "".join(swatch(k, color[k]) for k in
+                   ("text-1", "text-2", "shade") if k in color)
+    accents = "".join(swatch(k, color[k]) for k in
+                      ("accent", "accent-dim", "accent-ink", "glow") if k in color)
+    field = "".join(swatch(k, color[k]) for k in color if k.startswith("field-"))
+    ansi = "".join(
+        f'<div class="ansi" style="background:{c}" title="ansi[{i}] {c}"></div>'
+        for i, c in enumerate(term["ansi"]))
+
+    # The audit table, from the same function the build gate uses — the page
+    # cannot claim a ratio the build does not enforce.
+    rows = []
+    for label, fg, bg, need in audit_pairs(t):
+        ratio = contrast(fg, bg)
+        # A row that clears a 1.3 or 3.0 threshold is not "low" — those
+        # thresholds are the ones that apply to a hairline or a UI boundary.
+        # Grading everything against the text bar makes passing rows read as
+        # failures, which is how a green table gets ignored.
+        if ratio < need:
+            grade = "fail"
+        elif ratio >= 7:
+            grade = "AAA"
+        elif ratio >= 4.5:
+            grade = "AA"
+        else:
+            grade = "ok"
+        ok = "pass" if ratio >= need else "fail"
+        rows.append(
+            f'<tr class="{ok}"><td>{label}</td>'
+            f'<td><span class="dot" style="background:{fg}"></span>'
+            f'<span class="dot" style="background:{bg}"></span></td>'
+            f'<td class="num">{ratio:.2f}</td><td class="num">{need:.1f}</td>'
+            f'<td>{grade}</td></tr>')
+    audit_rows = "".join(rows)
+
+    sizes = "".join(
+        f'<p class="spec" style="font-size:{v}px">{k} · {v}px — '
+        f'The quick brown fox</p>' for k, v in typo["size"].items())
+    weights = "".join(
+        f'<p class="spec" style="font-weight:{v}">{k} · {v} — '
+        f'Weight never exceeds 400</p>' for k, v in typo["weight"].items())
+    spaces = "".join(
+        f'<div class="bar"><span style="width:{v}px"></span>'
+        f'<code>{k}</code><em>{v}px</em></div>' for k, v in space.items())
+    radii = "".join(
+        f'<figure class="sw"><div class="chip r" style="border-radius:'
+        f'{min(v, 48)}px"></div><figcaption><code>{k}</code>'
+        f'<span>{v}px</span></figcaption></figure>' for k, v in radius.items())
+    durations = "".join(
+        f'<div class="mo"><span class="ball" style="animation-duration:{v}ms">'
+        f'</span><code>{k}</code><em>{v}ms</em></div>'
+        for k, v in motion["duration"].items())
+
+    tpl = _SYSTEM_PAGE
+    for key, val in {
+        "__BANNER__": BANNER,
+        "__SURFACES__": surfaces, "__INKS__": inks, "__ACCENTS__": accents,
+        "__FIELD__": field, "__ANSI__": ansi, "__AUDIT__": audit_rows,
+        "__SIZES__": sizes, "__WEIGHTS__": weights, "__SPACES__": spaces,
+        "__RADII__": radii, "__DURATIONS__": durations,
+        "__BG0__": color["bg-0"], "__BG1__": color["bg-1"],
+        "__BG2__": color["bg-2"], "__BORDER__": color["border"],
+        "__TEXT1__": color["text-1"], "__TEXT2__": color["text-2"],
+        "__ACCENT__": color["accent"], "__SHADE__": color["shade"],
+        "__FAMILY__": ", ".join(f'"{f}"' for f in typo["families"]),
+        "__EASE__": f"cubic-bezier({e[0]}, {e[1]}, {e[2]}, {e[3]})",
+        "__DUR_BASE__": str(motion["duration"]["base"]),
+        "__TRACK__": str(typo["trackingEm"]),
+        "__RADIUS_SM__": str(radius["sm"]),
+        "__SPACE_LG__": str(space["lg"]),
+        "__CHROME_DARKEN__": str(round(ch["gradientDarken"] * 100)),
+        "__SHADOW_R__": str(ch["shadowRadius"]),
+        "__GLOW_EXT__": str(mat["glow"]["extent"]),
+        "__TERM_BG__": term["background"], "__TERM_FG__": term["foreground"],
+        "__NTOKENS__": str(len(collect_colour_tokens(t))),
+    }.items():
+        tpl = tpl.replace(key, val)
+    return tpl
+
+
+def collect_colour_tokens(node, path: str = "") -> list:
+    """Every hex value in the source, for the count on the page."""
+    out = []
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if not k.startswith("$"):
+                out += collect_colour_tokens(v, f"{path}.{k}" if path else k)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            out += collect_colour_tokens(v, f"{path}[{i}]")
+    elif isinstance(node, str) and re.fullmatch(r"#[0-9a-fA-F]{6,8}", node):
+        out.append(path)
+    return out
+
+
+# --------------------------------------------------------------------------
 # Contrast audit
 # --------------------------------------------------------------------------
 
@@ -2982,6 +3282,7 @@ def main() -> int:
         ROOT / "gtk-3.0/gtk.css": render_gtk(tokens, adwaita=False),
         ROOT / "vscode/gelo-xmb/themes/gelo-xmb-color-theme.json": render_vscode(tokens),
         ROOT / "vscode/gelo-xmb/package.json": render_vscode_manifest(tokens),
+        ROOT / "design/index.html": render_system_page(tokens),
         ROOT / "design/tokens.dtcg.json": render_dtcg(tokens),
         ROOT / "design/tokens.ts": render_tokens_ts(tokens),
         ROOT / "cava/config": render_cava(tokens),

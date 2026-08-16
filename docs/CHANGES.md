@@ -1775,3 +1775,33 @@ The minimal fix is `#466a9d` — same hue (215.6°) and saturation, lightness
 
 That is a palette change affecting every secondary label on the desktop, so it
 is gelo's call rather than the build's.
+
+
+---
+
+# The design system, as a page (roadmap 5.3)
+
+`design/index.html` — one self-contained file, no build step, no dependencies,
+opens from disk.
+
+Two properties make it worth *generating* rather than writing:
+
+- **It cannot go stale.** Every swatch, ratio and specimen is read from
+  `tokens.json` on the same run that produces the shell, the editor theme and
+  the Figma export. `--check` fails if the page falls behind the palette.
+- **It is built out of the thing it documents.** The page styles itself with
+  its own tokens — the card is `material.chrome`'s gradient and shadow, the
+  transitions are `motion.ease`, the type is the type scale, the animated dots
+  run on the real bezier. If a token is wrong, the page looks wrong. That is a
+  stronger guarantee than a screenshot in a README.
+
+The contrast section is rendered by **the same `audit_pairs()` the build gate
+uses**, so the page cannot advertise a ratio the build does not enforce.
+
+## One fix after looking at it
+
+Rows that pass a *lower* threshold — the hairline at 1.3, the accent at 3.0 —
+were graded against the 4.5 text bar and displayed as "low". A passing row that
+reads as a failure is how a green table gets ignored, so those now show "ok".
+The thresholds that apply to a hairline are not the thresholds that apply to
+body text.
