@@ -14,6 +14,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import "root:/Theme"
 
 Singleton {
     id: root
@@ -43,7 +44,8 @@ Singleton {
 
     Process {
         id: proc
-        command: ["python3", Quickshell.shellPath("scripts/agenda.py"), "14"]
+        command: ["python3", Quickshell.shellPath("scripts/agenda.py"),
+                  "14", Tokens.format.clock]
 
         stdout: StdioCollector {
             onStreamFinished: {

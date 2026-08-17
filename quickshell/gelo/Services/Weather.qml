@@ -30,10 +30,28 @@ Singleton {
     readonly property string location: Tokens.weather.location
 
     property int temperature: -999
-    property int precipitation: -1
+    property real precipitation: -1
     property string condition: ""
 
     readonly property bool valid: enabled && temperature > -900
+
+    // Units come from Tokens.format, not from here, so the weather agrees with
+    // the clock about which side of the Atlantic this desktop is on.
+    readonly property string temperatureText: temperature + Tokens.format.degree
+
+    // Inches want two decimals to say anything at all (a wet day is 0.30in);
+    // millimetres are already whole numbers at that resolution.
+    readonly property string precipitationText: Tokens.format.imperial
+        ? precipitation.toFixed(2) + "in"
+        : Math.round(precipitation) + "mm"
+
+    // Gate on what will actually be *rendered*, not on the raw reading. 0.1mm
+    // is greater than zero and displays as "0.00in", so testing the number
+    // would put a permanent "no rain" readout in the bar under imperial —
+    // exactly the thing the visibility rule exists to prevent.
+    readonly property bool hasPrecipitation: Tokens.format.imperial
+        ? precipitation >= 0.005
+        : precipitation >= 0.5
 
     // Map wttr's free-text condition onto our own icon set.
     readonly property string icon: {
@@ -56,7 +74,8 @@ Singleton {
     function refresh() {
         if (!enabled || proc.running)
             return;
-        proc.command = ["bash", Quickshell.shellPath("scripts/weather.sh"), location];
+        proc.command = ["bash", Quickshell.shellPath("scripts/weather.sh"),
+                        location, Tokens.format.units];
         proc.running = true;
     }
 

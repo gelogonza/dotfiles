@@ -142,12 +142,27 @@ def render_qml(t: dict) -> str:
     L += ["        }", "    }", ""]
 
     w = t["weather"]
+    fmt = t["format"]
     L += [
         "    // See design/tokens.json — this is off by default because turning it",
         "    // on means talking to a third-party server about where you are.",
         "    readonly property QtObject weather: QtObject {",
         f'        readonly property bool enabled: {"true" if w["enabled"] else "false"}',
         f'        readonly property string location: "{w["location"]}"',
+        "    }",
+        "",
+        "    // Time and measurement formatting. One source for the four surfaces",
+        "    // that show a clock, so they cannot disagree with each other.",
+        "    readonly property QtObject format: QtObject {",
+        f'        readonly property string clock: "{fmt["clock"]}"',
+        f'        readonly property string units: "{fmt["units"]}"',
+        "",
+        "        // Ready to hand to Qt.formatDateTime. `AP` renders AM/PM, and `h`",
+        "        // (not `hh`) drops the leading zero — 3:45 PM, not 03:45 PM.",
+        '        readonly property string timePattern: clock === "24h" ? "HH:mm" : "h:mm AP"',
+        "",
+        '        readonly property bool imperial: units === "imperial"',
+        '        readonly property string degree: imperial ? "°F" : "°C"',
         "    }",
         "",
         "    readonly property QtObject motion: QtObject {",

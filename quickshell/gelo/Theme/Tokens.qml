@@ -83,6 +83,20 @@ QtObject {
         readonly property string location: ""
     }
 
+    // Time and measurement formatting. One source for the four surfaces
+    // that show a clock, so they cannot disagree with each other.
+    readonly property QtObject format: QtObject {
+        readonly property string clock: "12h"
+        readonly property string units: "imperial"
+
+        // Ready to hand to Qt.formatDateTime. `AP` renders AM/PM, and `h`
+        // (not `hh`) drops the leading zero — 3:45 PM, not 03:45 PM.
+        readonly property string timePattern: clock === "24h" ? "HH:mm" : "h:mm AP"
+
+        readonly property bool imperial: units === "imperial"
+        readonly property string degree: imperial ? "°F" : "°C"
+    }
+
     readonly property QtObject motion: QtObject {
         // Feed straight into `easing.bezierCurve`. QML wants six values:
         // the two control points plus the fixed (1,1) endpoint.

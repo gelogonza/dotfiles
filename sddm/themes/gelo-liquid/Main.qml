@@ -95,7 +95,7 @@ Rectangle {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.formatDateTime(clock.now, "HH:mm")
+            text: Qt.formatDateTime(clock.now, Tokens.format.timePattern)
             font.family: Tokens.typography.display
             font.pixelSize: 84
             font.weight: Tokens.typography.weight.light

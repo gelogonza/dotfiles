@@ -20,7 +20,11 @@ is pushed to GitHub. Nothing here prints a URL, including on failure.
       { "name": "school",   "url": "https://outlook.office365.com/…/calendar.ics" }
     ]
 
-Usage: agenda.py [days]        (default 7)
+Usage: agenda.py [days] [12h|24h]        (default 7, 24h)
+
+The clock format is passed in rather than read from tokens.json: this script is
+deliberately free of any path back into the repo, and the caller (Services/
+Agenda.qml) already holds the token.
 """
 
 from __future__ import annotations
@@ -127,7 +131,16 @@ def parse_events(text: str) -> list[dict]:
     return events
 
 
-def expand(events: list[dict], window_start: datetime, window_end: datetime) -> list[dict]:
+def clock_format(local: datetime, twelve: bool) -> str:
+    """`%I` pads to two digits and there is no portable strip-zero flag that
+    works on both glibc (`%-I`) and everywhere else, so do it by hand."""
+    if not twelve:
+        return local.strftime("%H:%M")
+    return local.strftime("%I:%M %p").lstrip("0")
+
+
+def expand(events: list[dict], window_start: datetime, window_end: datetime,
+           twelve: bool = False) -> list[dict]:
     """Occurrences inside the window, recurrences included.
 
     RRULE is handed to python-dateutil rather than reimplemented: weekly
@@ -171,7 +184,7 @@ def expand(events: list[dict], window_start: datetime, window_end: datetime) -> 
                 "start": local.isoformat(),
                 "epoch": int(local.timestamp()),
                 "day": local.date().isoformat(),
-                "time": "" if e.get("all_day") else local.strftime("%H:%M"),
+                "time": "" if e.get("all_day") else clock_format(local, twelve),
             })
 
     out.sort(key=lambda x: x["epoch"])
@@ -185,6 +198,8 @@ def main() -> int:
             days = max(1, min(60, int(sys.argv[1])))
         except ValueError:
             pass
+
+    twelve = len(sys.argv) > 2 and sys.argv[2] == "12h"
 
     if not CONFIG.exists():
         print(json.dumps({"configured": False, "events": [], "calendars": []}))
@@ -220,7 +235,7 @@ def main() -> int:
             errors.append(f"{name}: {type(exc).__name__}")
             continue
 
-        for ev in expand(parse_events(body), window_start, window_end):
+        for ev in expand(parse_events(body), window_start, window_end, twelve):
             ev["calendar"] = name
             events.append(ev)
 

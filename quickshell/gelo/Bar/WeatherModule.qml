@@ -18,7 +18,7 @@ Row {
 
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        text: Weather.temperature + "°"
+        text: Weather.temperatureText
         font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
         color: Tokens.color.text1
@@ -28,8 +28,8 @@ Row {
     // noise, and this row is glanced at rather than read.
     Text {
         anchors.verticalCenter: parent.verticalCenter
-        visible: Weather.precipitation > 0
-        text: Weather.precipitation + "mm"
+        visible: Weather.hasPrecipitation
+        text: Weather.precipitationText
         font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.caption
         color: Tokens.color.text2

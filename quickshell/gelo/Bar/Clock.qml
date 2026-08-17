@@ -30,7 +30,7 @@ Row {
 
     Text {
         id: time
-        text: Qt.formatDateTime(clock.date, "HH:mm")
+        text: Qt.formatDateTime(clock.date, Tokens.format.timePattern)
         font.family: Tokens.typography.display
         font.pixelSize: Tokens.typography.size.title
         font.weight: Tokens.typography.weight.regular

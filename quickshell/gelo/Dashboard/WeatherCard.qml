@@ -44,7 +44,7 @@ Chrome {
 
             Text {
                 anchors.verticalCenter: parent.verticalCenter
-                text: Weather.temperature + "°"
+                text: Weather.temperatureText
                 font.family: Tokens.typography.display
                 font.pixelSize: Tokens.typography.size.title
                 color: Tokens.color.text1

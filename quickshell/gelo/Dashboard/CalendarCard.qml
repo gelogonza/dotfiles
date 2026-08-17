@@ -197,8 +197,10 @@ Chrome {
                 width: content.width
                 spacing: Tokens.space.sm
 
+                // Wide enough for "12:45 PM"; "15:45" fits inside it. Sizing
+                // to the 24h string would elide the meridiem.
                 Text {
-                    width: 52
+                    width: Tokens.format.clock === "24h" ? 52 : 74
                     text: modelData.time.length > 0 ? modelData.time : "all day"
                     font.family: Tokens.typography.display
                     font.pixelSize: Tokens.typography.size.caption
@@ -206,7 +208,8 @@ Chrome {
                 }
 
                 Text {
-                    width: parent.width - 52 - Tokens.space.sm
+                    width: parent.width - (Tokens.format.clock === "24h" ? 52 : 74)
+                           - Tokens.space.sm
                     text: modelData.summary
                     elide: Text.ElideRight
                     font.family: Tokens.typography.display

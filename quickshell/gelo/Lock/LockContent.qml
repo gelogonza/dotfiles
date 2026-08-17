@@ -94,7 +94,7 @@ Item {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.formatDateTime(clock.date, "HH:mm")
+            text: Qt.formatDateTime(clock.date, Tokens.format.timePattern)
             font.family: Tokens.typography.display
             font.pixelSize: 84
             font.weight: Tokens.typography.weight.light
