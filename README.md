@@ -9,6 +9,10 @@ The visual language is the **PS3 XMB**: cold silver-blue, one glowing accent,
 chrome surfaces, thin geometric type, and motion in a wave field behind the
 interface.
 
+Felt like using AI for this one because my previous rice took genuinely 10x as long without AI. 
+I had an idea of what I wanted and  did not feel like going through each change one by one myself tbh.
+
+
 MIT licensed. Live at
 **[gelogonza.github.io/dotfiles](https://gelogonza.github.io/dotfiles/)**.
 
