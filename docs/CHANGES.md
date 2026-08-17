@@ -2320,3 +2320,73 @@ there as the one sanctioned exception, alongside the accent rule's two. The
 justification is the same shape as the terminal's warm ANSI colours: the general
 rule is right, and this specific case cannot honour it without losing
 information.
+
+
+---
+
+# Every own icon had been rendering near-black
+
+Prompted by the new pause glyph looking off-theme. It was, and so was every other
+icon in `design/icons` — 23 of them, since the palette inverted.
+
+`Icon.qml` tinted with `MultiEffect { colorization: 1.0; colorizationColor }` and
+a comment asserting that this "replaces hue outright while keeping the alpha
+silhouette". It does not. Colourisation scales *toward* the target by the
+source's own **luminance**, and these are symbolic icons — authored black on
+transparent, which is the convention for the genre. Black has zero luminance, so
+there is nothing for it to scale.
+
+Measured, against a requested `#1b4c78`:
+
+| | rendered |
+|---|---|
+| stroked glyphs (power, bluetooth, weather) | `#0d1b29` |
+| solid shapes (the play triangle) | `#000000` |
+| tray icons (white sources) | `#1b4c78` — correct |
+
+Which is why it survived: the one case that worked was the case the tinting was
+written for, and near-black on a light plate reads as "dark ink" rather than as
+broken.
+
+`brightness: 1.0` lifts the source to white before colourisation, after which it
+lands on `#1b4c78` exactly — 152 pixels at the target value, the rest antialiased
+edges.
+
+## Scoped to our own icons, which is the whole subtlety
+
+`brightness` is applied only when the source is in `ownIcons`.
+
+Tray icons are arbitrary third-party artwork whose luminance carries real
+structure. Lifting Spotify's logo to white first flattened it to a featureless
+blue disc — the wave bars inside it gone. Recognisable as nothing. Verified by
+screenshot, reverted to plain colourisation for non-own sources, and confirmed
+the bars came back.
+
+So the old warning that brightness "blows out any source that is already bright"
+was *correct about tray icons* and wrong as a blanket rule. Both halves are now
+true at once, and the comment says which case each applies to.
+
+## A wrong turn worth recording
+
+The first fix was a solid `Rectangle` masked by the icon's alpha —
+`layer.effect: MultiEffect { maskEnabled: true; maskSource: image }`. Exact by
+construction, and it rendered every icon as a **solid filled square**: `image` is
+Quickshell's `IconImage`, not a QtQuick `Image`, and it is not a texture provider,
+so `maskSource` silently supplied no mask at all. A mask that fails open is worse
+than one that fails closed.
+
+Two process notes from the same session:
+
+- An offscreen probe reported all five candidate fixes producing identical
+  output. The probe window was never on screen — the dominant colour in the
+  capture was a window background at 22407 px. Checking the histogram for the
+  expected white backdrop would have caught it immediately. Measure the harness
+  before trusting the measurement.
+- `pkill -f <pattern>` killed this session again (exit 144) because the pattern
+  appeared in the command line doing the killing. That is documented in
+  handoff.md and it still happened. Use `pkill -x`.
+
+Verified after: the left bar plate contains **zero** pixels darker than sum 200 —
+the pause glyph now matches the track title beside it. The right plate's only
+remaining dark pixels are the Spotify tray logo, which is keeping its own
+luminance on purpose.

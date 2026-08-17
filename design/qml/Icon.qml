@@ -79,18 +79,41 @@ Item {
         smooth: true
     }
 
+    //! Whether this source is one of ours, which decides how it gets tinted.
+    readonly property bool ownSource: ownIcons.indexOf(source) >= 0
+
     MultiEffect {
         anchors.fill: image
         source: image
         visible: root.tinted && image.status === Image.Ready
 
-        // Full colourisation replaces hue outright while keeping the alpha
-        // silhouette, which is the whole point here.
-        //
-        // Do NOT add `brightness` to this. Lifting it fixes nothing and blows
-        // out any source that is already bright — tray icons are frequently
-        // white, and at brightness 1.0 they came back as pale washes rather
-        // than the ink colour they were asked for.
+        //! `colorization` alone does NOT recolour a black source. It scales
+        //! toward `colorizationColor` by the source's own luminance, so black
+        //! stays black however hard you colourise it — and every icon in
+        //! design/icons is authored black-on-transparent, because that is the
+        //! symbolic-icon convention. The whole set was rendering near-black
+        //! instead of in the palette ink: measured #0d1b29 against a requested
+        //! #1b4c78, with the solid shapes (the play triangle) coming out at
+        //! literal #000000. It looked plausible on a light plate, which is why
+        //! it survived this long.
+        //!
+        //! `brightness: 1.0` lifts the source to white first, after which
+        //! colourisation lands exactly on the requested colour — measured
+        //! #1b4c78 with no error.
+        //!
+        //! Applied ONLY to our own icons, and that distinction is the point.
+        //! Tray icons are arbitrary third-party artwork whose luminance carries
+        //! real structure — the Spotify logo's wave bars, for instance. Lifting
+        //! those to white first flattens the logo to a featureless disc, which
+        //! is recognisable as nothing. They keep plain colourisation, which
+        //! already lands correctly for the white icons that made tray tinting
+        //! necessary in the first place.
+        //!
+        //! An earlier comment here warned brightness "blows out any source that
+        //! is already bright". That is true of a tray logo and false of a black
+        //! symbolic glyph; the warning was right about the case it was written
+        //! for and wrong as a blanket rule.
+        brightness: root.ownSource ? 1.0 : 0.0
         colorization: 1.0
         colorizationColor: root.color
     }

@@ -74,18 +74,14 @@ Item {
         smooth: true
     }
 
+    readonly property bool ownSource: ownIcons.indexOf(source) >= 0
+
     MultiEffect {
         anchors.fill: image
         source: image
         visible: root.tinted && image.status === Image.Ready
 
-        // Full colourisation replaces hue outright while keeping the alpha
-        // silhouette, which is the whole point here.
-        //
-        // Do NOT add `brightness` to this. Lifting it fixes nothing and blows
-        // out any source that is already bright — tray icons are frequently
-        // white, and at brightness 1.0 they came back as pale washes rather
-        // than the ink colour they were asked for.
+        brightness: root.ownSource ? 1.0 : 0.0
         colorization: 1.0
         colorizationColor: root.color
     }
