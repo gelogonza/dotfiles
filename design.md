@@ -5,6 +5,12 @@ blue field, one glowing blue accent, chrome surfaces, thin geometric type, and
 motion that lives in a wave field *behind* the interface rather than in the
 interface itself.
 
+**One sanctioned exception to that last rule:** the now-playing readout in the
+bar scrolls (`material.marquee`). A track title is the only label in this system
+routinely longer than the space it has, and the alternative — eliding — hides the
+artist permanently rather than for a few seconds. It is a marquee because that is
+the honest fix; it is not licence for anything else in the interface to move.
+
 Everything visual in this desktop is generated from one file. If you are about
 to type a colour, a duration, a font name or a pixel gap anywhere else, that is
 the bug.

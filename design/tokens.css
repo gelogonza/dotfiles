@@ -71,6 +71,8 @@
   --bar-height: 48;
   --bar-radius: 16px;
   --bar-padding: 16;
+  --marquee-width: 190;
+  --marquee-speed: 34;
   --dock-radius: 28px;
   --dock-iconRest: 34;
   --dock-iconHover: 42;

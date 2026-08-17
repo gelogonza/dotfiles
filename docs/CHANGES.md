@@ -2264,3 +2264,59 @@ somewhere to be water. The plate lost ~24px of height with it.
 Radius 22 → 28, and the bar's plates went 8 → 16 (`material.bar.radius`). At 8px
 a free-floating 48px plate reads as a strip that was cut off rather than an
 object.
+
+
+---
+
+# Now playing: a marquee, and a pause icon that was one bar
+
+## The pause icon was two bars that had merged
+
+`media-pause.svg` really did draw two bars — and rendered as a single slab.
+
+    <path d="M5.5 3.6h1.7v8.8H5.5zM8.8 3.6h1.7v8.8H8.8z" fill="#000" stroke-width="1.1"/>
+
+Each bar is 1.7 wide with a 1.6 gap between them, and `stroke-width="1.1"`
+inflates every edge by 0.55 — so each bar renders 2.8 wide and the gap closes to
+0.5, which at 16px is nothing. `stroke-linejoin="round"` then softens what is
+left. The file was correct in structure and wrong in output.
+
+That `fill + stroke-width` pattern is the house style for these icons and is fine
+everywhere else, because everywhere else it thickens a *single* solid shape
+(volume-high's speaker cone). It only fails where two shapes are adjacent.
+
+Redrawn as two `rect`s with `stroke="none"`, 3.2 wide with a 2.4 gap — wider bars
+to keep the ink weight of the stroked version, without anything to merge into.
+
+## The readout scrolls
+
+Text enters at the right edge, travels left, exits, and re-enters from the right.
+Verified over two full cycles by sampling every 2s: the wrap is visible as `[Hypr`
+appearing hard against the right edge, and the cycle repeats without stopping.
+
+Details that mattered:
+
+- **The viewport width is fixed** (`marquee.width`, 190) rather than fitted to
+  the text. A viewport that resized per track would shove the workspace
+  indicator sideways on every song, which is the exact jitter the absolutely
+  centred clock exists to avoid.
+- **`clip: true`**, or the text draws over the workspace numbers and out past
+  the plate's rounded corner.
+- **No `width` and no `elide` on the Text.** Either one clamps it to the
+  viewport, and then there is nothing to scroll. This is the whole trick and it
+  is easy to reintroduce by "tidying up".
+- **Duration is derived from `speed`** (px/second), not fixed. A fixed duration
+  makes every title move at a different speed, which reads as the interface
+  being unsure of itself.
+- **Restart on text change.** `from`/`to` are read when a loop iteration begins,
+  so a new track would otherwise finish the *previous* title's journey at the
+  previous title's length. A new song should visibly start over.
+- No dead gap: at the moment it wraps, the text is already just off the right
+  edge, so it begins entering immediately.
+
+**This breaks a stated rule** — design.md's opening claim is that motion lives in
+the wave field behind the interface, not in the interface. It is now recorded
+there as the one sanctioned exception, alongside the accent rule's two. The
+justification is the same shape as the terminal's warm ANSI colours: the general
+rule is right, and this specific case cannot honour it without losing
+information.

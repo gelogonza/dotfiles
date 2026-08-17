@@ -67,20 +67,38 @@ Row {
         }
     }
 
-    // Fixed ceiling rather than free growth: a long title would otherwise push
-    // the launchers around every time the track changed, which turns a status
-    // readout into a layout jitter.
+    // A marquee, not an ellipsis.
+    //
+    // The width is FIXED rather than fitted to the text. A viewport that resized
+    // per track would shove the workspace indicator sideways on every song, and
+    // the whole reason the clock is absolutely centred is that things in this bar
+    // must not move when their contents change.
+    //
+    // DEVIATION, on purpose: design.md 5 says motion lives in the wave field
+    // behind the interface, not in the interface. A scrolling label breaks that.
+    // It is allowed here because a track title is the one label in this system
+    // that is routinely longer than the space it has, and the alternative —
+    // eliding — hides the artist permanently rather than briefly.
     Item {
+        id: viewport
+
         anchors.verticalCenter: parent.verticalCenter
-        width: Math.min(label.implicitWidth, 220)
+
+        // Clipped, so the text is genuinely cut off at the edges instead of
+        // being drawn over the workspace numbers and the plate's rounded corner.
+        clip: true
+
+        width: Tokens.material.marquee.width
         height: label.implicitHeight
 
         Text {
             id: label
-            width: parent.width
-            elide: Text.ElideRight
             textFormat: Text.PlainText
 
+            // No `width` and no `elide`: the Text takes its implicit width so
+            // the animation has a real length to travel. Setting either one
+            // would clamp it to the viewport and there would be nothing to
+            // scroll.
             text: {
                 if (!root.player)
                     return "";
@@ -93,6 +111,43 @@ Row {
             font.pixelSize: Tokens.typography.size.caption
             font.letterSpacing: Tokens.tracking(Tokens.typography.size.caption)
             color: Tokens.color.text1
+
+            // Parked off the right edge before the animation takes over, so the
+            // first frame after a track change is never a flash of text sitting
+            // at x=0.
+            x: viewport.width
+        }
+
+        // Enters at the right edge, exits past the left, repeat. At the moment
+        // it wraps the text is immediately off the right edge again, so there is
+        // no dead gap where the readout is blank.
+        //
+        // Duration is derived from `speed` (px/second) rather than fixed, so a
+        // long title takes longer instead of scrolling faster.
+        NumberAnimation {
+            id: scroll
+
+            target: label
+            property: "x"
+            from: viewport.width
+            to: -label.width
+            duration: Math.max(Tokens.motion.duration.base,
+                               (viewport.width + label.width)
+                               / Tokens.material.marquee.speed * 1000)
+            loops: Animation.Infinite
+            running: root.active && label.text.length > 0
+        }
+
+        // `from`/`to` are read when a loop begins, so a new track would finish
+        // the previous title's journey at the previous title's length before
+        // picking up the new one. Restarting makes the change immediate — and a
+        // new song should visibly start over rather than continue mid-scroll.
+        Connections {
+            target: label
+            function onTextChanged() {
+                if (scroll.running)
+                    scroll.restart();
+            }
         }
 
         MouseArea {

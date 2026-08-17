@@ -155,6 +155,11 @@ QtObject {
             readonly property int padding: 16
         }
 
+        readonly property QtObject marquee: QtObject {
+            readonly property int width: 190
+            readonly property int speed: 34
+        }
+
         readonly property QtObject dock: QtObject {
             readonly property int radius: 28
             readonly property int iconRest: 34
