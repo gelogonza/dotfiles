@@ -24,8 +24,8 @@ it remains in this tree.
 
 ```
 design/          token source, generators, shared QML/GLSL/SVG  ← edit here
-quickshell/gelo/ the shell — wallpaper, bar, launcher, notifications, power
-                 menu, lock, dashboard
+quickshell/gelo/ the shell — wallpaper, bar, dock, launcher, notifications,
+                 power menu, lock, dashboard
 hypr/            compositor config, plus hypr/scripts/ (lock, screenshot,
                  colour picker, cava launcher)
 sddm/            login theme + installer
@@ -297,14 +297,12 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 ## The bar
 
 ```
-[ workspaces | launchers | now playing ]   [ date  time ]   [ weather | tray | vol  bt  awake  power ]
-                                   [ window title ]
+[ workspaces | now playing ]   [ date  time ]   [ weather | tray | vol  bt  awake  power ]
+                           [ window title ]
 ```
 
 - **Workspaces** — click to switch. The active one is a travelling blob that
   stretches as it moves and fires a ripple into the wallpaper behind it.
-- **Launchers** — Ghostty, VS Code, Chrome, Obsidian, Blender. Edit the `apps`
-  list in `quickshell/gelo/Bar/AppLaunchers.qml`.
 - **Now playing** — whatever MPRIS player is actually playing, with a
   play/pause toggle. Click the title to raise the player. Hidden when nothing
   is loaded.
@@ -317,6 +315,40 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   it is on, and the inhibitor dies with the shell so it cannot get stuck.
 - **Power** — opens a menu: lock, sleep, log out, reboot, shut down. Sleep
   locks on the way down, so the machine never resumes to an open desktop.
+
+---
+
+## The dock
+
+Hidden until you push the pointer into the bottom edge of the screen. Pinned
+apps, magnifying on hover, with a mark under anything that is running.
+
+- **Edit the apps** — the `apps` list in `quickshell/gelo/Dock/Dock.qml`. Each
+  entry is `icon` (a desktop-entry icon name), `exec`, and `match` — the window
+  classes that count as "this is running". `match` is separate because the two
+  disagree constantly: VS Code ships its icon as `vscode` and reports its class
+  as `code`. `hyprctl clients -j | jq -r '.[].class'` lists what your machine
+  actually reports.
+- **Click** focuses the app if it is already open and launches it only if it is
+  not — the indicator tells you which will happen. **Middle-click** always
+  launches a new instance.
+- **The indicator** is a dot, or a short bar for more than one window. It is
+  `text-2`, not the accent: the accent is spent (design.md §3), and it is the
+  same mark the dashboard calendar puts under a day with something on it.
+- **Only `revealStrip` pixels are live.** The dock's surface spans the width of
+  the screen but its *input region* is masked down to a 6px band at the bottom
+  edge while hidden, so everything else along the bottom of the screen still
+  belongs to whatever window is under it. Widen it in `material.dock` if you
+  keep missing.
+- **Sizes, delays and the strip** are all in `material.dock` in `tokens.json`.
+
+```bash
+qs -c gelo ipc call dock toggle      # or open / close / status
+```
+
+> `open`/`close`, not `show`/`hide` — `quickshell ipc show` is the CLI's own
+> subcommand, so `ipc call dock show` prints the target listing and exits 0
+> without ever reaching the handler. It looks exactly like a call that worked.
 
 ### Keybinds
 
@@ -374,6 +406,7 @@ qs -c gelo ipc call launcher windows
 qs -c gelo ipc call power toggle
 qs -c gelo ipc call idle toggle      # or on / off / status
 qs -c gelo ipc call dashboard toggle
+qs -c gelo ipc call dock toggle      # or open / close / status
 ```
 
 ---
@@ -417,6 +450,20 @@ default — so it follows whatever you are listening on. Worth an alias:
 echo "alias cava='~/dotfiles/hypr/scripts/cava-launch.sh'" >> ~/.zshrc
 ```
 
+**Clock format and units** — `format` in `tokens.json`, then regenerate:
+
+```json
+"format": { "clock": "12h", "units": "imperial" }
+```
+
+`clock` is `12h` (3:45 PM) or `24h` (15:45); `units` is `imperial` (°F, inches)
+or `metric` (°C, mm). One token because **four** surfaces show a clock — bar,
+lock screen, SDDM greeter, and the dashboard agenda — and a desktop that reads
+3:45 PM in one and 15:45 in another is the same failure as two shades of the
+same blue. `Tokens.format.timePattern` is the ready-made `Qt.formatDateTime`
+pattern; the agenda gets `clock` as an argument, because `agenda.py`
+deliberately has no path back into the repo.
+
 **Switch the font** — one line in `tokens.json`. Figtree, Inter Display and
 Nimbus Sans are already installed as alternatives.
 
@@ -456,7 +503,9 @@ like an empty week rather than a missing package.
 **Enable weather** — off by default, because it sends a request to a
 third-party server every 15 minutes and, with no location set, that server
 geolocates you by IP. Set `weather.enabled` and preferably an explicit
-`weather.location` (a city name is coarser than your IP).
+`weather.location` (a city name is coarser than your IP). Scale follows
+`format.units`, not a separate setting — wttr's payload carries both °C and °F,
+so it is a field choice rather than a conversion.
 
 ---
 

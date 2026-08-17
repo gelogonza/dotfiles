@@ -116,10 +116,17 @@ Other landmines, all of which have already cost time:
 
 ## State as of this handoff
 
-**Committed and working:** bar (workspaces + launchers + clock/title + weather,
-CPU/MEM/GPU, git, tray, volume/bluetooth/power), command palette with app and
-clipboard modes, notifications, wallpaper shader with a ripple bus, cursor
-theme, terminal, GTK theming, idle daemon, polkit agent, power menu with sleep.
+**Committed and working:** bar (workspaces, clock/title, now playing, weather,
+tray, volume/bluetooth/keep-awake/power), auto-hiding dock with running
+indicators, command palette with app / clipboard / notification / window modes,
+notifications, dashboard (calendar, agenda, weather, CPU/MEM/GPU), wallpaper
+shader with a ripple bus, both lock screens, cursor theme, terminal, GTK
+theming, idle daemon, polkit agent, power menu with sleep.
+
+CPU/MEM/GPU and the git context used to sit in the bar permanently and now live
+in the dashboard; the pinned launchers used to sit in the bar and are now the
+dock. Both moves were the same argument — a thing you never actually look at is
+texture, and the bar is worth more quiet.
 
 **Uncommitted:**
 

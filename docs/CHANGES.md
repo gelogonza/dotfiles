@@ -1933,3 +1933,165 @@ New sections: **Before you start** (what installing this actually replaces, the
 four machine-specific values, back up first, and that the token layer is usable
 on its own), and **Did it work?** — five commands in the order things fail,
 each with what a pass looks like.
+
+
+---
+
+# `format` tokens: 12-hour clock, imperial units
+
+Two settings that were four and two hardcoded literals respectively.
+
+**The clock.** `"HH:mm"` appeared in `Bar/Clock.qml`, `Lock/LockContent.qml`
+and the SDDM greeter's `Main.qml`, and `agenda.py` had its own `%H:%M`. Changing
+the format meant changing four files, and a desktop that says 3:45 PM on the bar
+and 15:45 on the lock screen is the same class of failure as two shades of the
+same blue — so it became a token like every other cross-surface decision.
+
+`Tokens.format.timePattern` resolves to `"h:mm AP"` or `"HH:mm"` and goes
+straight into `Qt.formatDateTime`. `h` rather than `hh`: 3:45 PM, not 03:45 PM.
+
+`agenda.py` gets `clock` as `argv[2]` instead of reading tokens itself. It has
+no path back into the repo on purpose — it is the one script handling bearer
+secrets, and the fewer files it can reach the better. The caller already holds
+the token.
+
+Formatting the 12-hour string by hand rather than with `%-I`: that flag is a
+glibc extension, `%I` pads to two digits, and there is no portable strip-zero
+directive. `strftime("%I:%M %p").lstrip("0")` covers it — and does not eat the
+`1` of `12:45 AM`, which was the case worth checking.
+
+**Units.** wttr's `j1` payload carries `temp_C` *and* `temp_F`, so Fahrenheit is
+a field choice, not a conversion — no rounding error introduced, and no drift if
+wttr changes how it rounds. Precipitation is only published in mm and is
+converted.
+
+That conversion moved the visibility rule. The bar hid the precipitation readout
+on `precipitation > 0`, which under imperial leaves 0.1mm — 0.0039in, rendering
+as `"0.00in"` — passing the test. Gating on the *rendered* value instead
+(`hasPrecipitation`) keeps the rule doing what it was written to do: no
+permanent "no rain" readout in a row that is glanced at rather than read.
+
+**Layout.** `12:45 PM` is wider than `15:45`, so the agenda's time column went
+from a flat 52px to 74 under a 12-hour clock. Sizing to the 24h string would
+have elided the meridiem, which is the one part that matters.
+
+Measured live after restart: bar reads `Mon 17 Aug 10:20 AM` and
+`73°F 0.52in` (13mm → 0.52in ✓); the agenda reads `9:35 AM`, `12:45 PM`,
+`2:00 PM`, `5:30 PM` with no elision. Shell log clean.
+
+
+---
+
+# fastfetch: what I am sitting in, not what the box is
+
+`display`, `cpu` and `gpu` out; `wm`, `shell`, `terminal` in.
+
+The three that left are static facts about a desktop that does not change —
+printing them on every shell start is a screensaver, not information. The three
+that arrived are the things that actually vary between one invocation and the
+next: which compositor, which shell, which terminal emulator. CPU/MEM/GPU are
+live in the dashboard, which is where a number belongs if you want to watch it
+move.
+
+The colour header was also wrong. It documented `text-1`/`text-2`/`chrome-edge`
+and cited values the palette had moved past two changes ago — `chrome-edge` no
+longer exists, and `text-2` went `#5a7fb5` → `#466a9d` in the AA fix. More
+importantly the framing was wrong: fastfetch renders on the **terminal**
+background (`#14293f`, dark), not on chrome (`#f8fbff`, light), so the UI text
+tokens would be dark-on-dark here. The values now come from and cite the
+`terminal` block, and the separator moved to `ansi[8]`, the palette's designated
+dim.
+
+---
+
+# The dock (bar → bottom edge)
+
+The pinned launchers left the bar.
+
+They were five pieces of untinted outside colour — real app logos — sitting
+permanently next to the workspace blob, the one element allowed to carry the
+accent. The bar had to stay quiet around them and they had to stay small (18px)
+to not shout. Moving them out gives both back what they wanted.
+
+**Auto-hiding, bottom, centred.** A dock that is always up is a strip of screen
+you have stopped seeing, which is the same argument that moved CPU/MEM/GPU into
+the dashboard.
+
+## The input mask is the whole feature
+
+A layer surface captures the pointer across its **entire** area regardless of
+what it paints. An unmasked full-width panel at the bottom of the screen eats
+every click along that edge — every taskbar-shaped piece of muscle memory in
+whatever is running maximised.
+
+`PanelWindow.mask` narrows the input region. It is switched between two items
+rather than animated:
+
+| State | Live region |
+|---|---|
+| hidden | `strip` — `revealStrip` (6px) at the very bottom, plate width + one step each side |
+| open | `hitArea` — the full panel height |
+
+`hitArea` spans from the top of the plate **down to the screen edge**, not just
+the plate. The plate floats above an 8px bottom margin, so a mask covering only
+the plate excludes the exact strip the pointer is standing on at the instant of
+reveal: hover drops, dock hides, mask returns to the strip, hover fires again.
+It oscillates.
+
+Verified live by driving the cursor and screenshotting:
+
+| Pointer | Result |
+|---|---|
+| y=1400 (inside the panel, above the strip) | stays hidden, cursor renders as the window's own — input passes through |
+| y=1439 (in the strip) | reveals |
+| y=1380 (on the plate, after revealing) | stays open, icon under the pointer magnifies |
+| moved away | hides after `hideDelay` |
+
+## Click means "show me it"
+
+Left-click focuses the app if it is already open and launches only if it is not.
+Getting a second copy of a running app is exactly what an indicator exists to
+prevent — you can see it is open, so the click can only mean one thing.
+Middle-click still forces a new instance.
+
+`Windows.matching()` does the lookup by **class prefix, case-insensitively**,
+because the icon name and the window class disagree constantly: VS Code ships
+its icon as `vscode` and reports its class as `code`. Prefix rather than
+equality covers Chrome's per-channel classes without enumerating them — an app
+silently reading as "not running" because of a suffix is a worse failure than
+the occasional over-match.
+
+## The indicator is not the accent
+
+A dot in `text-2`, widening to a short bar for more than one window. The accent
+is spent on three things system-wide (design.md §3) and "an app is open" is not
+one of them; this is the same mark the dashboard calendar puts under a day that
+has something on it, for the same reason. A row of N dots was the other option
+and it stops being countable at three, then becomes texture.
+
+## Two things that bit
+
+**`Behavior` on a `readonly property`** is a hard error, not a no-op:
+`Invalid property assignment: "iconSize" is a read-only property`. The animation
+needs somewhere to write intermediates.
+
+**`ipc call dock show` never reached the handler.** `show` is the quickshell
+CLI's own subcommand (`quickshell ipc show` lists targets), so the call printed
+the target listing and **exited 0** — indistinguishable from success. Renamed to
+`open`/`close`. Worth knowing generally: a zero exit from `ipc call` does not
+mean the function ran.
+
+**The IpcHandler could not live in the dock.** The dock is per-screen like the
+bar, and `IpcHandler` registration is process-wide — the second instance is
+dropped with a warning and `ipc call dock …` silently only ever reaches one
+monitor. It moved to `Services/DockState.qml`, a singleton holding a `forced`
+flag that every dock ORs with its own hover state. Same constraint that makes
+the launcher single-instance.
+
+## Also fixed in passing
+
+Restarting the shell surfaced a pre-existing warning: `Dashboard.qml:100`,
+*"Cannot specify anchors for items inside Row. Row will not function."* A
+click-swallowing `MouseArea` was breaking the dashboard panel's layout — the
+same trap `Clock.qml` already documented. Replaced with a `TapHandler`, which is
+not an item and takes no slot in the positioner.
