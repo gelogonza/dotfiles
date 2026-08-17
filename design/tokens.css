@@ -68,6 +68,7 @@
   --blob-squashX: 1.08;
   --blob-squashY: 0.92;
   --blob-morphDuration: 400;
+  --dock-radius: 22px;
   --dock-iconRest: 34;
   --dock-iconHover: 42;
   --dock-gap: 14;

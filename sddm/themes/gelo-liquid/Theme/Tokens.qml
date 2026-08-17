@@ -150,6 +150,7 @@ QtObject {
         }
 
         readonly property QtObject dock: QtObject {
+            readonly property int radius: 22
             readonly property int iconRest: 34
             readonly property int iconHover: 42
             readonly property int gap: 14

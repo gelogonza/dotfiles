@@ -326,9 +326,22 @@ apps, magnifying on hover, with a mark under anything that is running.
 - **Edit the apps** — the `apps` list in `quickshell/gelo/Dock/Dock.qml`. Each
   entry is `icon` (a desktop-entry icon name), `exec`, and `match` — the window
   classes that count as "this is running". `match` is separate because the two
-  disagree constantly: VS Code ships its icon as `vscode` and reports its class
-  as `code`. `hyprctl clients -j | jq -r '.[].class'` lists what your machine
-  actually reports.
+  disagree constantly: Obsidian ships its icon as `obsidian` and reports its
+  class as `md.Obsidian`; VS Code ships `vscode` and reports `code`; Spotify
+  ships `spotify-client` and reports `spotify`.
+
+  Matching is case-insensitive against the whole class, its **last dot-segment**
+  (so `obsidian` finds `md.Obsidian`), or a hyphenated suffix (so
+  `google-chrome` finds `google-chrome-beta`). It is deliberately *not* a
+  substring test — `obs` is a substring of `obsidian`, and OBS Studio and
+  Obsidian would light each other's indicators.
+
+  ```bash
+  hyprctl clients -j | jq -r '.[].class' | sort -u
+  ```
+
+  That is the only source that is true for your machine; `StartupWMClass` in
+  the `.desktop` file is a good second guess.
 - **Click** focuses the app if it is already open and launches it only if it is
   not — the indicator tells you which will happen. **Middle-click** always
   launches a new instance.

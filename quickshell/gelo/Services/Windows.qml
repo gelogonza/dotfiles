@@ -60,18 +60,30 @@ Singleton {
 
     readonly property bool ready: entries.length > 0
 
-    // Open windows whose class matches any of `prefixes`. Used by the dock to
+    // Open windows whose class matches any of `names`. Used by the dock to
     // decide whether an entry is running, and which window a click should go
     // to.
     //
-    // Prefix rather than equality, and case-insensitively: Chrome reports
-    // `google-chrome` for the default profile and `google-chrome-beta` or
-    // `Google-chrome` depending on channel and how it was launched, and an app
-    // silently reading as "not running" because of a suffix is worse than the
-    // occasional over-match. `entries` is already sorted with the focused
-    // window last, so [0] is the one you were not just looking at.
-    function matching(prefixes) {
-        if (!prefixes || prefixes.length === 0)
+    // Three rules, all case-insensitive, in order of how specific they are:
+    //
+    //   1. the whole class          `obs`           matches `obs`
+    //   2. the last dot-segment     `obsidian`      matches `md.Obsidian`
+    //   3. a hyphenated suffix      `google-chrome` matches `google-chrome-beta`
+    //
+    // Rule 2 is the one that matters. Reverse-DNS classes are everywhere —
+    // `md.Obsidian`, `com.anthropic.Claude`, `org.gnome.Nautilus`,
+    // `com.mitchellh.ghostty` — and a plain prefix test silently never fires
+    // for any of them. That is how Obsidian sat in the dock with no running
+    // indicator: nothing errors, the app just reads as closed forever.
+    //
+    // Deliberately NOT a substring test, which is the obvious fix and the wrong
+    // one: `obs` is a substring of `obsidian`, so OBS Studio and Obsidian would
+    // light each other's indicators and steal each other's clicks.
+    //
+    // `entries` is already sorted with the focused window last, so [0] is the
+    // one you were not just looking at.
+    function matching(names) {
+        if (!names || names.length === 0)
             return [];
 
         const out = [];
@@ -79,8 +91,12 @@ Singleton {
             const cls = (entries[i].appClass || "").toLowerCase();
             if (cls.length === 0)
                 continue;
-            for (let p = 0; p < prefixes.length; p++) {
-                if (cls.startsWith(String(prefixes[p]).toLowerCase())) {
+
+            const tail = cls.slice(cls.lastIndexOf(".") + 1);
+
+            for (let n = 0; n < names.length; n++) {
+                const m = String(names[n]).toLowerCase();
+                if (cls === m || tail === m || cls.startsWith(m + "-")) {
                     out.push(entries[i]);
                     break;
                 }

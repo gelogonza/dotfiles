@@ -2095,3 +2095,50 @@ Restarting the shell surfaced a pre-existing warning: `Dashboard.qml:100`,
 click-swallowing `MouseArea` was breaking the dashboard panel's layout — the
 same trap `Clock.qml` already documented. Replaced with a `TapHandler`, which is
 not an item and takes no slot in the positioner.
+
+
+---
+
+# Dock: the indicator that never fired
+
+Obsidian sat in the dock with no running indicator no matter how many windows it
+had open. Nothing errored; the app simply read as closed forever.
+
+`Windows.matching()` compared by lowercase **prefix**, and Obsidian reports its
+class as `md.Obsidian` while its icon is `obsidian`. `"md.obsidian"` does not
+start with `"obsidian"`, so the test could never pass. The same hole covered
+every reverse-DNS class in the system — `com.anthropic.Claude`,
+`org.gnome.Nautilus`, `com.mitchellh.ghostty`.
+
+The obvious fix is a substring test, and it is the wrong one. `obs` is a
+substring of `obsidian`, so the moment OBS Studio joined the dock the two would
+light each other's indicators and steal each other's clicks.
+
+Three ordered rules instead, all case-insensitive:
+
+| Rule | Example |
+|---|---|
+| the whole class | `obs` matches `obs` |
+| the last dot-segment | `obsidian` matches `md.Obsidian` |
+| a hyphenated suffix | `google-chrome` matches `google-chrome-beta` |
+
+Checked every real class on this machine — observed via `hyprctl clients` plus
+the `StartupWMClass` of each `.desktop` file — against all nine dock entries:
+each resolves to exactly one owner, no collisions, and the two unclaimed
+classes (`localsend`, and OBS's alternate `com.obsproject.Studio`, since added
+explicitly) are correctly unclaimed rather than mis-assigned.
+
+Confirmed live: Claude is `com.anthropic.Claude` and now shows its dot, which is
+the same code path Obsidian takes.
+
+**Four apps added** — Files, Claude, Spotify, OBS — bringing the dock to nine,
+ordered by what the desk is for: shell, editor, browser, files, notes,
+assistant, music, capture, 3D. Icon names came from the desktop entries
+(`spotify-client`, not `spotify`; `claude-desktop`, not `claude`) and were
+checked against the icon theme before being committed rather than after.
+
+**Rounder plate.** `material.dock.radius` (22) instead of the shared
+`material.chrome.radius` (8). Every other surface in the system is anchored to a
+screen edge, where 8px reads as a machined corner; the dock floats free with
+nothing touching it, and at that size the same radius reads as a rectangle that
+forgot to commit.

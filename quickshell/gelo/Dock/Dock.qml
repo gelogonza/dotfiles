@@ -64,16 +64,30 @@ PanelWindow {
     //
     //   icon   desktop-entry icon name, resolved by Components/Icon
     //   exec   what a click runs when nothing is open
-    //   match  window-class prefixes that count as "this app is running"
+    //   match  window classes that count as "this app is running"
     //
-    // `match` exists because the icon name and the window class disagree more
-    // often than not — VS Code ships its icon as `vscode` and reports its class
-    // as `code`.
+    // `match` is separate from `icon` because the two disagree constantly:
+    // Obsidian ships its icon as `obsidian` and reports its class as
+    // `md.Obsidian`; VS Code ships `vscode` and reports `code`; Spotify ships
+    // `spotify-client` and reports `spotify`. See Windows.matching() for how
+    // these are compared — and note that `obs` and `obsidian` are why it is not
+    // a substring test.
+    //
+    // Values here were read off the desktop entries (`StartupWMClass`) and
+    // confirmed against `hyprctl clients -j | jq -r '.[].class'`, which is the
+    // only source that is actually true for your machine.
+    //
+    // Ordered by what the desk is for: shell, editor, browser, files, notes,
+    // assistant, music, capture, 3D.
     readonly property var apps: [
-        { icon: "com.mitchellh.ghostty", exec: "ghostty",              match: ["com.mitchellh.ghostty"] },
-        { icon: "vscode",                exec: "code",                 match: ["code", "visual-studio-code"] },
+        { icon: "com.mitchellh.ghostty", exec: "ghostty",              match: ["ghostty"] },
+        { icon: "vscode",                exec: "code",                 match: ["code"] },
         { icon: "google-chrome",         exec: "google-chrome-stable", match: ["google-chrome", "chromium"] },
+        { icon: "org.gnome.Nautilus",    exec: "nautilus --new-window", match: ["nautilus"] },
         { icon: "obsidian",              exec: "obsidian",             match: ["obsidian"] },
+        { icon: "claude-desktop",        exec: "claude-desktop",       match: ["claude"] },
+        { icon: "spotify-client",        exec: "spotify",              match: ["spotify"] },
+        { icon: "com.obsproject.Studio", exec: "obs",                  match: ["obs", "com.obsproject.Studio"] },
         { icon: "blender",               exec: "blender",              match: ["blender"] }
     ]
 
@@ -145,6 +159,13 @@ PanelWindow {
         // over a dark editor.
         opaque: true
         glowEnabled: false
+
+        // Rounder than the rest of the chrome. Everything else in the system
+        // is a strip or a panel anchored to an edge, where the 8px default
+        // reads as a machined corner; the dock is a free-floating object with
+        // nothing touching it, and at that size the same radius reads as a
+        // rectangle that forgot to commit.
+        cornerRadius: dock.d.radius
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
