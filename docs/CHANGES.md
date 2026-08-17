@@ -2433,3 +2433,62 @@ plus firefox/vlc/mpv: browsers out, Spotify, VLC and mpv through.
 The trade is stated rather than hidden: YouTube Music in a tab is also excluded.
 That is the right default for a panel whose job is "what am I listening to" on a
 desk with a dedicated music app, and it is one token to undo.
+
+
+---
+
+# Mini player
+
+Clicking the now-playing title opens a panel under the left bar plate: album art,
+title / artist / album, a seekable progress track, and previous · play/pause ·
+next · shuffle. The bar readout is untouched — a glyph and a scrolling title —
+because the bar is glanceable and transport controls are something you go to
+deliberately.
+
+Three new icons (`media-next`, `media-previous`, `media-shuffle`), authored with
+`stroke="none"` on the filled shapes. That is the direct lesson from the pause
+glyph: an inflating stroke on two adjacent shapes closes the gap between them.
+
+Shuffle shows its *state* rather than only reacting to being pressed — measured
+`text-1` (#1b4c78) while the other three sat at `text-2` (#466a9d), against
+`Shuffle = true` on the bus.
+
+## Player selection moved to a service
+
+`Services/Media.qml` now owns the selection and the browser filter. It was
+written inline in `MediaModule`, and the panel needed the same answer — a panel
+whose transport controls drive a different player from the title above them is
+worse than no panel. One copy, two readers.
+
+## Two bugs, both of which looked like working code
+
+**`position` and `length` are SECONDS, not microseconds.** The MPRIS wire format
+is microseconds — `busctl` reports `Position=69776000` and
+`mpris:length=413346000` for a 6:53 track — but Quickshell converts on the way
+in. Dividing by a million produced a confident `0:00` for *both* readouts while
+the progress bar filled correctly, because the bar only ever uses the ratio. Two
+of the three consumers of the same number agreed with each other and were wrong.
+Fixed and verified against `playerctl`: 1:58 → 2:02 over four seconds, length
+6:53.
+
+**The panel was 64px adrift.** `y` was set to `space.sm + bar.height + space.sm`,
+copying the power menu. But an overlay surface that respects the bar's exclusive
+zone has *already* been placed below the bar — measured origin y=56 — so adding
+the bar height again floated the panel in the middle of nothing. `y` is now one
+gap, which also survives a change to the bar height.
+
+Worth noting the same double-offset exists in `PowerMenu` and `Dashboard`, which
+sit 64px and 52px below the bar rather than 8px. Left alone: nobody has
+complained and it may well be the intended spacing there.
+
+## The queue
+
+Not implemented, because it cannot be. MPRIS exposes a queue only through the
+optional `org.mpris.MediaPlayer2.TrackList` interface; Spotify reports
+`HasTrackList = false` and does not implement it, and Quickshell's Mpris module
+ships no TrackList binding to read it with even where a player does. Spotify's
+real queue is Web-API-only and needs an OAuth app registration, token refresh and
+a network round-trip.
+
+The panel states this in place of the queue. "No queue here" and "the queue is
+empty" render identically as an empty box, and only one of them is true.

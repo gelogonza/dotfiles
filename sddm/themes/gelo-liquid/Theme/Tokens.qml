@@ -160,6 +160,14 @@ QtObject {
             readonly property int speed: 34
         }
 
+        readonly property QtObject miniPlayer: QtObject {
+            readonly property int width: 320
+            readonly property int artSize: 64
+            readonly property int trackHeight: 3
+            readonly property int controlSize: 20
+            readonly property int seekStep: 5
+        }
+
         readonly property QtObject dock: QtObject {
             readonly property int radius: 28
             readonly property int iconRest: 34

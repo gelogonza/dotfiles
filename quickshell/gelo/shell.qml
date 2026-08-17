@@ -9,6 +9,7 @@ import Quickshell
 import "root:/Bar"
 import "root:/Launcher"
 import "root:/Lock"
+import "root:/MiniPlayer"
 import "root:/Notifications"
 import "root:/Dashboard"
 import "root:/Dock"
@@ -49,6 +50,9 @@ ShellRoot {
 
     Dashboard {}
     PowerMenu {}
+
+    // Transport for whatever is playing, under the bar's left plate.
+    MiniPlayer {}
 
     // ext-session-lock client. See docs/lock-screen.md before relying on it.
     Lock {}

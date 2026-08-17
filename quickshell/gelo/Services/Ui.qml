@@ -12,4 +12,5 @@ import QtQuick
 Singleton {
     property bool powerMenuOpen: false
     property bool dashboardOpen: false
+    property bool miniPlayerOpen: false
 }

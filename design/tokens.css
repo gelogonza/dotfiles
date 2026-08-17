@@ -73,6 +73,11 @@
   --bar-padding: 16;
   --marquee-width: 190;
   --marquee-speed: 34;
+  --miniPlayer-width: 320;
+  --miniPlayer-artSize: 64;
+  --miniPlayer-trackHeight: 3;
+  --miniPlayer-controlSize: 20;
+  --miniPlayer-seekStep: 5;
   --dock-radius: 28px;
   --dock-iconRest: 34;
   --dock-iconHover: 42;

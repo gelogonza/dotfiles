@@ -320,8 +320,8 @@ Panel height, corner radius and padding are `material.bar` in `tokens.json`.
 - **Workspaces** — click to switch. The active one is a travelling blob that
   stretches as it moves and fires a ripple into the wallpaper behind it.
 - **Now playing** — the only thing that ever appears in the left plate besides
-  the workspaces. Scrolling title, play/pause toggle, click to raise the player,
-  hidden when nothing is loaded.
+  the workspaces. Scrolling title, play/pause toggle, hidden when nothing is
+  loaded. **Click the title for the mini player.**
 
   **Browsers are filtered out** (`ignore` in `Bar/MediaModule.qml`). A browser
   registers an MPRIS player for any page with media on it and reports the *page
@@ -391,6 +391,7 @@ apps, magnifying on hover, with a mark under anything that is running.
 
 ```bash
 qs -c gelo ipc call dock toggle      # or open / close / status
+qs -c gelo ipc call player toggle    # or open / close
 ```
 
 > `open`/`close`, not `show`/`hide` — `quickshell ipc show` is the CLI's own
@@ -454,7 +455,42 @@ qs -c gelo ipc call power toggle
 qs -c gelo ipc call idle toggle      # or on / off / status
 qs -c gelo ipc call dashboard toggle
 qs -c gelo ipc call dock toggle      # or open / close / status
+qs -c gelo ipc call player toggle    # or open / close
 ```
+
+---
+
+## The mini player
+
+Click the now-playing title in the bar. A panel drops out from under the left
+plate with album art, title / artist / album, a seekable progress track, and
+**previous · play/pause · next · shuffle**. Escape or a click outside closes it;
+it closes itself if the music goes away.
+
+The bar readout is unchanged — a glyph and a scrolling title. Transport controls
+are something you go to deliberately, so they are not in the glanceable strip.
+
+Shuffle shows its *state*: full ink when on, quiet when off. The progress track
+is `text-1`, not the accent — the accent is spent (design.md §3) and a progress
+bar is not one of its three places.
+
+> **There is no queue, and that is not an oversight.** MPRIS exposes a queue only
+> through the optional `org.mpris.MediaPlayer2.TrackList` interface. Spotify
+> reports `HasTrackList = false` and does not implement it — check yours with:
+>
+> ```bash
+> busctl --user introspect org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2
+> ```
+>
+> Quickshell's Mpris module has no TrackList binding either, so there is nothing
+> to read even where a player does implement it. Spotify's real queue is
+> Web-API-only and needs an OAuth app registration. The panel says so instead of
+> showing an empty box, because "no queue here" and "the queue is empty" look
+> identical and only one of them is true.
+
+Sizes are `material.miniPlayer` in `tokens.json`. Player selection — including
+the browser filter — lives once in `Services/Media.qml`, so the bar and the panel
+can never show different players.
 
 ---
 
