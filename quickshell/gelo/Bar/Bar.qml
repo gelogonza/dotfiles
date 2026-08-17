@@ -1,7 +1,7 @@
 // The bar — three separate panels, not one strip.
 //
 //   left    workspaces, then whatever is playing
-//   centre  clock and date, with the active window title beneath
+//   centre  clock and date
 //   right   weather, tray, volume/bluetooth/keep-awake/power
 //
 // One full-width plate with three clusters inside it was the old build, and it
@@ -137,29 +137,18 @@ PanelWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        width: Math.min(
-            Math.max(clock.implicitWidth, title.implicitWidth) + bar.b.padding * 2,
-            bar.width * 0.42)
+        // Sized to the clock alone. The active window title used to sit beneath
+        // it, which meant the plate's width was driven by whatever browser tab
+        // happened to be focused — and needed a cap and an elide to stop it
+        // reflowing on every tab change. With the title gone the plate is a
+        // fixed-content object again: the clock only changes width when the hour
+        // rolls over from one digit to two.
+        width: clock.implicitWidth + bar.b.padding * 2
         height: parent.height
 
-        Column {
+        Clock {
+            id: clock
             anchors.centerIn: parent
-            spacing: 0
-
-            Clock {
-                id: clock
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            WindowTitle {
-                id: title
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                // Bounded by the plate rather than by its own content, so a long
-                // browser-tab title elides instead of widening the plate and
-                // pushing its own edges out from under the clock.
-                width: Math.min(implicitWidth, centrePlate.width - bar.b.padding * 2)
-            }
         }
     }
 

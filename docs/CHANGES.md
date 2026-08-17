@@ -2390,3 +2390,46 @@ Verified after: the left bar plate contains **zero** pixels darker than sum 200 
 the pause glyph now matches the track title beside it. The right plate's only
 remaining dark pixels are the Spotify tray logo, which is keeping its own
 luminance on purpose.
+
+
+---
+
+# The window title, twice
+
+Removed from the bar — and then removed again, from where it had been sneaking in
+through a side door.
+
+## The centre plate
+
+`WindowTitle` sat under the clock. Deleted, along with the component. Two things
+improve: the plate is a fixed-content object again (it needed a width cap *and*
+an elide purely to stop it reflowing on every tab change), and the centre stops
+restating something you already know — the window you are looking at is the one
+thing on screen that needs no label.
+
+Verified: the centre plate's ink is a single 12-row band, and the clock's
+midpoint measures x=1279 against a screen centre of 1280.
+
+## The left plate was showing it too
+
+Less obvious, and the actual point of the request. A browser registers an MPRIS
+player for **any** page with media on it and reports the **page title** as the
+track. So the now-playing marquee had been scrolling
+
+    [Hyprland] Some fun CSS tricks to make the status bar and applauncher
+    "sparkle" ;) : r/unixporn
+
+— a Reddit tab, presented as a song, in the panel that exists for music. The
+window title was removed from the centre and was still arriving on the left.
+
+Confirmed on the live bus: two MPRIS players, `chromium.instance4576` (Stopped,
+no title) and `spotify` (Playing, *Poltergeist* / Deftones).
+
+`MediaModule` now filters by an `ignore` list matched as a substring of
+`desktopEntry + identity + dbusName` — which of the three is populated varies by
+player. `chrom` covers Chrome and Chromium. Checked against the real bus names
+plus firefox/vlc/mpv: browsers out, Spotify, VLC and mpv through.
+
+The trade is stated rather than hidden: YouTube Music in a tab is also excluded.
+That is the right default for a panel whose job is "what am I listening to" on a
+desk with a dedicated music app, and it is one token to undo.

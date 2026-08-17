@@ -19,14 +19,48 @@ Row {
 
     spacing: Tokens.space.sm
 
+    // MPRIS players that are not music, and must never appear here.
+    //
+    // A browser registers an MPRIS player for *any* page with media on it, and
+    // reports the PAGE TITLE as the track. That is how this readout ended up
+    // scrolling "[Hyprland] Some fun CSS tricks ... : r/unixporn" — a Reddit tab,
+    // presented as if it were a song. It is the same information the window
+    // title used to show, arriving through a different door, and this panel is
+    // for music.
+    //
+    // Matched as a substring of desktopEntry + identity + dbusName, lowercased,
+    // because which of the three is populated varies by player. `chrom` covers
+    // Chrome and Chromium; verified against the live bus, where Chrome appears
+    // as `chromium.instance4576` and Spotify as plain `spotify`.
+    //
+    // The trade is explicit: YouTube Music in a tab will not show up either.
+    // Delete the token if you want it back.
+    readonly property var ignore: [
+        "chrom", "firefox", "librewolf", "brave", "edge", "epiphany"
+    ]
+
+    function isMusic(p) {
+        if (!p)
+            return false;
+        const hay = ((p.desktopEntry || "") + " " + (p.identity || "")
+                     + " " + (p.dbusName || "")).toLowerCase();
+        for (let i = 0; i < ignore.length; i++) {
+            if (hay.indexOf(ignore[i]) >= 0)
+                return false;
+        }
+        return true;
+    }
+
     // Whichever player is actually playing wins; otherwise the first one that
-    // has a track. Picking `players[0]` unconditionally means a paused browser
-    // tab can outrank the thing you are listening to.
+    // has a track. Picking `players[0]` unconditionally means a paused player
+    // can outrank the thing you are listening to.
     readonly property var player: {
         const list = Mpris.players ? Mpris.players.values : [];
         let fallback = null;
         for (const p of list) {
             if (!p || !p.trackTitle || p.trackTitle.length === 0)
+                continue;
+            if (!root.isMusic(p))
                 continue;
             if (p.isPlaying)
                 return p;

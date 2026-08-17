@@ -301,9 +301,12 @@ Three separate plates with the wallpaper between them, not one strip:
 ```
  ╭───────────────────────────╮      ╭──────────────╮      ╭──────────────────────────────────╮
  │ workspaces │ now playing  │      │  date  time  │      │ weather │ tray │ vol bt awake pwr │
- ╰───────────────────────────╯      │ window title │      ╰──────────────────────────────────╯
-                                    ╰──────────────╯
+ ╰───────────────────────────╯      ╰──────────────╯      ╰──────────────────────────────────╯
 ```
+
+There is no active-window title. It was under the clock and it is gone: the
+window you are looking at is the one thing on screen you already know about, and
+it made the centre plate reflow on every browser tab change.
 
 It is still **one** layer surface, and has to be: Hyprland only honours a
 surface's exclusive zone if that surface *spans* its anchored edge, so three
@@ -316,9 +319,15 @@ Panel height, corner radius and padding are `material.bar` in `tokens.json`.
 
 - **Workspaces** — click to switch. The active one is a travelling blob that
   stretches as it moves and fires a ripple into the wallpaper behind it.
-- **Now playing** — whatever MPRIS player is actually playing, with a
-  play/pause toggle. Click the title to raise the player. Hidden when nothing
-  is loaded.
+- **Now playing** — the only thing that ever appears in the left plate besides
+  the workspaces. Scrolling title, play/pause toggle, click to raise the player,
+  hidden when nothing is loaded.
+
+  **Browsers are filtered out** (`ignore` in `Bar/MediaModule.qml`). A browser
+  registers an MPRIS player for any page with media on it and reports the *page
+  title* as the track — this readout was scrolling Reddit tab titles as if they
+  were songs. The trade is explicit: YouTube Music in a tab will not show up
+  either. Drop the token if you want it back.
 - **Volume** — click to open `pavucontrol`, drag the track to set the level,
   scroll to nudge it, right-click to mute.
 - **Bluetooth** — click to open `blueman-manager`, right-click to disconnect
