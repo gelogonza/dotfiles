@@ -118,10 +118,13 @@ PanelWindow {
 
         // Swallow clicks inside the panel so they do not reach the dismiss
         // layer underneath.
-        MouseArea {
-            anchors.fill: parent
-            z: -1
-            onClicked: {}
+        //
+        // A TapHandler, not a MouseArea: `anchors.fill` on a child of a Row
+        // logs "Cannot specify ... anchors for items inside Row. Row will not
+        // function" and the cards stop being laid out — same trap as Clock.qml.
+        // Pointer handlers are not items and take no slot in the positioner.
+        TapHandler {
+            onTapped: {}
         }
 
         CalendarCard {}
