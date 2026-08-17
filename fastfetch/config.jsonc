@@ -3,13 +3,18 @@
 // Colours are the palette from design/tokens.json, written by hand rather than
 // generated: fastfetch has no include mechanism, so a generated fragment would
 // have nowhere to be included from. If you change the palette, change these
-// four values too.
+// values too.
 //
-//   accent      #3478c4  ->  38;2;52;120;196
-//   accent-dim  #2e68a8  ->  38;2;46;104;168
-//   chrome-edge #8cc6f7  ->  38;2;140;198;247
-//   text-1      #dfe9f4  ->  38;2;223;233;244   (terminal foreground)
-//   text-2      #5a7fb5  ->  38;2;90;127;181
+// These come from the **terminal** block, not the UI `color` block. fastfetch
+// renders on the terminal background (#14293f, dark) rather than on chrome
+// (#f8fbff, light), so the UI's text tokens would be dark-on-dark here. That
+// distinction is easy to lose — an earlier version of this header claimed
+// these were text-1/text-2 and cited values the palette had already moved past.
+//
+//   accent       #3478c4  ->  38;2;52;120;196
+//   accent-dim   #2e68a8  ->  38;2;46;104;168
+//   foreground   #dfe9f4  ->  38;2;223;233;244   terminal.foreground
+//   ansi[8]      #4d6b8f  ->  38;2;77;107;143    terminal.ansi[8], the dim one
 //
 // The previous scheme was warm orange (252,148,56), which is the one hue family
 // this system does not contain.
@@ -33,21 +38,27 @@
       // Keys carry the accent; separators sit back so the column reads as one
       // block rather than as a grid.
       "keys": "38;2;52;120;196",
-      "separator": "38;2;90;127;181",
+      "separator": "38;2;77;107;143",
       "output": "38;2;223;233;244"
     },
     "separator": "  "
   },
 
+  // Two groups: what the machine *is*, then what I am *sitting in*.
+  //
+  // Hardware readouts (display, cpu, gpu) came out. They are static facts about
+  // a desktop that does not change, and the dashboard already shows CPU/MEM/GPU
+  // live — a number is worth printing here only if it tells you something the
+  // last run did not.
   "modules": [
     "os",
     "host",
     "kernel",
     "uptime",
     "packages",
-    "display",
-    "cpu",
-    "gpu",
+    "wm",
+    "shell",
+    "terminal",
     "memory",
     "disk",
     "battery",
