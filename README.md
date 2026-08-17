@@ -296,10 +296,23 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
 
 ## The bar
 
+Three separate plates with the wallpaper between them, not one strip:
+
 ```
-[ workspaces | now playing ]   [ date  time ]   [ weather | tray | vol  bt  awake  power ]
-                           [ window title ]
+ ╭───────────────────────────╮      ╭──────────────╮      ╭──────────────────────────────────╮
+ │ workspaces │ now playing  │      │  date  time  │      │ weather │ tray │ vol bt awake pwr │
+ ╰───────────────────────────╯      │ window title │      ╰──────────────────────────────────╯
+                                    ╰──────────────╯
 ```
+
+It is still **one** layer surface, and has to be: Hyprland only honours a
+surface's exclusive zone if that surface *spans* its anchored edge, so three
+side-by-side surfaces cannot reserve space and every window ends up under the
+bar. The three plates are drawn inside one spanning surface whose **input
+region** is masked down to the plates, so the gaps between them are
+click-through — useful when a fullscreen window is underneath.
+
+Panel height, corner radius and padding are `material.bar` in `tokens.json`.
 
 - **Workspaces** — click to switch. The active one is a travelling blob that
   stretches as it moves and fires a ripple into the wallpaper behind it.
@@ -315,6 +328,13 @@ at the bottom of `hyprland.conf`. Delete that line to revert all of them at once
   it is on, and the inhibitor dies with the shell so it cannot get stuck.
 - **Power** — opens a menu: lock, sleep, log out, reboot, shut down. Sleep
   locks on the way down, so the machine never resumes to an open desktop.
+- **Tray** — hidden items are listed in `ignore` in `Bar/TrayRow.qml`, matched
+  as a substring of the item's `id` and `title`. Claude and NordVPN are filtered
+  out by default: neither has anything to *report*, and a tray icon is a claim
+  on permanent screen space. Ids are not stable — Claude registers as
+  `Claude_status_icon_1` and that counter increments on restart — which is why
+  it matches on substring rather than equality, and why `title` alone is not
+  enough (Claude's is empty).
 
 ---
 
@@ -345,6 +365,11 @@ apps, magnifying on hover, with a mark under anything that is running.
 - **Click** focuses the app if it is already open and launches it only if it is
   not — the indicator tells you which will happen. **Middle-click** always
   launches a new instance.
+- **No reflections here**, unlike the bar. `Reflection` draws its mirror below
+  its own bounds, which meant reserving a third of the plate as empty space for
+  it to land in — and it pushed the running indicator far enough from its icon
+  to read as belonging to the plate. The water effect needs somewhere to be
+  water.
 - **The indicator** is a dot, or a short bar for more than one window. It is
   `text-2`, not the accent: the accent is spent (design.md §3), and it is the
   same mark the dashboard calendar puts under a day with something on it.

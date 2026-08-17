@@ -215,19 +215,16 @@ PanelWindow {
                     // shuffle sideways when one icon grows. Magnification
                     // happens inside a fixed box.
                     //
-                    // The extra height is where the reflection lands. Reflection
-                    // draws its mirror *below* its own bounds, so without room
-                    // reserved here it would spill past the plate.
-                    //
-                    // Two thirds of the mirror's nominal height, not all of it:
-                    // the gradient mask has taken it to near-zero well before
-                    // the end, and reserving the full 55% pushed the running
-                    // indicator so far from its icon that it read as belonging
-                    // to the plate instead.
+                    // No Reflection here, unlike the bar and the workspace
+                    // numbers. Reflection draws its mirror *below* its own
+                    // bounds, so it needed a third of the plate reserved as
+                    // empty space for the mirror to land in — and it pushed the
+                    // running indicator far enough from its icon to read as
+                    // belonging to the plate. The plate is a small, dense object
+                    // rather than a wide surface with room to spare; the water
+                    // effect needs somewhere to be water.
                     width: dock.d.iconHover
-                    height: dock.d.iconHover
-                        + Math.round(dock.d.iconHover * Tokens.material.reflection.heightRatio * 0.66)
-                        + dock.d.indicatorSize
+                    height: dock.d.iconHover + Tokens.space.xs + dock.d.indicatorSize
 
                     readonly property var openWindows: Windows.matching(modelData.match)
                     readonly property bool running: openWindows.length > 0
@@ -251,32 +248,25 @@ PanelWindow {
                         }
                     }
 
-                    Reflection {
+                    Icon {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: parent.top
                         anchors.topMargin: (dock.d.iconHover - entry.iconSize) / 2
 
-                        width: entry.iconSize
-                        height: entry.iconSize
+                        // Real logos, untinted. The dock is the one place
+                        // outside colour is allowed — flattening these to
+                        // silhouettes would make nine blue smudges you have to
+                        // read rather than recognise.
+                        source: entry.modelData.icon
+                        size: entry.iconSize
+                        tinted: false
+                        opacity: hover.hovered ? 1.0 : dock.d.restOpacity
 
-                        Icon {
-                            anchors.fill: parent
-
-                            // Real logos, untinted. The dock is the one place
-                            // outside colour is allowed — flattening these to
-                            // silhouettes would make five blue smudges you
-                            // have to read rather than recognise.
-                            source: entry.modelData.icon
-                            size: entry.iconSize
-                            tinted: false
-                            opacity: hover.hovered ? 1.0 : dock.d.restOpacity
-
-                            Behavior on opacity {
-                                NumberAnimation {
-                                    duration: Tokens.motion.duration.fast
-                                    easing.type: Easing.Bezier
-                                    easing.bezierCurve: Tokens.motion.easeBezier
-                                }
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: Tokens.motion.duration.fast
+                                easing.type: Easing.Bezier
+                                easing.bezierCurve: Tokens.motion.easeBezier
                             }
                         }
                     }

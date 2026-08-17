@@ -149,8 +149,14 @@ QtObject {
             readonly property int morphDuration: 400
         }
 
+        readonly property QtObject bar: QtObject {
+            readonly property int height: 48
+            readonly property int radius: 16
+            readonly property int padding: 16
+        }
+
         readonly property QtObject dock: QtObject {
-            readonly property int radius: 22
+            readonly property int radius: 28
             readonly property int iconRest: 34
             readonly property int iconHover: 42
             readonly property int gap: 14

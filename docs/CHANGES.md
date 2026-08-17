@@ -2186,3 +2186,81 @@ Measured, with the dock open and the launcher never touched:
 The general lesson is worth keeping: a service written for a pull consumer grew
 a push consumer, and the change of consumer — not the code — is what made it
 wrong. The launcher's explicit `reload()` on open stays as a guarantee.
+
+
+---
+
+# Three bar panels, and the exclusive-zone rule that shapes them
+
+The bar was one full-width plate. Chrome in this system is an *object* sitting
+above the desktop, and a plate spanning the whole screen stops reading as an
+object and starts reading as a frame — the wave field only ever touched it along
+one edge. Three plates put the field back between them.
+
+## It is still one surface, and it has to be
+
+The obvious build is three `PanelWindow`s. It does not work. Hyprland only
+honours a layer surface's exclusive zone if that surface **spans** its anchored
+edge — so three side-by-side surfaces reserve nothing, and every window sits
+underneath the bar.
+
+Measured against a clean baseline (no shell running at all), with the property
+read back to confirm it really was set:
+
+| Anchors | mode | zone | `hyprctl monitors` reserved |
+|---|---|---|---|
+| top+left+right | Auto | — | `[0,56,0,0]` |
+| top+left+right | Normal | 56 | `[0,56,0,0]` |
+| top+left | Normal | 56 | `[0,0,0,0]` |
+
+So: one spanning surface keeps the exclusive zone, three `Chrome` plates are
+drawn inside it, and `mask` narrows the **input** region to the plates via three
+`Region`s combined with `Intersection.Combine`. The gaps are click-through,
+which matters when a fullscreen window is underneath. Verified by hovering a
+tray icon and seeing the pointing-hand cursor appear — hover only reaches a
+MouseArea inside a masked-in region.
+
+Two things this cost, both worth recording:
+
+**`exclusionMode` defaults to `Auto`**, which derives the zone from the anchors
+and discards `exclusiveZone` entirely. The first attempt set `exclusiveZone`
+alone and reserved nothing.
+
+**Hyprland adds `margins.top` on top of the requested zone.** Asking for
+`height + margin` reserved 64 instead of 56. The request is the height; the
+compositor supplies the gap.
+
+A measurement note on the first of those: an early probe reported that the
+*spanning* case also failed, which would have been a much bigger problem. That
+reading was wrong — a previous probe instance had not exited when the
+measurement was taken. Re-run with an explicit `pkill` and a verified
+`reserved=[0,0,0,0]` baseline first, spanning worked. Two conclusions from one
+unreliable harness is one too many.
+
+## Tray: Claude and NordVPN out
+
+`TrayRow` grew an `ignore` list. A tray icon is a claim on permanent screen
+space and neither of those earns it — neither has anything to *report*; they are
+launchers wearing a status icon, and both apps are one click away in the dock.
+
+Matched as a substring of `id` + `title`, not by equality: Claude registers as
+`Claude_status_icon_1` and that counter increments if the app restarts while the
+shell is running. Its `title` is empty, so matching on title alone would have
+silently never fired. Ids were read off the live host — a second Quickshell
+instance cannot probe them, because the tray host is a single-owner DBus name.
+
+Filtered by `visible: false` on the delegate rather than by wrapping the model:
+`SystemTray.items` is an ObjectModel with no filtering view, and QtQuick
+positioners skip invisible children, so there is no gap where the icon was.
+
+## Dock: no reflections, rounder
+
+`Reflection` draws its mirror *below* its own bounds, so it needed a third of the
+plate reserved as empty space for the mirror to land in — and it pushed the
+running indicator far enough from its icon to read as belonging to the plate.
+The bar has width to spare and the dock does not; the water effect needs
+somewhere to be water. The plate lost ~24px of height with it.
+
+Radius 22 → 28, and the bar's plates went 8 → 16 (`material.bar.radius`). At 8px
+a free-floating 48px plate reads as a strip that was cut off rather than an
+object.
