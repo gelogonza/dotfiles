@@ -87,6 +87,10 @@
           padding-bottom: 3px; border-bottom: 1px solid transparent;
           transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
   nav a:hover { color: var(--text-1); }
+  /* Outbound, so it sits apart from the four internal pages rather than
+     reading as a fifth one. */
+  nav a.repo { margin-left: auto; }
+  nav a.repo::after { content: " \2197"; }
   nav a.on { color: var(--text-1); border-bottom-color: var(--accent); }
   .cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
            margin-bottom: calc(var(--gap) * 1.5); }
@@ -104,17 +108,17 @@
   hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
   p { max-width: 68ch; }
 </style>
-<nav><a href="index.html">the system</a><a href="xmb.html">the wave field</a><a href="accessibility.html">accessibility</a><a href="bridge.html" class="on">the bridge</a></nav>
+<nav><a href="index.html">the system</a><a href="xmb.html">the wave field</a><a href="accessibility.html">accessibility</a><a href="bridge.html" class="on">the bridge</a><a class="repo" href="https://github.com/gelogonza/dotfiles" target="_blank" rel="noopener">source on GitHub</a></nav>
 <main>
 <h1>the bridge</h1>
 <p class="lede">The desktop, a Figma file and a web project as the same palette object rather than three copies that drift.</p>
 
-<h2>one source, twelve targets</h2>
+<h2>one source, every consumer</h2>
 <p>45 colours in <code>design/tokens.json</code> generate a Quickshell
 desktop, an SDDM login theme, a terminal theme, a VS Code extension, a Spotify
-theme, GTK 3 and 4, a cursor, hyprlang variables, a CSS module, this site —
-and the two below. <code>--check</code> fails the build if any of them falls
-behind.</p>
+theme, GTK 3 and 4, an audio visualiser, hyprlang variables, a CSS module, this
+site — and the two below. A separate script derives the cursor from the same
+accent. <code>--check</code> fails the build if any of them falls behind.</p>
 
 <h2>Figma, without a copy</h2>
 <p><code>design/tokens.dtcg.json</code> is W3C Design Tokens format: what Tokens

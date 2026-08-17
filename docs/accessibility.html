@@ -87,6 +87,10 @@
           padding-bottom: 3px; border-bottom: 1px solid transparent;
           transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
   nav a:hover { color: var(--text-1); }
+  /* Outbound, so it sits apart from the four internal pages rather than
+     reading as a fifth one. */
+  nav a.repo { margin-left: auto; }
+  nav a.repo::after { content: " \2197"; }
   nav a.on { color: var(--text-1); border-bottom-color: var(--accent); }
   .cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
            margin-bottom: calc(var(--gap) * 1.5); }
@@ -104,7 +108,7 @@
   hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
   p { max-width: 68ch; }
 </style>
-<nav><a href="index.html">the system</a><a href="xmb.html">the wave field</a><a href="accessibility.html" class="on">accessibility</a><a href="bridge.html">the bridge</a></nav>
+<nav><a href="index.html">the system</a><a href="xmb.html">the wave field</a><a href="accessibility.html" class="on">accessibility</a><a href="bridge.html">the bridge</a><a class="repo" href="https://github.com/gelogonza/dotfiles" target="_blank" rel="noopener">source on GitHub</a></nav>
 <main>
 <h1>accessibility</h1>
 <p class="lede">Contrast is asserted by the build, not by intention. The audit found a defect that had been shipping for months.</p>

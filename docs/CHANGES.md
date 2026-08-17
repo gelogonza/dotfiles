@@ -2552,3 +2552,39 @@ JSON string. Caught by a validation pass over every colour literal in the token
 file rather than by anything downstream, which would have silently rendered it as
 transparent black. Worth knowing that the token file has no schema check on its
 colour format.
+
+
+---
+
+# The site links to the source
+
+Every page now carries `source on GitHub` at the far end of the nav, pushed there
+with `margin-left: auto` so it reads as leaving rather than as a fifth page. On
+all four pages, not just the landing page — people arrive at the accessibility
+audit or the bridge page from a direct link as often as they arrive at the front.
+
+The gap mattered because anywhere that allows exactly one link — LinkedIn's
+Projects field, a résumé line — the site is the one worth giving out: it is
+readable by people who will not read QML, and it is styled by the tokens it
+documents. But with no way back to the code it was a dead end for anyone who
+*would*.
+
+`REPO_URL` is a constant in the generator rather than a literal in the markup,
+since it now appears on four pages.
+
+## Two stale claims found while verifying it
+
+**"one source, twelve targets"** on the bridge page, with thirteen consumers
+listed under it, and cava missing from the list. Rather than correct the number —
+which is how it went stale in the first place — the heading is now "one source,
+every consumer" and the prose enumerates without counting. The colour count next
+to it stays, because that one is interpolated from the token file and cannot
+drift.
+
+**"twelve targets"** again in the landing-page lede, removed for the same reason.
+
+The lesson is the one this repo keeps relearning: a number in prose is a number
+nobody regenerates. Either derive it or do not state it.
+
+Checked at 375px as well as desktop — the nav wraps to two rows with the outbound
+link still pushed right, `scrollWidth == clientWidth`, no horizontal overflow.

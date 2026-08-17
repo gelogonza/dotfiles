@@ -25,6 +25,10 @@ TOKENS = ROOT / "design" / "tokens.json"
 
 BANNER = "GENERATED FILE — DO NOT EDIT. Source: design/tokens.json (run design/build-tokens.py)"
 
+# The site is the public face of this repo and, for anything that allows one
+# link, the only one worth giving out — so it has to be able to reach the code.
+REPO_URL = "https://github.com/gelogonza/dotfiles"
+
 
 def strip_comments(node):
     """Drop $-prefixed annotation keys; they document the source, not the output."""
@@ -1203,6 +1207,10 @@ _SITE_CSS = r'''
           padding-bottom: 3px; border-bottom: 1px solid transparent;
           transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease); }
   nav a:hover { color: var(--text-1); }
+  /* Outbound, so it sits apart from the four internal pages rather than
+     reading as a fifth one. */
+  nav a.repo { margin-left: auto; }
+  nav a.repo::after { content: " \2197"; }
   nav a.on { color: var(--text-1); border-bottom-color: var(--accent); }
   .cards { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
            margin-bottom: calc(var(--gap) * 1.5); }
@@ -2466,6 +2474,11 @@ def _site_page(t: dict, slug: str, title: str, lede: str, body: str) -> str:
         f'{" class=\"on\"" if n == slug else ""}>{label}</a>'
         for n, label in nav_items)
 
+    # Every page carries it, not just the landing page: people arrive at the
+    # accessibility audit or the bridge page from a direct link just as often.
+    nav += (f'<a class="repo" href="{REPO_URL}" target="_blank"'
+            ' rel="noopener">source on GitHub</a>')
+
     css = _SITE_CSS
     for k, v in {
         "__BG0__": color["bg-0"], "__BG1__": color["bg-1"],
@@ -2670,12 +2683,12 @@ construction rather than by luck.</p>
 """
 
     bridge_body = f"""
-<h2>one source, twelve targets</h2>
+<h2>one source, every consumer</h2>
 <p>{ntok} colours in <code>design/tokens.json</code> generate a Quickshell
 desktop, an SDDM login theme, a terminal theme, a VS Code extension, a Spotify
-theme, GTK 3 and 4, a cursor, hyprlang variables, a CSS module, this site —
-and the two below. <code>--check</code> fails the build if any of them falls
-behind.</p>
+theme, GTK 3 and 4, an audio visualiser, hyprlang variables, a CSS module, this
+site — and the two below. A separate script derives the cursor from the same
+accent. <code>--check</code> fails the build if any of them falls behind.</p>
 
 <h2>Figma, without a copy</h2>
 <p><code>design/tokens.dtcg.json</code> is W3C Design Tokens format: what Tokens
@@ -2702,8 +2715,8 @@ type error instead of a slightly-wrong blue nobody notices for a month:</p>
         "index": ("the system",
                   f"One file generates a Hyprland desktop, its terminal, editor, "
                   f"login screen, Spotify and a Figma export — {ntok} colours, "
-                  f"twelve targets, one source. This page is one of them, styled "
-                  f"by the tokens it documents.", index_body),
+                  f"one source. This page is one of them, styled by the tokens "
+                  f"it documents.", index_body),
         "xmb": ("the wave field",
                 "A GLSL field of filaments, running on the wallpaper and behind "
                 "Spotify from one authored shader — and the version that taught "
