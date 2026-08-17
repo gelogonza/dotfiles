@@ -4,45 +4,46 @@
    upstream value, which is deliberate — overriding the full set
    produces a theme that breaks on every libadwaita release. */
 
-@define-color window_bg_color #eef1f8;
-@define-color window_fg_color #1b4c78;
-@define-color view_bg_color #f8fbff;
-@define-color view_fg_color #1b4c78;
-@define-color headerbar_bg_color #f8fbff;
-@define-color headerbar_fg_color #1b4c78;
-@define-color headerbar_border_color #bed7eb;
-@define-color headerbar_backdrop_color #eef1f8;
-@define-color sidebar_bg_color #dceaf8;
-@define-color sidebar_fg_color #1b4c78;
-@define-color sidebar_backdrop_color #eef1f8;
-@define-color secondary_sidebar_bg_color #dceaf8;
-@define-color secondary_sidebar_fg_color #1b4c78;
-@define-color card_bg_color #f8fbff;
-@define-color card_fg_color #1b4c78;
-@define-color dialog_bg_color #eef1f8;
-@define-color dialog_fg_color #1b4c78;
-@define-color popover_bg_color #f8fbff;
-@define-color popover_fg_color #1b4c78;
-@define-color thumbnail_bg_color #f8fbff;
-@define-color thumbnail_fg_color #1b4c78;
+@define-color window_bg_color #14293f;
+@define-color window_fg_color #dfe9f4;
+@define-color view_bg_color #1b3350;
+@define-color view_fg_color #dfe9f4;
+@define-color headerbar_bg_color #1b3350;
+@define-color headerbar_fg_color #dfe9f4;
+@define-color headerbar_border_color #2c4a6b;
+@define-color headerbar_backdrop_color #14293f;
+@define-color sidebar_bg_color #102133;
+@define-color sidebar_fg_color #dfe9f4;
+@define-color sidebar_backdrop_color #14293f;
+@define-color secondary_sidebar_bg_color #102133;
+@define-color secondary_sidebar_fg_color #dfe9f4;
+@define-color card_bg_color #1b3350;
+@define-color card_fg_color #dfe9f4;
+@define-color dialog_bg_color #14293f;
+@define-color dialog_fg_color #dfe9f4;
+@define-color popover_bg_color #1b3350;
+@define-color popover_fg_color #dfe9f4;
+@define-color thumbnail_bg_color #1b3350;
+@define-color thumbnail_fg_color #dfe9f4;
 
-@define-color accent_bg_color #3478c4;
-@define-color accent_fg_color #ffffff;
-/* accent_color is used for TEXT on light surfaces, so it needs the
-   darker step or links fail contrast against view_bg. */
-@define-color accent_color #2e68a8;
+@define-color accent_bg_color #6aa8e6;
+@define-color accent_fg_color #0d1a28;
+/* accent_color is TEXT, so on these dark surfaces it needs the
+   LIGHT step. color.accent (#3478c4) is tuned for near-white and
+   falls below AA as link text on #14293f. */
+@define-color accent_color #6aa8e6;
 
 @define-color destructive_bg_color #d9738a;
-@define-color destructive_fg_color #ffffff;
+@define-color destructive_fg_color #0d1a28;
 @define-color destructive_color #d9738a;
 @define-color success_bg_color #5cb894;
-@define-color success_fg_color #ffffff;
+@define-color success_fg_color #0d1a28;
 @define-color success_color #5cb894;
 @define-color warning_bg_color #d2b46e;
-@define-color warning_fg_color #ffffff;
+@define-color warning_fg_color #0d1a28;
 @define-color warning_color #d2b46e;
 @define-color error_bg_color #d9738a;
-@define-color error_fg_color #ffffff;
+@define-color error_fg_color #0d1a28;
 @define-color error_color #d9738a;
 
-@define-color borders #bed7eb;
+@define-color borders #2c4a6b;

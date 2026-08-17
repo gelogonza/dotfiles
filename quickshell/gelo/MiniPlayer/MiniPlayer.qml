@@ -19,8 +19,9 @@
 // is Web-API-only and would need an OAuth app registration, a token refresh and
 // a network round-trip, which is a different project from a shell panel.
 //
-// The panel says so rather than showing an empty box, because "no queue here" and
-// "the queue is empty" look identical and only one of them is true.
+// The panel does not mention it either. A line of apology about somebody else's
+// D-Bus interface is not information you need every time you skip a track — the
+// constraint belongs here and in the README, not on screen.
 
 import QtQuick
 import Quickshell
@@ -353,25 +354,6 @@ PanelWindow {
                         }
                     }
                 }
-            }
-
-            // --- the queue that is not there -------------------------------
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: Tokens.color.border
-            }
-
-            Text {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                text: mini.player && mini.player.identity.length > 0
-                    ? mini.player.identity + " does not publish a queue over MPRIS."
-                    : "This player does not publish a queue over MPRIS."
-                font.family: Tokens.typography.display
-                font.pixelSize: Tokens.typography.size.caption
-                color: Tokens.color.text2
             }
         }
     }

@@ -2492,3 +2492,63 @@ a network round-trip.
 
 The panel states this in place of the queue. "No queue here" and "the queue is
 empty" render identically as an empty box, and only one of them is true.
+
+
+---
+
+# GTK goes dark; the mini player stops apologising
+
+## The queue note is gone from the panel
+
+It stated a true and permanent fact about somebody else's D-Bus interface, on
+screen, every time you looked at what was playing. The constraint is documented
+in the source header and the README — a UI is not the place to explain why a
+feature you never asked for in that moment is absent. The divider went with it,
+so the panel now ends at the transport row.
+
+## GTK / libadwaita is a dark ramp now
+
+Nautilus was light. The shell chrome stays light and the content windows go dark,
+which is the same figure/ground call the terminal already makes: a file manager is
+a window you look *into*, a bar is a surface you look *at*.
+
+The ramp is a new `dark` block in tokens.json, anchored on `terminal.background`
+(#14293f) with bg-1 = `terminal.ansi[0]` — so the terminal and the file manager
+are the *same* dark rather than two darks that nearly match.
+
+`color-scheme` was **already** `prefer-dark` on this machine. That is worth
+recording, because it means the preference was never the problem: libadwaita picks
+its light or dark variant from that setting, but the `@define-color` overrides in
+`gtk.css` apply to *both* variants, so the light values won regardless. Nautilus
+was being explicitly told to be light by our own generated file.
+
+`accent_color` had to invert with the surfaces. It is TEXT, and the light palette's
+accent is tuned for a near-white background:
+
+| on `#1b3350` | ratio | |
+|---|---|---|
+| `color.accent` `#3478c4` | 2.83 | below AA |
+| `color.accent-dim` `#2e68a8` | 2.24 | below AA |
+| `dark.accent` `#6aa8e6` | 5.11 | AA |
+
+**Nine new pairs went into `--audit`.** A second palette is exactly how `text-2`
+shipped below AA on the light side, and adding one unmeasured would have been the
+same mistake twice. 44 pairs total, all clearing.
+
+Also set `gtk-application-prefer-dark-theme=1` in both `settings.ini` files. GTK3
+honours it and needs it so its widget internals match; libadwaita ignores it
+entirely, which is why the named colours are what actually do the work.
+
+Verified against a live Nautilus window: sidebar `#14293f`, main view `#1b3350`,
+both exact token values. Note libadwaita maps the sidebar to `window_bg_color` in
+this layout rather than `sidebar_bg_color`, so `dark.bg-2` is currently unused —
+left in the ramp because dialogs and popovers reach for it.
+
+## One typo worth recording
+
+The `dark.border` value went in as `#2c4a६b` — a Devanagari digit six, from a
+slip while typing the hex. `json.load` accepted it, since it is a perfectly valid
+JSON string. Caught by a validation pass over every colour literal in the token
+file rather than by anything downstream, which would have silently rendered it as
+transparent black. Worth knowing that the token file has no schema check on its
+colour format.

@@ -484,9 +484,11 @@ bar is not one of its three places.
 >
 > Quickshell's Mpris module has no TrackList binding either, so there is nothing
 > to read even where a player does implement it. Spotify's real queue is
-> Web-API-only and needs an OAuth app registration. The panel says so instead of
-> showing an empty box, because "no queue here" and "the queue is empty" look
-> identical and only one of them is true.
+> Web-API-only and needs an OAuth app registration.
+>
+> The panel does not mention this. A line of apology about somebody else's D-Bus
+> interface is not information you need every time you skip a track — the
+> constraint is recorded here and in the source, which is where it belongs.
 
 Sizes are `material.miniPlayer` in `tokens.json`. Player selection — including
 the browser filter — lives once in `Services/Media.qml`, so the bar and the panel
@@ -516,6 +518,18 @@ pkill -x quickshell; setsid quickshell -c gelo >/dev/null 2>&1 &
 `@define-color` overrides generated into `gtk-4.0/gtk.css`. libadwaita ignores
 custom *themes* by design, but it does read those named colours — that is the
 supported way to retheme it. Restart the app to pick up changes.
+
+**They are dark, while the shell chrome is light.** That is the same
+figure/ground call the terminal makes: a file manager is a window you look
+*into*, and the bar is a surface you look *at*. The ramp is the `dark` block in
+`tokens.json`, anchored on `terminal.background` so the terminal and Nautilus are
+the same dark rather than two darks that nearly match. All nine of its text/
+surface pairs are measured by `--audit`.
+
+Note what actually controls this: libadwaita picks its light or dark variant from
+`org.gnome.desktop.interface color-scheme`, but the `@define-color` values
+override **both** variants, so they win either way. Set the whole `dark` block to
+the light values to go back.
 
 **cava** — run it through the launcher, not directly:
 

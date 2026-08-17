@@ -2830,6 +2830,21 @@ def audit_pairs(t: dict) -> list:
         ("spotify subtext on main", spice_sub, bg, 4.5),
         ("spotify field subtext on main", field_sub, bg, 4.5),
     ]
+
+    # --- GTK / libadwaita dark ramp ---
+    #
+    # These are a whole second palette and they went in unmeasured the first
+    # time, which is exactly how `text-2` shipped below AA on the light side.
+    # Every surface a GTK app puts text on is listed.
+    d = t["dark"]
+    for surface in ("bg-0", "bg-1", "bg-2"):
+        pairs.append((f"gtk ink on {surface}", d["text-1"], d[surface], 4.5))
+        pairs.append((f"gtk dim ink on {surface}", d["text-2"], d[surface], 4.5))
+    pairs += [
+        ("gtk accent as link text", d["accent"], d["bg-1"], 4.5),
+        ("gtk ink on accent fill", d["accent-ink"], d["accent"], 4.5),
+        ("gtk border against window", d["border"], d["bg-0"], 1.3),
+    ]
     return pairs
 
 
@@ -3115,8 +3130,19 @@ def render_gtk(t: dict, adwaita: bool) -> str:
     Nautilus and friends without fighting the toolkit.
 
     GTK3 apps read a much smaller set of names, hence the two variants.
+
+    These surfaces are DARK while the shell chrome is light. That is the same
+    figure/ground call the terminal already makes: a file manager is a window you
+    look *into*, and the bar is a surface you look *at*. The ramp is `dark` in
+    tokens.json, anchored on terminal.background so the terminal and Nautilus are
+    the same dark rather than two darks that nearly match.
+
+    Note that libadwaita picks its light or dark variant from
+    org.gnome.desktop.interface color-scheme, but these @define-color values
+    override BOTH variants — which is why Nautilus was rendering light even with
+    color-scheme already set to prefer-dark. The named colours won.
     """
-    c = t["color"]
+    c = t["dark"]
     term = t["terminal"]
 
     # ANSI red/green/yellow, reused for destructive/success/warning. Same
@@ -3159,9 +3185,10 @@ def render_gtk(t: dict, adwaita: bool) -> str:
             "",
             f'@define-color accent_bg_color {c["accent"]};',
             f'@define-color accent_fg_color {c["accent-ink"]};',
-            "/* accent_color is used for TEXT on light surfaces, so it needs the",
-            "   darker step or links fail contrast against view_bg. */",
-            f'@define-color accent_color {c["accent-dim"]};',
+            "/* accent_color is TEXT, so on these dark surfaces it needs the",
+            "   LIGHT step. color.accent (#3478c4) is tuned for near-white and",
+            "   falls below AA as link text on #14293f. */",
+            f'@define-color accent_color {c["accent"]};',
             "",
             f'@define-color destructive_bg_color {red};',
             f'@define-color destructive_fg_color {c["accent-ink"]};',
