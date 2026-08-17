@@ -2142,3 +2142,47 @@ checked against the icon theme before being committed rather than after.
 screen edge, where 8px reads as a machined corner; the dock floats free with
 nothing touching it, and at that size the same radius reads as a rectangle that
 forgot to commit.
+
+
+---
+
+# Dock: the indicators were stale, not wrong
+
+The class-matching fix was real, but it was not the whole bug. Indicators still
+did not appear when an app was opened — only after something *else* happened to
+open the launcher.
+
+`Windows.reload()` was called from exactly one place: `Launcher.qml`, when the
+window-switcher mode opens. That was correct while the launcher was the only
+consumer — you ask for the window list, it gets fetched. The dock reads the same
+service *continuously*, and inherited whatever happened to be cached.
+
+The failure is silent for a specific reason. `entries` drops any toplevel with an
+empty title, and an un-refreshed toplevel **has** an empty title — Hyprland's
+event socket announces that a window exists, but the title and class only land
+on a follow-up IPC query. So a window that just opened is indistinguishable from
+one that does not exist. No error, no empty state, just an app that reads as
+closed forever.
+
+`Windows` now refreshes itself off `Hyprland.rawEvent`, on the events that
+change the set or the ordering:
+
+    openwindow  closewindow  movewindow  windowtitle  windowtitlev2
+    activewindow  activewindowv2
+
+Coalesced through a 60ms timer, because opening a single window emits five of
+those within a few milliseconds and that is one refresh, not five. No feedback
+loop is possible: `refreshToplevels()` is a query against Hyprland's socket, and
+queries do not emit events.
+
+Measured, with the dock open and the launcher never touched:
+
+| | dots |
+|---|---|
+| before | VS Code, Chrome, Claude |
+| open Nautilus + Ghostty | Ghostty, VS Code, Chrome, Files, Claude |
+| close both | VS Code, Chrome, Claude |
+
+The general lesson is worth keeping: a service written for a pull consumer grew
+a push consumer, and the change of consumer — not the code — is what made it
+wrong. The launcher's explicit `reload()` on open stays as a guarantee.

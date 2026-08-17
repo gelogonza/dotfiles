@@ -118,6 +118,52 @@ Singleton {
         Hyprland.refreshToplevels();
     }
 
+    // Refresh on its own, rather than waiting to be asked.
+    //
+    // This used to be called only when the launcher opened, which was fine
+    // while the launcher was the only consumer: you asked for the window list
+    // and it was fetched. The dock reads the same data continuously, and got
+    // whatever happened to be cached — open an app and no running indicator
+    // appeared until something else happened to open the launcher.
+    //
+    // It fails this way rather than erroring because `entries` drops any
+    // toplevel with an empty title, and an un-refreshed toplevel *has* an empty
+    // title. A window that just opened is indistinguishable from one that does
+    // not exist.
+    //
+    // No feedback loop: refreshToplevels() is an IPC query against Hyprland's
+    // socket, and queries do not emit events.
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event) {
+            switch (event.name) {
+            // The set changed, or a title arrived.
+            case "openwindow":
+            case "closewindow":
+            case "movewindow":
+            case "windowtitle":
+            case "windowtitlev2":
+            // Focus moved, which reorders `entries` — the sort drops the active
+            // window last so the switcher never offers you the one you are
+            // looking at.
+            case "activewindow":
+            case "activewindowv2":
+                settle.restart();
+                break;
+            }
+        }
+    }
+
+    // Coalesces the burst. Opening one window emits openwindow, activewindow,
+    // activewindowv2 and two windowtitle variants in a few milliseconds; that
+    // is one refresh, not five.
+    Timer {
+        id: settle
+        interval: 60
+        onTriggered: root.reload()
+    }
+
     function activate(entry) {
         if (!entry || !entry.address)
             return;
