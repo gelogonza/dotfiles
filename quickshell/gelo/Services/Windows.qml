@@ -60,6 +60,35 @@ Singleton {
 
     readonly property bool ready: entries.length > 0
 
+    // Open windows whose class matches any of `prefixes`. Used by the dock to
+    // decide whether an entry is running, and which window a click should go
+    // to.
+    //
+    // Prefix rather than equality, and case-insensitively: Chrome reports
+    // `google-chrome` for the default profile and `google-chrome-beta` or
+    // `Google-chrome` depending on channel and how it was launched, and an app
+    // silently reading as "not running" because of a suffix is worse than the
+    // occasional over-match. `entries` is already sorted with the focused
+    // window last, so [0] is the one you were not just looking at.
+    function matching(prefixes) {
+        if (!prefixes || prefixes.length === 0)
+            return [];
+
+        const out = [];
+        for (let i = 0; i < entries.length; i++) {
+            const cls = (entries[i].appClass || "").toLowerCase();
+            if (cls.length === 0)
+                continue;
+            for (let p = 0; p < prefixes.length; p++) {
+                if (cls.startsWith(String(prefixes[p]).toLowerCase())) {
+                    out.push(entries[i]);
+                    break;
+                }
+            }
+        }
+        return out;
+    }
+
     // Hyprland pushes toplevel changes over its event socket, but the detail
     // arrives on an async refresh. Both calls are needed:
     //

@@ -11,6 +11,7 @@ import "root:/Launcher"
 import "root:/Lock"
 import "root:/Notifications"
 import "root:/Dashboard"
+import "root:/Dock"
 import "root:/PowerMenu"
 import "root:/Wallpaper"
 
@@ -27,6 +28,15 @@ ShellRoot {
         model: Quickshell.screens
 
         Bar {}
+    }
+
+    // One dock per connected screen, for the same reason as the bar: it is
+    // anchored to a screen edge, so following the focused monitor would mean
+    // the bottom of one screen being live and the other not.
+    Variants {
+        model: Quickshell.screens
+
+        Dock {}
     }
 
     // Single instance, unlike the bar. Two palettes would mean two IPC handlers

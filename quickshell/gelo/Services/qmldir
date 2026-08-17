@@ -12,3 +12,4 @@ singleton NotificationHistory 1.0 NotificationHistory.qml
 singleton Windows 1.0 Windows.qml
 singleton IdleInhibitor 1.0 IdleInhibitor.qml
 singleton Agenda 1.0 Agenda.qml
+singleton DockState 1.0 DockState.qml

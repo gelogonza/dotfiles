@@ -1,8 +1,8 @@
 // The bar. Three clusters:
 //
-//   left    workspaces, then pinned application launchers
+//   left    workspaces, then whatever is playing
 //   centre  clock and date, with the active window title beneath
-//   right   weather, system load, git context, tray, controls
+//   right   weather, tray, controls
 //
 // The centre is absolutely centred on the SCREEN rather than laid out between
 // the two side clusters. A flow layout would drift the clock sideways every
@@ -35,8 +35,8 @@ PanelWindow {
         right: Tokens.space.lg
     }
 
-    // 48 rather than 36: the workspace numbers and app icons carry reflections
-    // beneath them and those need somewhere to land.
+    // 48 rather than 36: the workspace numbers carry reflections beneath them
+    // and those need somewhere to land.
     implicitHeight: 48
     color: "transparent"
 
@@ -62,17 +62,8 @@ PanelWindow {
                 window: bar
             }
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 1
-                height: Tokens.space.lg
-                color: Tokens.color.border
-            }
-
-            AppLaunchers {
-                anchors.verticalCenter: parent.verticalCenter
-                window: bar
-            }
+            // The pinned launchers used to sit here, behind a divider. They
+            // are the dock now (Dock/Dock.qml) — see its header for why.
 
             // Only earns its space when something is loaded in a player.
             Rectangle {

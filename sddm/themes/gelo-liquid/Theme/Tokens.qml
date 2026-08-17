@@ -149,6 +149,17 @@ QtObject {
             readonly property int morphDuration: 400
         }
 
+        readonly property QtObject dock: QtObject {
+            readonly property int iconRest: 34
+            readonly property int iconHover: 42
+            readonly property int gap: 14
+            readonly property int padding: 12
+            readonly property int revealStrip: 6
+            readonly property int hideDelay: 320
+            readonly property int indicatorSize: 4
+            readonly property real restOpacity: 0.82
+        }
+
         readonly property QtObject ripple: QtObject {
             readonly property real speed: 0.55
             readonly property real width: 0.05

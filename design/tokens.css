@@ -68,6 +68,14 @@
   --blob-squashX: 1.08;
   --blob-squashY: 0.92;
   --blob-morphDuration: 400;
+  --dock-iconRest: 34;
+  --dock-iconHover: 42;
+  --dock-gap: 14;
+  --dock-padding: 12;
+  --dock-revealStrip: 6;
+  --dock-hideDelay: 320;
+  --dock-indicatorSize: 4;
+  --dock-restOpacity: 0.82;
   --ripple-speed: 0.55;
   --ripple-width: 0.05;
   --ripple-amplitude: 0.55;
